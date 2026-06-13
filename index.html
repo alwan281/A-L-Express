@@ -744,31 +744,39 @@
 
         function cancelOrder() {
     let orderId = localStorage.getItem('last_order_id');
-    if (confirm("Apakah Anda yakin ingin membatalkan pesanan ini?")) {
-        if (orderId) {
-            // Jika sudah ada ID pesanan, hapus dari Firebase
-            database.ref('semua_pesanan/' + orderId).remove()
-            .then(() => {
-                alert("Pesanan berhasil dibatalkan.");
-                localStorage.removeItem('last_order_id');
-                location.reload();
-            });
-        } else {
-            // Jika hanya reset formulir
-            cart = {};
-            document.getElementById('orderForm').reset();
-            updateCalculation();
-            
-            // Perbaikan: Pastikan elemen ini ada di HTML Anda
-            let statusContainer = document.getElementById('status-container');
-            if (statusContainer) {
-                statusContainer.style.display = 'none';
-            }
-            document.getElementById('statusAlert').style.display = 'none';
-            document.getElementById('main-top').scrollIntoView({ behavior: 'smooth' });
-        }
+    
+    if (!orderId) {
+        // Jika belum ada pesanan, reset form saja
+        resetForm();
+        return;
     }
+
+    // Cek status ke Firebase sebelum membatalkan
+    database.ref('semua_pesanan/' + orderId + '/status').once('value').then((snapshot) => {
+        const status = snapshot.val();
+        
+        if (status !== "Mencari Driver") {
+            alert("Maaf, pesanan sedang dalam proses/perjalanan oleh driver dan tidak dapat dibatalkan.");
+        } else {
+            if (confirm("Apakah Anda yakin ingin membatalkan pesanan ini?")) {
+                database.ref('semua_pesanan/' + orderId).remove().then(() => {
+                    alert("Pesanan berhasil dibatalkan.");
+                    localStorage.removeItem('last_order_id');
+                    location.reload();
+                });
+            }
+        }
+    });
 }
+
+function resetForm() {
+    cart = {};
+    document.getElementById('orderForm').reset();
+    updateCalculation();
+    document.getElementById('statusAlert').style.display = 'none';
+    document.getElementById('main-top').scrollIntoView({ behavior: 'smooth' });
+}
+
 
 
         // =================================================================
@@ -831,13 +839,21 @@
                 document.getElementById('realtime-status-text').innerText = "Status: Mencari Driver Terdekat... [ID: " + uniqueOrderID + "]";
 
                 // MESIN SINKRONISASI: Dengerin perubahan status secara LIVE dari HP Driver
-                database.ref('semua_pesanan/' + uniqueOrderID + '/status').on('value', (snapshot) => {
-                    const statusTerbaru = snapshot.val();
-                    const statusText = document.getElementById('realtime-status-text');
-                    const iconWrapper = document.getElementById('status-icon-wrapper');
+database.ref('semua_pesanan/' + uniqueOrderID + '/status').on('value', (snapshot) => {
+    const statusTerbaru = snapshot.val();
+    const statusText = document.getElementById('realtime-status-text');
+    const iconWrapper = document.getElementById('status-icon-wrapper');
+    const cancelBtn = document.querySelector('.btn-cancel'); // Tambahkan ini
 
-                    if(statusTerbaru) {
-                        statusText.innerText = "Status: " + statusTerbaru;
+    // LOGIKA TOMBOL BATAL: Disembunyikan jika status bukan "Mencari Driver"
+    if (statusTerbaru !== "Mencari Driver") {
+        if(cancelBtn) cancelBtn.style.display = 'none';
+    } else {
+        if(cancelBtn) cancelBtn.style.display = 'flex';
+    }
+
+    if(statusTerbaru) {
+        statusText.innerText = "Status: " + statusTerbaru;
 
                         // Perubahan visual dinamis di layar customer mengikuti aksi Driver
                         if (statusTerbaru === "Pesanan Diproses Driver") {
