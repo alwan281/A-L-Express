@@ -22,7 +22,7 @@
             --success: #10b981;
             --danger: #ef4444;
             --info: #3b82f6;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
         * {
@@ -55,20 +55,9 @@
             font-size: 22px;
             font-weight: 800;
             color: var(--text-main);
-            margin-bottom: 5px;
         }
 
-        header h1 span {
-            color: var(--accent);
-        }
-
-        header p {
-            color: var(--accent);
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        header h1 span { color: var(--accent); }
 
         .container {
             max-width: 768px;
@@ -76,7 +65,7 @@
             padding: 15px;
         }
 
-        /* CARD RINGKASAN PENDAPATAN HARI INI */
+        /* DASHBOARD STATS */
         .driver-stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -90,34 +79,14 @@
             border-radius: 14px;
             padding: 15px;
             box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
         }
 
-        .stat-card .stat-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
+        .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 5px; }
+        .stat-value { font-size: 18px; font-weight: 800; }
+        .stat-value.money { color: var(--accent); }
+        .stat-value.count { color: var(--success); }
 
-        .stat-card .stat-value {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--text-main);
-        }
-
-        .stat-card .stat-value.money {
-            color: var(--accent);
-        }
-
-        .stat-card .stat-value.count {
-            color: var(--success);
-        }
-
-        /* TABS MANAGEMENT ALA SPRINTER */
+        /* TABS */
         .delivery-tabs {
             display: flex;
             background-color: var(--bg-card);
@@ -125,7 +94,6 @@
             border-radius: 12px;
             margin-bottom: 20px;
             box-shadow: var(--shadow);
-            position: relative;
         }
 
         .tab-btn {
@@ -138,302 +106,107 @@
             font-weight: 700;
             cursor: pointer;
             border-radius: 8px;
-            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
             position: relative;
         }
 
-        .tab-btn.active {
-            background-color: var(--accent);
-            color: #0f172a;
-        }
+        .tab-btn.active { background-color: var(--accent); color: #0f172a; }
 
-        /* BADGE NOTIFIKASI DI MENU ORDERAN BARU */
         .order-badge {
             background-color: var(--danger);
             color: white;
-            font-size: 11px;
-            padding: 2px 8px;
+            font-size: 10px;
+            padding: 1px 6px;
             border-radius: 10px;
             font-weight: 800;
-            animation: pulse-danger 1.5s infinite;
             display: none;
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.4);
         }
 
-        @keyframes pulse-danger {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-
-        /* CARD ORDERAN */
-        .order-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
+        /* ORDER CARDS */
+        .order-list { display: flex; flex-direction: column; gap: 15px; }
         .order-card {
             background-color: var(--bg-card);
             border-radius: 16px;
-            padding: 20px;
+            padding: 18px;
             box-shadow: var(--shadow);
             border: 1px solid rgba(255, 255, 255, 0.04);
             animation: fadeIn 0.3s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
-            padding-bottom: 12px;
-            margin-bottom: 12px;
-        }
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .order-id { font-weight: 800; color: var(--accent); }
+        .order-time { font-size: 11px; color: var(--text-muted); }
 
-        .order-id {
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--accent);
-        }
+        .info-row { margin-bottom: 8px; }
+        .info-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+        .info-value { font-weight: 600; font-size: 14px; margin-top: 2px; }
+        .items-box { background: rgba(15,23,42,0.4); padding: 10px; border-radius: 8px; border-left: 3px solid var(--accent); font-size: 13px; }
 
-        .order-time {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .info-row {
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .info-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .info-value {
-            font-weight: 600;
-            color: var(--text-main);
-            margin-top: 2px;
-        }
-
-        .info-value.items-box {
-            background-color: rgba(15, 23, 42, 0.4);
-            padding: 10px 14px;
-            border-radius: 8px;
-            border-left: 3px solid var(--accent);
-            font-size: 13px;
-        }
-
-        .price-tag {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--success);
-        }
-
-        /* TOMBOL AKSI DRIVER */
         .btn-action {
-            width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 15px;
-            transition: opacity 0.2s;
-        }
-
-        .btn-action:active {
-            opacity: 0.8;
+            width: 100%; padding: 14px; border-radius: 10px; font-weight: 700; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px;
         }
 
         .btn-take { background-color: var(--accent); color: #0f172a; }
         .btn-ship { background-color: var(--info); color: white; }
         .btn-done { background-color: var(--success); color: white; }
 
-        .btn-wa {
-            background: none;
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            color: #34d399;
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin-left: 10px;
-        }
+        .btn-wa { background: none; border: 1px solid #10b981; color: #10b981; font-size: 11px; padding: 2px 8px; border-radius: 5px; margin-left: 8px; }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .empty-state i {
-            font-size: 40px;
-            margin-bottom: 12px;
-            display: block;
-            color: var(--bg-input);
-        }
-
-        /* JENDELA POP-UP (MODAL) DAFTAR SIAPA YANG ORDER */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(4px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            z-index: 100;
-        }
-
-        .modal-content {
-            background-color: var(--bg-card);
-            width: 100%;
-            max-width: 450px;
-            border-radius: 18px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            animation: scaleUp 0.2s ease-out;
-        }
-
-        @keyframes scaleUp {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 12px;
-            margin-bottom: 15px;
-        }
-
-        .modal-header h3 {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 22px;
-            cursor: pointer;
-        }
-
-        .modal-row {
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-row:last-child { border: none; }
-        .buyer-name { font-weight: 600; font-size: 14px; color: var(--text-main); }
-        .buyer-id { font-size: 12px; color: var(--text-muted); }
+        .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
     </style>
 </head>
 <body>
 
     <header>
         <h1>A&L EXPRESS <span>PANEL</span></h1>
-        <p><i class="fa-solid fa-motorcycle"></i> Sprinter Kurir Kontrol</p>
     </header>
 
     <div class="container">
         
-        <!-- DASHBOARD PENDAPATAN & KINERJA -->
+        <!-- DASHBOARD (RESTORED) -->
         <div class="driver-stats-grid">
             <div class="stat-card">
-                <span class="stat-label"><i class="fa-solid fa-wallet"></i> Pendapatan Hari Ini</span>
+                <span class="stat-label">Pendapatan Hari Ini</span>
                 <span class="stat-value money" id="total-pendapatan">Rp 0</span>
             </div>
             <div class="stat-card">
-                <span class="stat-label"><i class="fa-solid fa-square-check"></i> Orderan Sukses</span>
+                <span class="stat-label">Orderan Sukses</span>
                 <span class="stat-value count" id="total-orderan-sukses">0 Order</span>
             </div>
         </div>
         
-        <!-- NAVIGASI DELIVERY TAB STATUS -->
+        <!-- TABS (RESTORED) -->
         <div class="delivery-tabs">
-            <button class="tab-btn active" onclick="switchTab('baru')">
-                <i class="fa-solid fa-inbox"></i> Order Baru
-                <!-- Angka orderan yang jika diklik akan memunculkan daftar pengorder -->
-                <span class="order-badge" id="badge-baru" onclick="bukaDaftarPengorder(event)">0</span>
+            <button class="tab-btn active" onclick="switchTab('baru', event)">
+                <i class="fa-solid fa-inbox"></i> Baru
+                <span class="order-badge" id="badge-baru">0</span>
             </button>
-            <button class="tab-btn" onclick="switchTab('proses')">
-                <i class="fa-solid fa-truck-ramp-box"></i> Proses
+            <button class="tab-btn" onclick="switchTab('proses', event)">
+                <i class="fa-solid fa-motorcycle"></i> Proses
             </button>
-            <button class="tab-btn" onclick="switchTab('selesai')">
-                <i class="fa-solid fa-clock-rotate-left"></i> Selesai
+            <button class="tab-btn" onclick="switchTab('selesai', event)">
+                <i class="fa-solid fa-check-double"></i> Selesai
             </button>
         </div>
 
-        <!-- CONTAINER RENDER KARTU PESANAN -->
         <div class="order-list" id="order-container">
-            <div class="empty-state">
-                <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--accent)"></i> Mengoneksikan ke Satelit Firebase...
-            </div>
+            <div class="empty-state">Menghubungkan Database...</div>
         </div>
 
     </div>
 
-    <!-- POP-UP MODAL J&T STYLE UNTUK MELIHAT SIAPA YANG ORDER -->
-    <div class="modal-overlay" id="orderModal" onclick="tutupDaftarPengorder()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h3><i class="fa-solid fa-users"></i> Daftar Customer Mengantre</h3>
-                <button class="close-modal" onclick="tutupDaftarPengorder()">&times;</button>
-            </div>
-            <div id="modalBuyersList">
-                <!-- Data nama pengorder di-render di sini -->
-            </div>
-        </div>
-    </div>
-
-    <!-- AUDIO NOTIFIKASI J&T STYLE -->
     <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-84.wav" preload="auto"></audio>
 
-    <!-- HUBUNGAN KE SDK FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // =================================================================
-        // PASTIKAN ISI CONFIG INI SAMA PERSIS DENGAN APLIKASI CUSTOMERMU!
-        // =================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCGhsZw1wyy1OyqfUiH-bvYqln7fMZyiYg",
             authDomain: "jnt-jastip.firebaseapp.com",
@@ -447,235 +220,111 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        let localOrdersMemory = {}; 
+        let localOrders = {}; 
         let currentActiveTab = 'baru'; 
 
-        // MEMULAI MENDENGARKAN DATABASE SECARA LIVE
-        function startLiveDatabaseListener() {
+        function isToday(timestamp) {
+            if(!timestamp) return true;
+            return new Date(timestamp).toDateString() === new Date().toDateString();
+        }
+
+        function listenDatabase() {
             database.ref('semua_pesanan').on('value', (snapshot) => {
-                const data = snapshot.val();
-                localOrdersMemory = data || {};
-                hitungHitunganDashboard();
-                renderOrderCards();
+                localOrders = snapshot.val() || {};
+                hitungDashboard();
+                renderCards();
             });
         }
 
-        // SELEKSI HITUNG BADGE NOTIFIKASI & PENDAPATAN
-        function hitungHitunganDashboard() {
-            let totalBaru = 0;
-            let akumulasiPendapatan = 0;
-            let orderanSukses = 0;
+        function hitungDashboard() {
+            let income = 0;
+            let successCount = 0;
+            let totalNew = 0;
 
-            for (const key in localOrdersMemory) {
-                const order = localOrdersMemory[key];
+            for (const key in localOrders) {
+                const order = localOrders[key];
                 
-                // 1. Hitung antrean order baru
-                if (order.status === "Mencari Driver") {
-                    totalBaru++;
-                }
-                
-                // 2. Hitung pendapatan dari order yang sukses ("Selesai")
+                // Filter hanya data hari ini
+                if (!isToday(order.timestamp)) continue;
+
+                if (order.status === "Mencari Driver") totalNew++;
+
                 if (order.status === "Selesai") {
-                    orderanSukses++;
-                    
-                    // Bersihkan teks string uang "Rp 25.000" menjadi angka murni 25000 agar bisa dijumlah matematika
-                    if (order.total_biaya) {
-                        let angkaMurni = parseInt(order.total_biaya.replace(/[^0-9]/g, '')) || 0;
-                        akumulasiPendapatan += angkaMurni;
-                    } else if (order.total) {
-                        let angkaMurni = parseInt(order.total.replace(/[^0-9]/g, '')) || 0;
-                        akumulasiPendapatan += angkaMurni;
-                    }
+                    successCount++;
+                    // Parsing Rp 15.000 ke 15000
+                    let price = parseInt(order.total_biaya.replace(/[^0-9]/g, '')) || 0;
+                    income += price;
                 }
             }
 
-            // Update ke komponen dashboard atas
-            document.getElementById('total-pendapatan').innerText = "Rp " + akumulasiPendapatan.toLocaleString('id-ID');
-            document.getElementById('total-orderan-sukses').innerText = orderanSukses + " Order";
+            document.getElementById('total-pendapatan').innerText = "Rp " + income.toLocaleString('id-ID');
+            document.getElementById('total-orderan-sukses').innerText = successCount + " Order";
 
-            // Update badge menu order baru
             const badge = document.getElementById('badge-baru');
-            if (totalBaru > 0) {
-                // Mencegah bunyi berulang jika nilainya tidak bertambah besar
-                if (parseInt(badge.innerText) < totalBaru) {
-                    document.getElementById('alertSound').play().catch(() => {});
-                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                }
-                badge.innerText = totalBaru;
+            if(totalNew > 0) {
+                if(parseInt(badge.innerText) < totalNew) document.getElementById('alertSound').play().catch(()=>{});
+                badge.innerText = totalNew;
                 badge.style.display = 'block';
             } else {
-                badge.innerText = "0";
                 badge.style.display = 'none';
             }
         }
 
-        // FUNGSI UNTUK MELIHAT SIAPA SAJA YANG ORDER SAAT BADGE DIKLIK
-        function bukaDaftarPengorder(event) {
-            event.stopPropagation(); // Mencegah bentrok klik dengan tab halaman belakangnya
-            const containerDaftar = document.getElementById('modalBuyersList');
-            containerDaftar.innerHTML = '';
-
-            let adaAntrean = false;
-            for (const key in localOrdersMemory) {
-                const order = localOrdersMemory[key];
-                if (order.status === "Mencari Driver") {
-                    adaAntrean = true;
-                    containerDaftar.innerHTML += `
-                        <div class="modal-row">
-                            <div>
-                                <div class="buyer-name">${order.nama}</div>
-                                <div class="buyer-id">${order.id} &bull; ${order.waktu_order || ''}</div>
-                            </div>
-                            <span style="font-size: 13px; font-weight:700; color: var(--success);">${order.total_biaya || order.total || ''}</span>
-                        </div>
-                    `;
-                }
-            }
-
-            if (!adaAntrean) {
-                containerDaftar.innerHTML = `<div class="empty-state" style="padding: 20px 0;">Tidak ada customer mengantre.</div>`;
-            }
-
-            document.getElementById('orderModal').style.display = 'flex';
-        }
-
-        function tutupDaftarPengorder() {
-            document.getElementById('orderModal').style.display = 'none';
-        }
-
-        // ENGINE PENGALIH HALAMAN TAB
-        function switchTab(targetTab) {
-            currentActiveTab = targetTab;
-            
-            // Setel tombol aktif visual
-            const buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-
-            renderOrderCards();
-        }
-
-        // RENDER DAN FILTER KARTU SECARA DINAMIS
-        function renderOrderCards() {
+        function renderCards() {
             const container = document.getElementById('order-container');
             container.innerHTML = '';
+            let hasData = false;
 
-            let arrayKoleksi = Object.values(localOrdersMemory);
-            arrayKoleksi.reverse(); // Urutkan dari yang paling baru masuk
+            const sorted = Object.values(localOrders).reverse();
 
-            let adaData = false;
+            sorted.forEach(order => {
+                if (!isToday(order.timestamp)) return;
 
-            arrayKoleksi.forEach(order => {
-                let cocok = false;
-                if (currentActiveTab === 'baru' && order.status === "Mencari Driver") cocok = true;
-                if (currentActiveTab === 'proses' && (order.status === "Pesanan Diproses Driver" || order.status === "Dalam Perjalanan")) cocok = true;
-                if (currentActiveTab === 'selesai' && order.status === "Selesai") cocok = true;
+                let match = false;
+                if (currentActiveTab === 'baru' && order.status === "Mencari Driver") match = true;
+                if (currentActiveTab === 'proses' && (order.status === "Pesanan Diproses Driver" || order.status === "Dalam Perjalanan")) match = true;
+                if (currentActiveTab === 'selesai' && order.status === "Selesai") match = true;
 
-                if (!cocok) return;
-                adaData = true;
+                if (!match) return;
+                hasData = true;
 
-                // Ekstrak detail belanjaan
-                let teksBelanjaan = "";
-                if(order.pesanan_detail) {
-                    teksBelanjaan = Object.entries(order.pesanan_detail)
-                        .map(([menuName, qty]) => `${qty}x ${menuName}`).join(', ');
-                } else {
-                    teksBelanjaan = order.pesanan || "-";
-                }
+                let items = order.pesanan_detail ? Object.entries(order.pesanan_detail).map(([n, q]) => `${q}x ${n}`).join(', ') : order.pesanan;
 
-                // Tombol eksekusi dinamis
-                let tombolAksiKondisional = "";
-                if (order.status === "Mencari Driver") {
-                    tombolAksiKondisional = `<button class="btn-action btn-take" onclick="ubahStatusOrder('${order.id}', 'Pesanan Diproses Driver')"><i class="fa-solid fa-hand-holding-hand"></i> Ambil & Proses Orderan</button>`;
-                } else if (order.status === "Pesanan Diproses Driver") {
-                    tombolAksiKondisional = `<button class="btn-action btn-ship" onclick="ubahStatusOrder('${order.id}', 'Dalam Perjalanan')"><i class="fa-solid fa-motorcycle"></i> Gas Antar (Dalam Perjalanan)</button>`;
-                } else if (order.status === "Dalam Perjalanan") {
-                    tombolAksiKondisional = `<button class="btn-action btn-done" onclick="ubahStatusOrder('${order.id}', 'Selesai')"><i class="fa-solid fa-circle-check"></i> Konfirmasi Sampai (Selesai)</button>`;
-                }
+                let actionBtn = "";
+                if (order.status === "Mencari Driver") actionBtn = `<button class="btn-action btn-take" onclick="updateStatus('${order.id}', 'Pesanan Diproses Driver')">Ambil Orderan</button>`;
+                else if (order.status === "Pesanan Diproses Driver") actionBtn = `<button class="btn-action btn-ship" onclick="updateStatus('${order.id}', 'Dalam Perjalanan')">Mulai Antar</button>`;
+                else if (order.status === "Dalam Perjalanan") actionBtn = `<button class="btn-action btn-done" onclick="updateStatus('${order.id}', 'Selesai')">Selesai / Sampai</button>`;
 
                 container.innerHTML += `
                     <div class="order-card">
-                        <div class="card-header">
-                            <span class="order-id">${order.id}</span>
-                            <span class="order-time"><i class="fa-regular fa-clock"></i> ${order.waktu_order || "-"}</span>
+                        <div class="card-header"><span class="order-id">#${order.id}</span><span class="order-time">${order.waktu_order || ''}</span></div>
+                        <div class="info-row"><div class="info-label">Penerima</div><div class="info-value">${order.nama} <button class="btn-wa" onclick="window.open('https://wa.me/62${order.hp.substring(1)}')">WA</button></div></div>
+                        <div class="info-row"><div class="info-label">Alamat</div><div class="info-value">${order.alamat}</div></div>
+                        <div class="info-row"><div class="info-label">Pesanan</div><div class="items-box">${items}</div></div>
+                        <div class="info-row" style="display:flex; justify-content:space-between; align-items:center;">
+                            <div><div class="info-label">Total</div><div class="stat-value count" style="font-size:16px">${order.total_biaya}</div></div>
+                            <div style="text-align:right"><div class="info-label">Status</div><span style="font-size:11px; font-weight:800; color:var(--accent)">${order.status}</span></div>
                         </div>
-                        
-                        <div class="info-row">
-                            <div class="info-label">Nama Penerima</div>
-                            <div class="info-value">
-                                ${order.nama} 
-                                <button class="btn-wa" onclick="bukaWhatsAppPenerima('${order.whatsapp}')"><i class="fa-brands fa-whatsapp"></i> Chat</button>
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">Alamat Pengiriman</div>
-                            <div class="info-value" style="color: #cbd5e1;">${order.alamat}</div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">Menu Item Belanjaan</div>
-                            <div class="info-value items-box">${teksBelanjaan}</div>
-                        </div>
-
-                        <div class="info-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
-                            <div>
-                                <div class="info-label">Tagihan Driver ke Pembeli</div>
-                                <div class="price-tag">${order.total_biaya || order.total}</div>
-                            </div>
-                            <div style="text-align:right">
-                                <div class="info-label">Status Log</div>
-                                <span style="font-size:12px; font-weight:700; color:var(--accent)">${order.status}</span>
-                            </div>
-                        </div>
-
-                        ${tombolAksiKondisional}
+                        ${actionBtn}
                     </div>
                 `;
             });
 
-            if (!adaData) {
-                let pesanKosong = "Tidak ada orderan baru saat ini.";
-                if(currentActiveTab === 'proses') pesanKosong = "Kamu tidak memiliki tugas pengiriman berjalan.";
-                if(currentActiveTab === 'selesai') pesanKosong = "Belum ada riwayat orderan selesai hari ini.";
-                
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fa-solid fa-folder-open"></i>
-                        ${pesanKosong}
-                    </div>
-                `;
-            }
+            if(!hasData) container.innerHTML = '<div class="empty-state">Tidak ada orderan di tab ini.</div>';
         }
 
-        // UPDATE STATUS FIREBASE LIVE DARI DRIVER
-        function ubahStatusOrder(orderId, statusBaru) {
-            if(confirm(`Apakah Anda yakin ingin mengubah status order ${orderId} menjadi: "${statusBaru}"?`)) {
-                database.ref('semua_pesanan/' + orderId).update({
-                    status: statusBaru
-                })
-                .then(() => {
-                    if (statusBaru === "Pesanan Diproses Driver") {
-                        currentActiveTab = 'proses';
-                        const tabs = document.querySelectorAll('.tab-btn');
-                        tabs[0].classList.remove('active');
-                        tabs[1].classList.add('active');
-                    }
-                })
-                .catch(err => alert("Gagal memperbarui status data: " + err));
-            }
+        function switchTab(tab, e) {
+            currentActiveTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            renderCards();
         }
 
-        // TOMBOL PINTAS CHAT KE WHATSAPP PEMBELI
-        function bukaWhatsAppPenerima(nomorHp) {
-            let formatNomor = nomorHp.replace(/[^0-9]/g, '');
-            if(formatNomor.startsWith('0')) {
-                formatNomor = '62' + formatNomor.slice(1);
-            }
-            window.open(`https://api.whatsapp.com/send?phone=${formatNomor}`, '_blank');
+        function updateStatus(id, stat) {
+            database.ref('semua_pesanan/' + id).update({ status: stat });
         }
 
-        window.onload = startLiveDatabaseListener;
+        window.onload = listenDatabase;
     </script>
 </body>
 </html>
