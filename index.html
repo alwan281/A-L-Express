@@ -627,12 +627,14 @@
         let cart = {};
         let currentOpenCat = ''; 
 
-        function openCategory(catName, catTitle) {
+                function openCategory(catName, catTitle) {
             currentOpenCat = catName;
             document.getElementById('modalTitle').innerText = catTitle;
-            ModalItems();
+            // PERBAIKAN: Ubah ModalItems() menjadi renderModalItems()
+            renderModalItems(); 
             document.getElementById('menuModal').style.display = 'flex';
         }
+
 
         function closeCategory(event) {
             document.getElementById('menuModal').style.display = 'none';
