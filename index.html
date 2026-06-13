@@ -630,7 +630,7 @@
         function openCategory(catName, catTitle) {
             currentOpenCat = catName;
             document.getElementById('modalTitle').innerText = catTitle;
-            renderModalItems();
+            ModalItems();
             document.getElementById('menuModal').style.display = 'flex';
         }
 
@@ -665,6 +665,7 @@
                 `;
             });
         }
+
 
         function addToCart(id) {
             cart[id] = 1;
@@ -743,7 +744,7 @@
     let orderId = localStorage.getItem('last_order_id');
     if (confirm("Apakah Anda yakin ingin membatalkan pesanan ini?")) {
         if (orderId) {
-            // Jika pesanan sudah masuk Firebase, hapus dari database
+            // Jika sudah ada ID pesanan, hapus dari Firebase
             database.ref('semua_pesanan/' + orderId).remove()
             .then(() => {
                 alert("Pesanan berhasil dibatalkan.");
@@ -751,18 +752,22 @@
                 location.reload();
             });
         } else {
-            // Jika belum dipesan (hanya mengosongkan keranjang di aplikasi)
+            // Jika hanya reset formulir
             cart = {};
             document.getElementById('orderForm').reset();
             updateCalculation();
-            if(document.getElementById('status-container')) {
-                document.getElementById('status-container').style.display = 'none';
             
+            // Perbaikan: Pastikan elemen ini ada di HTML Anda
+            let statusContainer = document.getElementById('status-container');
+            if (statusContainer) {
+                statusContainer.style.display = 'none';
+            }
             document.getElementById('statusAlert').style.display = 'none';
             document.getElementById('main-top').scrollIntoView({ behavior: 'smooth' });
         }
     }
 }
+
 
         // =================================================================
         // MODIFIKASI LANGSUNG MESIN FIREBASE & LINKING WHATSAPP
