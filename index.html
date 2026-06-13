@@ -740,10 +740,15 @@
         }
 
         function cancelOrder() {
-    let orderId = localStorage.getItem('last_order_id'); // Mengambil ID pesanan yang tersimpan
-    
+    let orderId = localStorage.getItem('last_order_id');
     if (confirm("Apakah Anda yakin ingin membatalkan pesanan ini?")) {
-        if (orderId) {
+        database.ref('semua_pesanan/' + orderId).remove();
+        localStorage.removeItem('last_order_id');
+        document.getElementById('status-container').style.display = 'none';
+        alert("Pesanan telah dibatalkan.");
+        location.reload();
+    }
+}
             // Hapus data dari Firebase
             database.ref('semua_pesanan/' + orderId).remove()
             .then(() => {
