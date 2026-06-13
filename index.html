@@ -2,20 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A&L EXPRESS - Jasa Pesan Makan & Minuman Modern</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A&L EXPRESS - Multi Order v3</title>
     
-    <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="A&L EXPRESS">
-    
-    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22A%26L%20EXPRESS%22%2C%22short_name%22%3A%22A%26L%20EXPRESS%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3081%2F3081986.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -23,895 +14,341 @@
             --bg-card: #1e293b;
             --bg-input: #334155;
             --accent: #f59e0b;
-            --accent-hover: #d97706;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --success: #10b981;
+            --info: #3b82f6;
             --danger: #ef4444;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            line-height: 1.6;
-            padding-bottom: 140px; 
-            user-select: none; 
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 50px; }
 
         header {
             background: linear-gradient(135deg, #1e1b4b 0%, #1e293b 100%);
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 2px solid rgba(245, 158, 11, 0.2);
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            padding: 25px 20px; text-align: center; border-bottom: 3px solid var(--accent);
         }
 
-        header h1 {
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: var(--text-main);
-            margin-bottom: 5px;
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+
+        /* SEARCH BAR */
+        .search-bar {
+            background: var(--bg-card); display: flex; padding: 5px;
+            border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .search-bar input {
+            flex: 1; background: none; border: none; padding: 10px 15px;
+            color: white; outline: none; font-size: 14px;
+        }
+        .search-bar button {
+            background: var(--info); border: none; color: white;
+            padding: 10px 20px; border-radius: 12px; cursor: pointer;
         }
 
-        header h1 span {
-            color: var(--accent);
-        }
-
-        header p {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .container {
-            max-width: 1024px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin: 20px 0 15px 0;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        @media (max-width: 600px) {
-            .category-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
+        /* GRID MENU */
+        .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .category-box {
-            background-color: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px 10px;
-            text-align: center;
-            cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            position: relative; background: var(--bg-card); padding: 20px 5px; 
+            border-radius: 18px; text-align: center; cursor: pointer; 
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
             box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            transition: all 0.2s ease;
+        }
+        .category-box:active { transform: scale(0.95); background: var(--bg-input); }
+        .category-box i { font-size: 28px; color: var(--accent); margin-bottom: 8px; display: block; }
+        .category-box.box-pesanan i { color: var(--info); }
+        .category-box span { font-weight: 700; font-size: 11px; }
+
+        /* BADGE */
+        .badge {
+            position: absolute; top: -8px; right: -5px;
+            background: var(--danger); color: white; width: 24px; height: 24px;
+            border-radius: 50%; font-size: 12px; font-weight: 800;
+            display: none; align-items: center; justify-content: center;
+            border: 2px solid var(--bg-main); box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
         }
 
-        .category-box:hover {
-            border-color: var(--accent);
-            transform: translateY(-3px);
-        }
-
-        .category-box .icon-wrapper {
-            width: 55px;
-            height: 55px;
-            background-color: rgba(245, 158, 11, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent);
-            font-size: 22px;
-            transition: all 0.2s;
-        }
-
-        .category-box:hover .icon-wrapper {
-            background-color: var(--accent);
-            color: #0f172a;
-        }
-
-        .category-box span {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
+        /* MODAL */
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(4px);
-            display: none;
-            justify-content: center;
-            align-items: flex-end;
-            z-index: 100;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); display: none;
+            justify-content: center; align-items: flex-end; z-index: 999999;
         }
-
         .modal-content {
-            background-color: var(--bg-card);
-            width: 100%;
-            max-width: 600px;
-            border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
-            padding: 25px;
-            max-height: 75vh;
-            overflow-y: auto;
-            box-shadow: 0 -10px 25px rgba(0,0,0,0.5);
-            animation: slideUp 0.25s ease-out;
+            background: var(--bg-card); width: 100%; max-width: 600px;
+            padding: 25px; border-radius: 30px 30px 0 0;
+            max-height: 85vh; overflow-y: auto; border-top: 5px solid var(--accent);
         }
 
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .btn-add { background: var(--accent); color: #000; border: none; padding: 8px 18px; border-radius: 50px; font-weight: 800; cursor: pointer; }
+        .counter { display: flex; align-items: center; gap: 12px; background: var(--bg-input); padding: 5px 12px; border-radius: 50px; }
+        .btn-qty { background: none; border: none; color: white; font-size: 20px; font-weight: 800; cursor: pointer; width: 25px; }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 15px;
-        }
+        /* FORM & SUMMARY */
+        .card { background: var(--bg-card); padding: 20px; border-radius: 20px; margin-top: 25px; border: 1px solid rgba(255,255,255,0.05); }
+        .input-style { width: 100%; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 12px; color: white; margin-bottom: 12px; outline: none; }
+        .price-summary { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+        .summary-row.total-bold { border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 10px; margin-top: 10px; font-weight: 800; font-size: 16px; color: var(--accent); }
+        .btn-order { width: 100%; background: var(--success); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 800; font-size: 16px; cursor: pointer; }
 
-        .modal-header h2 {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-main);
+        /* ORDER LIST ITEMS */
+        .order-card-item {
+            background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px; margin-bottom: 15px; border-left: 5px solid var(--info);
         }
-
-        .close-modal {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 22px;
-            cursor: pointer;
-        }
-
-        .menu-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
-        .item-info h3 {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .item-info .price {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .btn-add {
-            background-color: rgba(245, 158, 11, 0.1);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-        }
-
-        .counter-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background-color: var(--bg-input);
-            padding: 4px 8px;
-            border-radius: 20px;
-        }
-
-        .btn-counter {
-            background: none;
-            border: none;
-            color: var(--text-main);
-            font-size: 14px;
-            cursor: pointer;
-            width: 26px;
-            height: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        .btn-counter:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .qty-text {
-            font-weight: 700;
-            font-size: 14px;
-            min-width: 15px;
-            text-align: center;
-        }
-
-        .order-section {
-            background-color: var(--bg-card);
-            border-radius: 16px;
-            padding: 25px;
-            margin-top: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            background-color: var(--bg-input);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 12px 16px;
-            color: var(--text-main);
-            font-size: 14px;
-            outline: none;
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
-            border-color: var(--accent);
-        }
-
-        .summary-box {
-            background-color: rgba(15, 23, 42, 0.6);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 25px;
-        }
-
-        .summary-title {
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: var(--text-main);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 10px;
-        }
-
-        .cart-items-preview {
-            margin-bottom: 15px;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-            padding-bottom: 10px;
-        }
-
-        .cart-preview-item {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            margin-bottom: 8px;
-            color: var(--text-main);
-        }
-
-        .cart-preview-empty {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-style: italic;
-            margin-bottom: 8px;
-        }
-
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            margin-bottom: 10px;
-            color: var(--text-muted);
-        }
-
-        .summary-item.total {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-            color: var(--text-main);
-            font-weight: 700;
-        }
-
-        .summary-item.total .price {
-            color: var(--accent);
-            font-size: 18px;
-        }
-
-        .status-alert {
-            display: none;
-            background-color: rgba(245, 158, 11, 0.15);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 14px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 14px;
-            margin-top: 15px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; } to { opacity: 1; }
-        }
-
-        .action-buttons-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .btn-submit {
-            flex: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background-color: var(--success);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-cancel {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background-color: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            border: 1px solid var(--danger);
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-cancel:hover {
-            background-color: var(--danger);
-            color: white;
-        }
-
-        .floating-basket {
-            position: fixed;
-            bottom: 60px; 
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 40px);
-            max-width: 600px;
-            background-color: var(--accent);
-            color: #0f172a;
-            padding: 16px 24px;
-            border-radius: 50px;
-            display: none;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 99;
-            cursor: pointer;
-            font-weight: 700;
-        }
-
-        .running-text-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #1e1b4b; 
-            border-top: 1px solid rgba(245, 158, 11, 0.3);
-            color: #f59e0b; 
-            font-size: 13px;
-            font-weight: 600;
-            padding: 10px 0;
-            z-index: 101;
-            white-space: nowrap;
-            overflow: hidden;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
-        }
-
-        .running-text-footer marquee {
-            vertical-align: middle;
+        .status-pill { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 800; color: white; text-transform: uppercase; }
+        .btn-chat-wa {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: #25d366; color: white; text-decoration: none;
+            padding: 14px; border-radius: 12px; font-weight: 800; font-size: 14px; margin-top: 15px;
+            width: 100%; text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <div id="main-top"></div> 
-
     <header>
-        <h1>A&L EXPRESS</h1>
-        <p>Pesan Praktis Melalui Menu Aplikasi Kreatif</p>
+        <h1>A&L <span>EXPRESS</span></h1>
     </header>
 
     <div class="container">
-        
-        <div class="section-title">Kategori Makanan</div>
+        <!-- SEARCH -->
+        <div class="search-bar">
+            <input type="text" id="resi-search" placeholder="Cek No Resi Manual...">
+            <button onclick="lacakResiManual()"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+
+        <!-- GRID -->
         <div class="category-grid">
-            <div class="category-box" onclick="openCategory('nasi-mie', 'Nasi & Mie')">
-                <div class="icon-wrapper"><i class="fa-solid fa-bowl-rice"></i></div>
-                <span>Nasi & Mie</span>
+            <div class="category-box" onclick="bukaMenu('nasi-mie')">
+                <i class="fa-solid fa-bowl-rice"></i><span>NASI & MIE</span>
             </div>
-            <div class="category-box" onclick="openCategory('bakso', 'Bakso Esoh')">
-                <div class="icon-wrapper"><i class="fa-solid fa-bowl-food"></i></div>
-                <span>Bakso Esoh</span>
+            <div class="category-box" onclick="bukaMenu('bakso')">
+                <i class="fa-solid fa-bowl-food"></i><span>BAKSO ESOH</span>
             </div>
-            <div class="category-box" onclick="openCategory('lalapan', 'Lalapan')">
-                <div class="icon-wrapper"><i class="fa-solid fa-drumstick-bite"></i></div>
-                <span>Lalapan</span>
+            <div class="category-box" onclick="bukaMenu('lalapan')">
+                <i class="fa-solid fa-drumstick-bite"></i><span>LALAPAN</span>
             </div>
-            <div class="category-box" onclick="openCategory('cemilan', 'Dimsum & Pentol')">
-                <div class="icon-wrapper"><i class="fa-solid fa-cookie"></i></div>
-                <span>Dimsum Pentol</span>
+            <div class="category-box" onclick="bukaMenu('cemilan')">
+                <i class="fa-solid fa-cookie"></i><span>DIMSUM</span>
+            </div>
+            <div class="category-box" onclick="bukaMenu('minuman')">
+                <i class="fa-solid fa-glass-water"></i><span>MINUMAN</span>
+            </div>
+            <!-- KOTAK PESANAN DENGAN BADGE -->
+            <div class="category-box box-pesanan" onclick="lihatDaftarPesanan()">
+                <div class="badge" id="order-badge">0</div>
+                <i class="fa-solid fa-receipt"></i><span>PESANAN</span>
             </div>
         </div>
 
-        <div class="section-title">Kategori Minuman</div>
-        <div class="category-grid">
-            <div class="category-box" onclick="openCategory('minuman', 'Minuman Segar')">
-                <div class="icon-wrapper"><i class="fa-solid fa-glass-water"></i></div>
-                <span>Es Segar</span>
-            </div>
-        </div>
-
-        <div class="order-section" id="checkout-section">
-            <div class="summary-title" style="font-size: 16px; color: var(--text-main);">
-                <i class="fa-solid fa-receipt" style="color: var(--success); margin-right: 5px;"></i> Data Penerima & Biaya
-            </div>
-            
-            <form id="orderForm" onsubmit="sendToWhatsApp(event)">
-                <div class="form-group">
-                    <label for="nama">Nama Penerima</label>
-                    <input type="text" id="nama" placeholder="Masukkan nama lengkap" required>
-                </div>
-                <div class="form-group">
-                    <label for="nohp">Nomor HP / WhatsApp</label>
-                    <input type="tel" id="nohp" placeholder="Contoh: 081234567xxx" required>
-                </div>
-                <div class="form-group">
-                    <label for="alamat">Alamat Lengkap</label>
-                    <textarea id="alamat" placeholder="Tulis jalan, nomor rumah, RT/RW, kelurahan, dan patokan" required></textarea>
+        <!-- FORM -->
+        <div class="card">
+            <h3 style="margin-bottom: 15px; color: var(--accent); font-size: 15px;">Konfirmasi Pengiriman</h3>
+            <form onsubmit="kirimKeDriver(event)">
+                <input type="text" id="f-nama" class="input-style" placeholder="Nama Penerima" required>
+                <input type="tel" id="f-hp" class="input-style" placeholder="Nomor WhatsApp" required>
+                <textarea id="f-alamat" class="input-style" placeholder="Alamat & Patokan" style="height: 80px;" required></textarea>
+                
+                <div class="price-summary">
+                    <div id="cart-preview" style="margin-bottom: 10px; font-size: 12px; color: var(--text-muted); text-align: center;">Keranjang Kosong</div>
+                    <div class="summary-row"><span>Subtotal Menu</span><span id="sub-display">Rp 0</span></div>
+                    <div class="summary-row"><span>Ongkir</span><span>Rp 5.000</span></div>
+                    <div class="summary-row total-bold"><span>Total Bayar</span><span id="f-total">Rp 5.000</span></div>
                 </div>
 
-                <div class="summary-box">
-                    <div class="summary-title">Ringkasan Biaya</div>
-                    
-                    <div class="cart-items-preview" id="cart-preview-container">
-                        <div class="cart-preview-empty">Belum ada menu yang dipilih</div>
-                    </div>
-
-                    <div class="summary-item">
-                        <span>Total Pesanan</span>
-                        <span id="subtotal-display">Rp 0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Ongkos Kirim</span>
-                        <span id="ongkir-display">Rp 5.000</span>
-                    </div>
-                    <div class="summary-item total">
-                        <span>Total Keseluruhan</span>
-                        <span class="price" id="total-display">Rp 5.000</span>
-                    </div>
-                </div>
-
-                <!-- ELEMEN PELACAKAN STATUS REALTIME DRIVER -->
-                <div class="status-alert" id="statusAlert">
-                    <span id="status-icon-wrapper"><i class="fa-solid fa-circle-notch fa-spin"></i></span> 
-                    <span id="realtime-status-text" style="margin-left: 5px;">Status: Mencari Driver...</span>
-                </div>
-
-                <div class="action-buttons-group">
-                    <button type="button" class="btn-cancel" onclick="cancelOrder()">
-                        <i class="fa-solid fa-trash-can"></i> Batal
-                    </button>
-                    <button type="submit" class="btn-submit">
-                        <i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i> Pesan Sekarang
-                    </button>
-                </div>
+                <button type="submit" class="btn-order">PESAN SEKARANG</button>
             </form>
         </div>
     </div>
 
-    <div class="modal-overlay" id="menuModal" onclick="closeCategory(event)">
+    <!-- MODAL MENU -->
+    <div id="modalMenu" class="modal-overlay" onclick="tutupMenu()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h2 id="modalTitle">Daftar Menu</h2>
-                <button class="close-modal" onclick="document.getElementById('menuModal').style.display='none'">&times;</button>
-            </div>
-            <div id="modalItemsContainer"></div>
+            <h2 id="m-title" style="margin-bottom: 20px; font-size: 18px;">Pilih Menu</h2>
+            <div id="m-list"></div>
+            <button onclick="tutupMenu()" style="width: 100%; background: var(--info); color: white; border: none; padding: 15px; border-radius: 12px; margin-top: 20px; font-weight: 800;">SELESAI</button>
         </div>
     </div>
 
-    <div class="floating-basket" id="floatingBasket" onclick="scrollToCheckout()">
-        <span><i class="fa-solid fa-basket-shopping"></i> <span id="floating-count">0</span> Item Dipilih</span>
-        <span id="floating-total">Rp 0</span>
+    <!-- MODAL LIST PESANAN -->
+    <div id="modalPesanan" class="modal-overlay" onclick="tutupModalPesanan()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 style="margin-bottom: 20px; font-size: 18px; color: var(--info);">Daftar Pesanan Saya</h2>
+            <div id="list-pesanan-container"></div>
+            <button onclick="tutupModalPesanan()" style="width: 100%; background: var(--bg-input); color: white; border: none; padding: 15px; border-radius: 12px; margin-top: 10px; font-weight: 800;">KEMBALI</button>
+        </div>
     </div>
 
-    <div class="running-text-footer">
-        <marquee scrollamount="5" behavior="scroll" direction="left">
-            ⚠️ Ini aplikasi dalam pengembangan, jika ada menu yang mau ditambah harap lapor ke wa kami 081807151531 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚠️ Ini aplikasi dalam pengembangan, jika ada menu yang mau ditambah harap lapor ke wa kami 081807151531
-        </marquee>
-    </div>
-
-    <!-- ENGINE UTAMA FIREBASE REALTIME DATABASE -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // =================================================================
-        // SILAKAN MASUKKAN KODE UTAMA FIREBASE CONFIKMU DI SINI
-        // =================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCGhsZw1wyy1OyqfUiH-bvYqln7fMZyiYg",
-  authDomain: "jnt-jastip.firebaseapp.com",
-  databaseURL: "https://jnt-jastip-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "jnt-jastip",
-  storageBucket: "jnt-jastip.firebasestorage.app",
-  messagingSenderId: "187685093180",
-  appId: "1:187685093180:web:159e921771f2c8a5572839",
+            authDomain: "jnt-jastip.firebaseapp.com",
+            databaseURL: "https://jnt-jastip-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "jnt-jastip",
+            storageBucket: "jnt-jastip.firebasestorage.app",
+            messagingSenderId: "187685093180",
+            appId: "1:187685093180:web:159e921771f2c8a5572839"
         };
-        
-        // Menyalakan Mesin Sinkronisasi
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        const allMenuData = [
-            { id: 'm1', name: 'Nasi Goreng Partelon', price: 15000, category: 'nasi-mie' },
-            { id: 'm2', name: 'Mie Gacor', price: 12000, category: 'nasi-mie' },
-            { id: 'm3', name: 'Mie Gacoan', price: 13000, category: 'nasi-mie' },
-            { id: 'm4', name: 'Dimsum (Isi 4)', price: 10000, category: 'cemilan' },
-            { id: 'm5', name: 'Lalapan Depan Masjid', price: 18000, category: 'lalapan' },
-            { id: 'm6', name: 'Bakso Esoh H. Muat', price: 17000, category: 'bakso' },
-            { id: 'm7', name: 'Bakso Esoh H. Munaji', price: 17000, category: 'bakso' },
-            { id: 'm8', name: 'Pentol', price: 8000, category: 'cemilan' },
-            { id: 'd1', name: 'Es Teler Depan Cinta Anak', price: 10000, category: 'minuman' },
-            { id: 'd2', name: 'Es Bobo', price: 8000, category: 'minuman' },
-            { id: 'd3', name: 'Es Tung Tung', price: 5000, category: 'minuman' }
-        ];
+        const DRIVER_WA = "6281807151531";
+        const ONGKIR = 5000;
+        let keranjang = {};
+        let myOrderIDs = JSON.parse(localStorage.getItem('my_orders')) || [];
 
-        const targetWhatsApp = "6281807151531";
-        const ongkosKirim = 5000; 
-        let cart = {};
-        let currentOpenCat = ''; 
+        const dataMenu = {
+            'nasi-mie': [{id:'n1', nama:'Nasi Goreng', harga:15000},{id:'n2', nama:'Mie Goreng', harga:13000}],
+            'bakso': [{id:'b1', nama:'Bakso Urat', harga:15000},{id:'b2', nama:'Bakso Telur', harga:12000}],
+            'lalapan': [{id:'l1', nama:'Ayam Goreng', harga:15000}],
+            'cemilan': [{id:'c1', nama:'Dimsum Ayam', harga:12000}],
+            'minuman': [{id:'m1', nama:'Es Teh', harga:3000},{id:'m2', nama:'Es Jeruk', harga:5000}]
+        };
 
-                function openCategory(catName, catTitle) {
-            currentOpenCat = catName;
-            document.getElementById('modalTitle').innerText = catTitle;
-            // PERBAIKAN: Ubah ModalItems() menjadi renderModalItems()
-            renderModalItems(); 
-            document.getElementById('menuModal').style.display = 'flex';
-        }
+        window.onload = syncBadge;
 
-
-        function closeCategory(event) {
-            document.getElementById('menuModal').style.display = 'none';
-        }
-
-        function renderModalItems() {
-            const container = document.getElementById('modalItemsContainer');
-            container.innerHTML = '';
-            const filteredItems = allMenuData.filter(item => item.category === currentOpenCat);
-
-            filteredItems.forEach(item => {
-                const qty = cart[item.id] || 0;
-                const isSelected = qty > 0;
-
-                container.innerHTML += `
-                    <div class="menu-list-item">
-                        <div class="item-info">
-                            <h3>${item.name}</h3>
-                            <div class="price">Rp ${item.price.toLocaleString('id-ID')}</div>
-                        </div>
-                        <div class="action-container">
-                            <button class="btn-add" id="pop-add-${item.id}" style="display: ${isSelected ? 'none' : 'block'}" onclick="addToCart('${item.id}')">Tambah</button>
-                            <div class="counter-container" id="pop-counter-${item.id}" style="display: ${isSelected ? 'flex' : 'none'}">
-                                <button class="btn-counter" onclick="updateQty('${item.id}', -1)"><i class="fa-solid fa-minus"></i></button>
-                                <span class="qty-text" id="pop-qty-${item.id}">${qty}</span>
-                                <button class="btn-counter" onclick="updateQty('${item.id}', 1)"><i class="fa-solid fa-plus"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                `;
+        function bukaMenu(kat) {
+            const list = document.getElementById('m-list');
+            document.getElementById('m-title').innerText = kat.toUpperCase();
+            list.innerHTML = '';
+            dataMenu[kat].forEach(item => {
+                const qty = keranjang[item.id] ? keranjang[item.id].qty : 0;
+                list.innerHTML += `<div class="menu-item"><div><b>${item.nama}</b><br><small>Rp ${item.harga.toLocaleString()}</small></div><div id="target-${item.id}">${qty > 0 ? buatCounter(item.id, qty) : `<button class="btn-add" onclick="tambahKeCart('${item.id}','${item.nama}',${item.harga})">Tambah</button>`}</div></div>`;
             });
+            document.getElementById('modalMenu').style.display = 'flex';
         }
 
-
-        function addToCart(id) {
-            cart[id] = 1;
-            document.getElementById(`pop-add-${id}`).style.display = 'none';
-            document.getElementById(`pop-counter-${id}`).style.display = 'flex';
-            document.getElementById(`pop-qty-${id}`).innerText = 1;
-            updateCalculation();
+        function buatCounter(id, qty) {
+            return `<div class="counter"><button class="btn-qty" onclick="updateQty('${id}', -1)">-</button><b>${qty}</b><button class="btn-qty" onclick="updateQty('${id}', 1)">+</button></div>`;
         }
 
-        function updateQty(id, change) {
-            if (!cart[id]) return;
-            cart[id] += change;
+        function tambahKeCart(id, nama, harga) { keranjang[id] = { nama, harga, qty: 1 }; refreshUI(); bukaMenu(document.getElementById('m-title').innerText.toLowerCase().replace(/ /g, '-')); }
 
-            if (cart[id] <= 0) {
-                delete cart[id];
-                if(document.getElementById(`pop-add-${id}`)) {
-                    document.getElementById(`pop-add-${id}`).style.display = 'block';
-                    document.getElementById(`pop-counter-${id}`).style.display = 'none';
-                }
-            } else {
-                if(document.getElementById(`pop-qty-${id}`)) {
-                    document.getElementById(`pop-qty-${id}`).innerText = cart[id];
-                }
-            }
-            updateCalculation();
-        }
-
-        function updateCalculation() {
-            let subtotal = 0;
-            let totalItems = 0;
-            const previewContainer = document.getElementById('cart-preview-container');
-            previewContainer.innerHTML = ''; 
-
-            for (const id in cart) {
-                const item = allMenuData.find(i => i.id === id);
-                if (item) {
-                    const itemTotal = item.price * cart[id];
-                    subtotal += itemTotal;
-                    totalItems += cart[id];
-
-                    previewContainer.innerHTML += `
-                        <div class="cart-preview-item">
-                            <span>${cart[id]}x ${item.name}</span>
-                            <span>Rp ${itemTotal.toLocaleString('id-ID')}</span>
-                        </div>
-                    `;
-                }
-            }
-
-            if (totalItems === 0) {
-                previewContainer.innerHTML = '<div class="cart-preview-empty">Belum ada menu yang dipilih</div>';
-                document.getElementById('statusAlert').style.display = 'none';
-            }
-
-            const totalKeseluruhan = subtotal > 0 ? (subtotal + ongkosKirim) : 0;
-            document.getElementById('subtotal-display').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
-            document.getElementById('total-display').innerText = `Rp ${totalKeseluruhan.toLocaleString('id-ID')}`;
-            document.getElementById('ongkir-display').innerText = subtotal > 0 ? `Rp ${ongkosKirim.toLocaleString('id-ID')}` : 'Rp 0';
-
-            const floatingBasket = document.getElementById('floatingBasket');
-            if (totalItems > 0) {
-                floatingBasket.style.display = 'flex';
-                document.getElementById('floating-count').innerText = totalItems;
-                document.getElementById('floating-total').innerText = `Rp ${totalKeseluruhan.toLocaleString('id-ID')}`;
-            } else {
-                floatingBasket.style.display = 'none';
+        function updateQty(id, delta) {
+            if(keranjang[id]) {
+                keranjang[id].qty += delta;
+                if(keranjang[id].qty <= 0) delete keranjang[id];
+                refreshUI();
+                const activeTitle = document.getElementById('m-title').innerText.toLowerCase().replace(/ /g, '-');
+                if(dataMenu[activeTitle]) bukaMenu(activeTitle);
             }
         }
 
-        function scrollToCheckout() {
-            document.getElementById('checkout-section').scrollIntoView({ behavior: 'smooth' });
-            document.getElementById('menuModal').style.display = 'none';
-        }
-
-        function cancelOrder() {
-    let orderId = localStorage.getItem('last_order_id');
-    
-    if (!orderId) {
-        // Jika belum ada pesanan, reset form saja
-        resetForm();
-        return;
-    }
-
-    // Cek status ke Firebase sebelum membatalkan
-    database.ref('semua_pesanan/' + orderId + '/status').once('value').then((snapshot) => {
-        const status = snapshot.val();
-        
-        if (status !== "Mencari Driver") {
-            alert("Maaf, pesanan sedang dalam proses/perjalanan oleh driver dan tidak dapat dibatalkan.");
-        } else {
-            if (confirm("Apakah Anda yakin ingin membatalkan pesanan ini?")) {
-                database.ref('semua_pesanan/' + orderId).remove().then(() => {
-                    alert("Pesanan berhasil dibatalkan.");
-                    localStorage.removeItem('last_order_id');
-                    location.reload();
-                });
+        function refreshUI() {
+            const preview = document.getElementById('cart-preview');
+            let sub = 0; preview.innerHTML = '';
+            for(let id in keranjang) {
+                sub += keranjang[id].harga * keranjang[id].qty;
+                preview.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px; color:white;"><span>${keranjang[id].nama} (x${keranjang[id].qty})</span><span>Rp ${(keranjang[id].harga*keranjang[id].qty).toLocaleString()}</span></div>`;
             }
+            document.getElementById('sub-display').innerText = 'Rp ' + sub.toLocaleString();
+            document.getElementById('f-total').innerText = 'Rp ' + (sub + ONGKIR).toLocaleString();
         }
-    });
-}
 
-function resetForm() {
-    cart = {};
-    document.getElementById('orderForm').reset();
-    updateCalculation();
-    document.getElementById('statusAlert').style.display = 'none';
-    document.getElementById('main-top').scrollIntoView({ behavior: 'smooth' });
-}
-
-
-
-        // =================================================================
-        // MODIFIKASI LANGSUNG MESIN FIREBASE & LINKING WHATSAPP
-        // =================================================================
-        function sendToWhatsApp(event) {
-            event.preventDefault();
-            const nama = document.getElementById('nama').value;
-            const nohp = document.getElementById('nohp').value;
-            const alamat = document.getElementById('alamat').value;
-
-            let orderListText = "";
-            let subtotal = 0;
-            let hasItems = false;
+        function kirimKeDriver(e) {
+            e.preventDefault();
+            if(Object.keys(keranjang).length === 0) return alert('Pilih menu dulu!');
+            const resi = 'AL' + Math.floor(1000 + Math.random() * 9000);
+            const nama = document.getElementById('f-nama').value;
+            const hp = document.getElementById('f-hp').value;
+            const alamat = document.getElementById('f-alamat').value;
             
-            // Struktur data object untuk dikirim secara rapi ke database driver
-            let pesananDetailObj = {};
+            let sub = 0, detail = {};
+            for(let id in keranjang) { sub += keranjang[id].harga * keranjang[id].qty; detail[keranjang[id].nama] = keranjang[id].qty; }
 
-            for (const id in cart) {
-                const item = allMenuData.find(i => i.id === id);
-                if (item) {
-                    hasItems = true;
-                    const itemTotal = item.price * cart[id];
-                    subtotal += itemTotal;
-                    orderListText += `- ${cart[id]}x ${item.name} (Rp ${itemTotal.toLocaleString('id-ID')})\n`;
-                    
-                    // Simpan ke struktur data Firebase
-                    pesananDetailObj[item.name] = cart[id];
-                }
-            }
-
-            if (!hasItems) {
-                alert("Pilih makanan atau minuman terlebih dahulu lewat tombol menu kotak di atas!");
-                return;
-            }
-
-            const totalKeseluruhan = subtotal + ongkosKirim;
-
-            // Membuat ID pesanan unik (Contoh: ALX-893521)
-            const uniqueOrderID = "ALX-" + Date.now().toString().slice(-6);
-
-            // Payload Paket Data Mesin Firebase Realtime
-            const firebasePayload = {
-                id: uniqueOrderID,
-                nama: nama,
-                whatsapp: nohp,
-                alamat: alamat,
-                pesanan_detail: pesananDetailObj, 
-                total_biaya: "Rp " + totalKeseluruhan.toLocaleString('id-ID'),
-                status: "Mencari Driver", 
-                waktu_order: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+            const orderData = { 
+                id: resi, nama, hp, alamat, pesanan_detail: detail, 
+                total_biaya: "Rp " + (sub + ONGKIR).toLocaleString(), 
+                status: "Mencari Driver", waktu_order: new Date().toLocaleTimeString() 
             };
-            database.ref('semua_pesanan/' + uniqueOrderID).set(firebasePayload)
-            .then(() => {
-                const alertBox = document.getElementById('statusAlert');
-                alertBox.style.display = 'block';
-                document.getElementById('realtime-status-text').innerText = "Status: Mencari Driver Terdekat... [ID: " + uniqueOrderID + "]";
-database.ref('semua_pesanan/' + uniqueOrderID + '/status').on('value', (snapshot) => {
-    const statusTerbaru = snapshot.val();
-    const statusText = document.getElementById('realtime-status-text');
-    const iconWrapper = document.getElementById('status-icon-wrapper');
-    const cancelBtn = document.querySelector('.btn-cancel');
-    if (statusTerbaru !== "Mencari Driver") {
-        if(cancelBtn) cancelBtn.style.display = 'none';
-    } else {
-        if(cancelBtn) cancelBtn.style.display = 'flex';
-    }
 
-    if(statusTerbaru) {
-        statusText.innerText = "Status: " + statusTerbaru;
-                        if (statusTerbaru === "Pesanan Diproses Driver") {
-                            alertBox.style.backgroundColor = "rgba(59, 130, 246, 0.15)";
-                            alertBox.style.borderColor = "#3b82f6";
-                            alertBox.style.color = "#60a5fa";
-                            iconWrapper.innerHTML = '<i class="fa-solid fa-store fa-bounce"></i>';
-                        } else if (statusTerbaru === "Dalam Perjalanan") {
-                            alertBox.style.backgroundColor = "rgba(245, 158, 11, 0.15)";
-                            alertBox.style.borderColor = "#f59e0b";
-                            alertBox.style.color = "#fbbf24";
-                            iconWrapper.innerHTML = '<i class="fa-solid fa-motorcycle fa-slide"></i>';
-                        } else if (statusTerbaru === "Selesai") {
-                            alertBox.style.backgroundColor = "rgba(16, 185, 129, 0.15)";
-                            alertBox.style.borderColor = "#10b981";
-                            alertBox.style.color = "#34d399";
-                            iconWrapper.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-                            alert("Hore! Driver mengonfirmasi pesanan Anda telah sampai di lokasi tujuan.");
-                        }
-                    }
+            database.ref('semua_pesanan/' + resi).set(orderData).then(() => {
+                if(!myOrderIDs.includes(resi)) myOrderIDs.push(resi);
+                localStorage.setItem('my_orders', JSON.stringify(myOrderIDs));
+                syncBadge();
+                alert("Pesanan Berhasil! Cek menu PESANAN.");
+                keranjang = {}; refreshUI(); e.target.reset();
+            });
+        }
+
+        function syncBadge() {
+            const badge = document.getElementById('order-badge');
+            let activeCount = 0;
+            if(myOrderIDs.length === 0) { badge.style.display="none"; return; }
+
+            let promises = myOrderIDs.map(id => database.ref('semua_pesanan/' + id).once('value'));
+            Promise.all(promises).then(snapshots => {
+                snapshots.forEach(s => {
+                    if(s.exists() && s.val().status !== "Selesai") activeCount++;
                 });
-            })
-            .catch((err) => {
-                console.error("Gagal terhubung ke database driver: ", err);
-            });
-
-            // INTEGRASI WHATSAPP ASLI SEBAGAI GENERATOR NOTA STRUK
-            const textMessage = 
-`Halo, saya mau pesan makanan/minuman lewat Aplikasi:
-
-[DATA PENERIMA]
-Nama Penerima  : ${nama}
-No. HP/WA      : ${nohp}
-Alamat Lengkap : ${alamat}
-
-----------------------------------
-[DETAIL PESANAN] (ID ID: ${uniqueOrderID})
-${orderListText}
-----------------------------------
-[RINCIAN BIAYA]
-Total Pesanan     : Rp ${subtotal.toLocaleString('id-ID')}
-Ongkos Kirim      : Rp ${ongkosKirim.toLocaleString('id-ID')}
-TOTAL KESELURUHAN : Rp ${totalKeseluruhan.toLocaleString('id-ID')}
-
-Mohon segera diproses ya, Terima kasih!`;
-
-            const urlEncoded = encodeURIComponent(textMessage);
-            const waUrl = `https://api.whatsapp.com/send?phone=${targetWhatsApp}&text=${urlEncoded}`;
-
-            // Redirect ke WhatsApp secara mulus
-            setTimeout(() => {
-                window.open(waUrl, '_blank');
-            }, 500);
-        }
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                const swContent = `
-                    const CACHE_NAME = 'al-express-v1';
-                    self.addEventListener('install', e => self.skipWaiting());
-                    self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-                `;
-                const blob = new Blob([swContent], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(swUrl).catch(err => console.log('SW registration failed:', err));
+                if(activeCount > 0) { badge.innerText = activeCount; badge.style.display = "flex"; }
+                else badge.style.display = "none";
             });
         }
+
+        function lihatDaftarPesanan() {
+            const container = document.getElementById('list-pesanan-container');
+            container.innerHTML = '';
+            if(myOrderIDs.length === 0) container.innerHTML = '<p style="text-align:center;color:#94a3b8">Belum ada pesanan.</p>';
+
+            [...myOrderIDs].reverse().forEach(resi => {
+                database.ref('semua_pesanan/' + resi).on('value', snapshot => {
+                    const data = snapshot.val();
+                    if(!data) return;
+
+                    let waItems = '';
+                    for(let m in data.pesanan_detail) waItems += `- ${m} (x${data.pesanan_detail[m]})\n`;
+
+                    const waMsg = `🚀 *A%26L EXPRESS - PESANAN*\n---------------------------\n📌 *RESI:* #${data.id}\n👤 *NAMA:* ${data.nama}\n📍 *ALAMAT:* ${data.alamat}\n🍱 *MENU:* \n${waItems}---------------------------\n💰 *TOTAL:* ${data.total_biaya}`;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'order-card-item';
+                    card.innerHTML = `
+                        <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+                            <b style="color:var(--accent)">#${data.id}</b>
+                            <span class="status-pill" style="background:${getStatusCol(data.status)}">${data.status}</span>
+                        </div>
+                        <div style="font-size:13px; margin-bottom:10px">
+                            <b>Penerima:</b> ${data.nama}<br>
+                            <b style="color:var(--success)">Total: ${data.total_biaya}</b>
+                        </div>
+                        <a href="https://api.whatsapp.com/send?phone=${DRIVER_WA}&text=${encodeURIComponent(waMsg)}" 
+                           target="_blank" rel="noopener" class="btn-chat-wa">
+                            <i class="fa-brands fa-whatsapp"></i> Chat Driver Sekarang
+                        </a>
+                    `;
+                    const exist = document.getElementById('card-' + data.id);
+                    if(exist) exist.replaceWith(card); else { card.id = 'card-' + data.id; container.appendChild(card); }
+                });
+            });
+            document.getElementById('modalPesanan').style.display = 'flex';
+        }
+
+        function getStatusCol(s) {
+            if(s === "Pesanan Diproses Driver") return "#f59e0b";
+            if(s === "Dalam Perjalanan") return "#10b981";
+            if(s === "Selesai") return "#64748b";
+            return "#3b82f6";
+        }
+
+        function lacakResiManual() {
+            const r = document.getElementById('resi-search').value.toUpperCase().trim();
+            if(!r) return;
+            database.ref('semua_pesanan/' + r).once('value', s => {
+                if(s.exists()) {
+                    if(!myOrderIDs.includes(r)) { myOrderIDs.push(r); localStorage.setItem('my_orders', JSON.stringify(myOrderIDs)); }
+                    lihatDaftarPesanan();
+                } else alert("Resi tidak ditemukan.");
+            });
+        }
+
+        function tutupMenu() { document.getElementById('modalMenu').style.display = 'none'; }
+        function tutupModalPesanan() { document.getElementById('modalPesanan').style.display = 'none'; }
     </script>
 </body>
 </html>
