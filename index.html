@@ -829,23 +829,16 @@ function resetForm() {
                 status: "Mencari Driver", 
                 waktu_order: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
             };
-
-            // MESIN ENGINE: Push langsung ke Realtime Database Firebase
             database.ref('semua_pesanan/' + uniqueOrderID).set(firebasePayload)
             .then(() => {
-                // Tampilkan banner status pelacakan di layar customer
                 const alertBox = document.getElementById('statusAlert');
                 alertBox.style.display = 'block';
                 document.getElementById('realtime-status-text').innerText = "Status: Mencari Driver Terdekat... [ID: " + uniqueOrderID + "]";
-
-                // MESIN SINKRONISASI: Dengerin perubahan status secara LIVE dari HP Driver
 database.ref('semua_pesanan/' + uniqueOrderID + '/status').on('value', (snapshot) => {
     const statusTerbaru = snapshot.val();
     const statusText = document.getElementById('realtime-status-text');
     const iconWrapper = document.getElementById('status-icon-wrapper');
-    const cancelBtn = document.querySelector('.btn-cancel'); // Tambahkan ini
-
-    // LOGIKA TOMBOL BATAL: Disembunyikan jika status bukan "Mencari Driver"
+    const cancelBtn = document.querySelector('.btn-cancel');
     if (statusTerbaru !== "Mencari Driver") {
         if(cancelBtn) cancelBtn.style.display = 'none';
     } else {
@@ -854,8 +847,6 @@ database.ref('semua_pesanan/' + uniqueOrderID + '/status').on('value', (snapshot
 
     if(statusTerbaru) {
         statusText.innerText = "Status: " + statusTerbaru;
-
-                        // Perubahan visual dinamis di layar customer mengikuti aksi Driver
                         if (statusTerbaru === "Pesanan Diproses Driver") {
                             alertBox.style.backgroundColor = "rgba(59, 130, 246, 0.15)";
                             alertBox.style.borderColor = "#3b82f6";
