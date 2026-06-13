@@ -365,10 +365,10 @@
 
         .status-alert {
             display: none;
-            background-color: rgba(16, 185, 129, 0.15);
-            border: 1px solid var(--success);
-            color: #34d399;
-            padding: 12px;
+            background-color: rgba(245, 158, 11, 0.15);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 14px;
             border-radius: 10px;
             text-align: center;
             font-weight: 700;
@@ -547,8 +547,10 @@
                     </div>
                 </div>
 
+                <!-- ELEMEN PELACAKAN STATUS REALTIME DRIVER -->
                 <div class="status-alert" id="statusAlert">
-                    <i class="fa-solid fa-circle-check"></i> Status: Pesanan Sedang Diproses (Dipesan)...
+                    <span id="status-icon-wrapper"><i class="fa-solid fa-circle-notch fa-spin"></i></span> 
+                    <span id="realtime-status-text" style="margin-left: 5px;">Status: Mencari Driver...</span>
                 </div>
 
                 <div class="action-buttons-group">
@@ -584,7 +586,28 @@
         </marquee>
     </div>
 
+    <!-- ENGINE UTAMA FIREBASE REALTIME DATABASE -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <script>
+        // =================================================================
+        // SILAKAN MASUKKAN KODE UTAMA FIREBASE CONFIKMU DI SINI
+        // =================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCGhsZw1wyy1OyqfUiH-bvYqln7fMZyiYg",
+  authDomain: "jnt-jastip.firebaseapp.com",
+  databaseURL: "https://jnt-jastip-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "jnt-jastip",
+  storageBucket: "jnt-jastip.firebasestorage.app",
+  messagingSenderId: "187685093180",
+  appId: "1:187685093180:web:159e921771f2c8a5572839",
+        };
+        
+        // Menyalakan Mesin Sinkronisasi
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         const allMenuData = [
             { id: 'm1', name: 'Nasi Goreng Partelon', price: 15000, category: 'nasi-mie' },
             { id: 'm2', name: 'Mie Gacor', price: 12000, category: 'nasi-mie' },
@@ -726,6 +749,9 @@
             }
         }
 
+        // =================================================================
+        // MODIFIKASI LANGSUNG MESIN FIREBASE & LINKING WHATSAPP
+        // =================================================================
         function sendToWhatsApp(event) {
             event.preventDefault();
             const nama = document.getElementById('nama').value;
@@ -735,6 +761,9 @@
             let orderListText = "";
             let subtotal = 0;
             let hasItems = false;
+            
+            // Struktur data object untuk dikirim secara rapi ke database driver
+            let pesananDetailObj = {};
 
             for (const id in cart) {
                 const item = allMenuData.find(i => i.id === id);
@@ -743,6 +772,9 @@
                     const itemTotal = item.price * cart[id];
                     subtotal += itemTotal;
                     orderListText += `- ${cart[id]}x ${item.name} (Rp ${itemTotal.toLocaleString('id-ID')})\n`;
+                    
+                    // Simpan ke struktur data Firebase
+                    pesananDetailObj[item.name] = cart[id];
                 }
             }
 
@@ -751,9 +783,66 @@
                 return;
             }
 
-            document.getElementById('statusAlert').style.display = 'block';
             const totalKeseluruhan = subtotal + ongkosKirim;
 
+            // Membuat ID pesanan unik (Contoh: ALX-893521)
+            const uniqueOrderID = "ALX-" + Date.now().toString().slice(-6);
+
+            // Payload Paket Data Mesin Firebase Realtime
+            const firebasePayload = {
+                id: uniqueOrderID,
+                nama: nama,
+                whatsapp: nohp,
+                alamat: alamat,
+                pesanan_detail: pesananDetailObj, 
+                total_biaya: "Rp " + totalKeseluruhan.toLocaleString('id-ID'),
+                status: "Mencari Driver", 
+                waktu_order: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            // MESIN ENGINE: Push langsung ke Realtime Database Firebase
+            database.ref('semua_pesanan/' + uniqueOrderID).set(firebasePayload)
+            .then(() => {
+                // Tampilkan banner status pelacakan di layar customer
+                const alertBox = document.getElementById('statusAlert');
+                alertBox.style.display = 'block';
+                document.getElementById('realtime-status-text').innerText = "Status: Mencari Driver Terdekat... [ID: " + uniqueOrderID + "]";
+
+                // MESIN SINKRONISASI: Dengerin perubahan status secara LIVE dari HP Driver
+                database.ref('semua_pesanan/' + uniqueOrderID + '/status').on('value', (snapshot) => {
+                    const statusTerbaru = snapshot.val();
+                    const statusText = document.getElementById('realtime-status-text');
+                    const iconWrapper = document.getElementById('status-icon-wrapper');
+
+                    if(statusTerbaru) {
+                        statusText.innerText = "Status: " + statusTerbaru;
+
+                        // Perubahan visual dinamis di layar customer mengikuti aksi Driver
+                        if (statusTerbaru === "Pesanan Diproses Driver") {
+                            alertBox.style.backgroundColor = "rgba(59, 130, 246, 0.15)";
+                            alertBox.style.borderColor = "#3b82f6";
+                            alertBox.style.color = "#60a5fa";
+                            iconWrapper.innerHTML = '<i class="fa-solid fa-store fa-bounce"></i>';
+                        } else if (statusTerbaru === "Dalam Perjalanan") {
+                            alertBox.style.backgroundColor = "rgba(245, 158, 11, 0.15)";
+                            alertBox.style.borderColor = "#f59e0b";
+                            alertBox.style.color = "#fbbf24";
+                            iconWrapper.innerHTML = '<i class="fa-solid fa-motorcycle fa-slide"></i>';
+                        } else if (statusTerbaru === "Selesai") {
+                            alertBox.style.backgroundColor = "rgba(16, 185, 129, 0.15)";
+                            alertBox.style.borderColor = "#10b981";
+                            alertBox.style.color = "#34d399";
+                            iconWrapper.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                            alert("Hore! Driver mengonfirmasi pesanan Anda telah sampai di lokasi tujuan.");
+                        }
+                    }
+                });
+            })
+            .catch((err) => {
+                console.error("Gagal terhubung ke database driver: ", err);
+            });
+
+            // INTEGRASI WHATSAPP ASLI SEBAGAI GENERATOR NOTA STRUK
             const textMessage = 
 `Halo, saya mau pesan makanan/minuman lewat Aplikasi:
 
@@ -763,7 +852,7 @@ No. HP/WA      : ${nohp}
 Alamat Lengkap : ${alamat}
 
 ----------------------------------
-[DETAIL PESANAN]
+[DETAIL PESANAN] (ID ID: ${uniqueOrderID})
 ${orderListText}
 ----------------------------------
 [RINCIAN BIAYA]
@@ -776,6 +865,7 @@ Mohon segera diproses ya, Terima kasih!`;
             const urlEncoded = encodeURIComponent(textMessage);
             const waUrl = `https://api.whatsapp.com/send?phone=${targetWhatsApp}&text=${urlEncoded}`;
 
+            // Redirect ke WhatsApp secara mulus
             setTimeout(() => {
                 window.open(waUrl, '_blank');
             }, 500);
