@@ -742,32 +742,27 @@
         function cancelOrder() {
     let orderId = localStorage.getItem('last_order_id');
     if (confirm("Apakah Anda yakin ingin membatalkan pesanan ini?")) {
-        database.ref('semua_pesanan/' + orderId).remove();
-        localStorage.removeItem('last_order_id');
-        document.getElementById('status-container').style.display = 'none';
-        alert("Pesanan telah dibatalkan.");
-        location.reload();
-    }
-}
-            // Hapus data dari Firebase
+        if (orderId) {
+            // Jika pesanan sudah masuk Firebase, hapus dari database
             database.ref('semua_pesanan/' + orderId).remove()
             .then(() => {
-                alert("Pesanan berhasil dibatalkan dari sistem.");
-                localStorage.removeItem('last_order_id'); // Hapus ID lokal
-                location.reload(); // Refresh halaman
+                alert("Pesanan berhasil dibatalkan.");
+                localStorage.removeItem('last_order_id');
+                location.reload();
             });
         } else {
-            // Jika belum dipesan (hanya di keranjang), bersihkan keranjang biasa
+            // Jika belum dipesan (hanya mengosongkan keranjang di aplikasi)
             cart = {};
             document.getElementById('orderForm').reset();
             updateCalculation();
+            if(document.getElementById('status-container')) {
+                document.getElementById('status-container').style.display = 'none';
+            
             document.getElementById('statusAlert').style.display = 'none';
             document.getElementById('main-top').scrollIntoView({ behavior: 'smooth' });
         }
     }
 }
-
-        }
 
         // =================================================================
         // MODIFIKASI LANGSUNG MESIN FIREBASE & LINKING WHATSAPP
@@ -821,21 +816,8 @@
             };
 
             // MESIN ENGINE: Push langsung ke Realtime Database Firebase
-            // UBAH DARI BARIS 804 SAMPAI 807 MENJADI SEPERTI INI:
-
-database.ref('semua_pesanan/' + uniqueOrderID).set(firebasePayload)
-.then(() => {
-    // 1. Simpan ID ke HP agar bisa dibatalkan
-    localStorage.setItem('last_order_id', uniqueOrderID); 
-    
-    // 2. Munculkan kotak status yang tadi kita tempel di atas
-    document.getElementById('status-container').style.display = 'block';
-    
-    // 3. Tampilkan teks status
-    document.getElementById('statusAlert').style.display = 'block';
-    document.getElementById('realtime-status-text').innerText = "Status: Mencari Driver Terdekat...";
-});
-
+            database.ref('semua_pesanan/' + uniqueOrderID).set(firebasePayload)
+            .then(() => {
                 // Tampilkan banner status pelacakan di layar customer
                 const alertBox = document.getElementById('statusAlert');
                 alertBox.style.display = 'block';
