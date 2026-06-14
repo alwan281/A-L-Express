@@ -1,9 +1,9 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>A&L EXPRESS - Premium Ordering</title>
+    <title>A&L EXPRESS - Official Customer App</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,153 +23,195 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 60px; overflow-x: hidden; }
+        body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 80px; overflow-x: hidden; }
 
-        header {
-            background: linear-gradient(135deg, #1e1b4b 0%, #020617 100%);
-            padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(245, 158, 11, 0.3);
-        }
-        header h1 { font-size: 26px; font-weight: 800; letter-spacing: 1px; }
-        header h1 span { color: var(--accent); text-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
-        header p { font-size: 12px; color: var(--text-muted); margin-top: 5px; text-transform: uppercase; letter-spacing: 2px; }
+        /* TOAST NOTIF */
+        #modern-notif { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); z-index: 100000; width: 90%; max-width: 400px; padding: 15px 20px; border-radius: 20px; display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 13px; box-shadow: 0 15px 30px rgba(0,0,0,0.5); transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        #modern-notif.show { top: 20px; }
+        #modern-notif.error { background: #7f1d1d; border: 1px solid var(--danger); color: #fecaca; }
+        #modern-notif.success { background: #064e3b; border: 1px solid var(--success); color: #d1fae5; }
+
+        /* AUTH UI */
+        .auth-view { display: none; min-height: 100vh; flex-direction: column; justify-content: center; align-items: center; padding: 25px; }
+        .auth-card { background: var(--bg-card); width: 100%; max-width: 400px; padding: 35px 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); }
+        .input-group { margin-bottom: 18px; text-align: left; }
+        .input-group label { display: block; font-size: 10px; font-weight: 800; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; }
+        .input-style { width: 100%; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 15px; color: white; outline: none; transition: 0.3s; }
+
+        /* HEADER */
+        header { background: linear-gradient(135deg, #1e1b4b 0%, #020617 100%); padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(245, 158, 11, 0.3); border-radius: 0 0 30px 30px; margin-bottom: 20px; }
+        header h1 { font-size: 26px; font-weight: 800; }
+        header span { color: var(--accent); }
 
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
 
-        .search-bar {
-            background: rgba(30, 41, 59, 0.7); display: flex; padding: 6px;
-            border-radius: 20px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-        }
-        .search-bar input { flex: 1; background: none; border: none; padding: 10px 18px; color: white; outline: none; font-size: 14px; }
-        .search-bar button { background: var(--accent); border: none; color: #000; padding: 10px 22px; border-radius: 15px; cursor: pointer; font-weight: 800; }
+        /* CATEGORIES & BADGE */
+        .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px; }
+        .category-box { position: relative; background: var(--bg-card); padding: 22px 5px; border-radius: 20px; text-align: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; box-shadow: var(--shadow); }
+        .category-box:active { transform: scale(0.95); background: var(--bg-input); }
+        .category-box i { font-size: 28px; color: var(--accent); margin-bottom: 10px; display: block; }
+        .category-box span { font-weight: 700; font-size: 10px; color: var(--text-main); }
+        .badge-notif { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 50%; font-size: 11px; font-weight: 800; display: none; align-items: center; justify-content: center; border: 2px solid var(--bg-card); box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
 
-        .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
-        .category-box {
-            position: relative; background: var(--bg-card); padding: 22px 5px; 
-            border-radius: 20px; text-align: center; cursor: pointer; 
-            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
-            box-shadow: var(--shadow);
-        }
-        .category-box:active { transform: scale(0.9); background: var(--accent); }
-        .category-box i { font-size: 30px; color: var(--accent); margin-bottom: 10px; display: block; }
-        .category-box span { font-weight: 700; font-size: 11px; color: var(--text-main); }
-
-        .badge {
-            position: absolute; top: -5px; right: -5px; background: var(--danger);
-            color: white; width: 22px; height: 22px; border-radius: 50%;
-            font-size: 11px; font-weight: 800; display: none; align-items: center; justify-content: center;
-            border: 2px solid var(--bg-main);
-        }
-
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); display: none;
-            justify-content: center; align-items: flex-end; z-index: 9999;
-            backdrop-filter: blur(8px);
-        }
-        .modal-content {
-            background: var(--bg-card); width: 100%; max-width: 600px;
-            padding: 30px 25px; border-radius: 35px 30px 0 0;
-            max-height: 88vh; overflow-y: auto; border-top: 5px solid var(--accent);
-        }
-
+        /* MENU MODAL UI */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: flex-end; z-index: 9998; backdrop-filter: blur(8px); }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 600px; padding: 30px 25px; border-radius: 35px 30px 0 0; max-height: 88vh; overflow-y: auto; border-top: 5px solid var(--accent); }
         .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .btn-add { background: var(--accent); color: #000; border: none; padding: 10px 22px; border-radius: 50px; font-weight: 800; cursor: pointer; }
-        .counter { display: flex; align-items: center; gap: 15px; background: var(--bg-input); padding: 7px 15px; border-radius: 50px; }
-        .btn-qty { background: none; border: none; color: white; font-size: 20px; font-weight: 800; cursor: pointer; }
-
-        .card { background: var(--bg-card); padding: 25px; border-radius: 25px; margin-top: 30px; border: 1px solid rgba(255,255,255,0.05); }
-        .input-style { width: 100%; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 15px; color: white; margin-bottom: 15px; outline: none; }
+        .menu-info b { font-size: 15px; color: var(--text-main); display: block; }
+        .menu-info span { color: var(--accent); font-weight: 800; }
         
-        .price-summary { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 20px; margin-bottom: 20px; }
-        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
-        .total-bold { border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 15px; font-weight: 800; font-size: 18px; color: var(--accent); }
+        .btn-add { background: var(--accent); color: #000; border: none; padding: 10px 24px; border-radius: 12px; font-weight: 800; font-size: 12px; cursor: pointer; }
+        .counter-container { display: flex; align-items: center; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 4px; gap: 10px; }
+        .btn-qty { background: var(--accent); border: none; color: #000; width: 32px; height: 32px; border-radius: 8px; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .qty-val { font-weight: 800; font-size: 16px; color: white; min-width: 25px; text-align: center; }
 
-        .btn-order { width: 100%; background: var(--success); color: white; border: none; padding: 20px; border-radius: 18px; font-weight: 800; font-size: 16px; cursor: pointer; }
+        /* FORM & SUMMARY */
+        .card { background: var(--bg-card); padding: 25px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.05); }
+        .price-summary { background: rgba(15, 23, 42, 0.8); padding: 20px; border-radius: 20px; margin: 20px 0; border: 1px solid rgba(255,255,255,0.05); }
+        .cart-item-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: var(--text-main); }
+        .total-bold { border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 15px; margin-top: 10px; font-weight: 800; font-size: 18px; color: var(--accent); display: flex; justify-content: space-between; }
+        .btn-order { width: 100%; background: var(--success); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); }
 
-        #success-popup {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(2, 6, 23, 0.98); z-index: 10001; display: none;
-            flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center;
-        }
+        /* TIMELINE TRACKING */
+        .tracking-timeline { margin: 25px 0 30px 15px; border-left: 2px solid #334155; padding-left: 25px; position: relative; text-align: left; }
+        .timeline-step { position: relative; margin-bottom: 30px; opacity: 0.3; }
+        .timeline-step.active { opacity: 1; }
+        .timeline-step.done { opacity: 0.7; }
+        .step-dot { position: absolute; left: -34px; top: 5px; width: 16px; height: 16px; border-radius: 50%; background: #475569; border: 3px solid var(--bg-card); }
+        .timeline-step.done .step-dot { background: var(--success); }
+        .timeline-step.active .step-dot { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+        .step-content b { display: block; font-size: 14px; color: var(--text-main); margin-bottom: 2px; }
+        .step-content p { font-size: 12px; color: var(--text-muted); }
 
-        .btn-wa-shared {
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            width: 100%; background: #25d366; color: white; 
-            text-align: center; padding: 18px; border-radius: 15px; 
-            text-decoration: none; font-weight: 800; margin-top: 15px; font-size: 16px;
-        }
+        /* NAVBAR */
+        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-card); display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 999; }
+        .nav-item { color: var(--text-muted); text-align: center; font-size: 10px; font-weight: 700; cursor: pointer; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); }
+        .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
+
+        /* SUCCESS POPUP */
+        #success-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.98); z-index: 10001; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .btn-wa-final { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; background: #25d366; color: white; padding: 18px; border-radius: 18px; text-decoration: none; font-weight: 800; font-size: 16px; margin-top: 20px; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2); }
         
-        .btn-close-large {
-            width: 100%; background: transparent; color: var(--text-muted); 
-            border: 2px solid #334155; padding: 18px; border-radius: 15px; 
-            font-weight: 800; font-size: 16px; cursor: pointer; margin-top: 20px;
-        }
-
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--bg-input); color: white; padding: 12px 25px; border-radius: 50px; border: 1px solid var(--accent); z-index: 10000; display: none; }
+        .animate { animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <header>
+    <div id="modern-notif">
+        <i id="notif-icon" class="fa-solid"></i>
+        <span id="notif-msg"></span>
+    </div>
+
+    <!-- 1. VIEW LOGIN -->
+    <div id="view-login" class="auth-view animate">
         <h1>A&L <span>EXPRESS</span></h1>
-        <p>Premium Jastip & Delivery</p>
-    </header>
-
-    <div class="container">
-        <div class="search-bar">
-            <input type="text" id="resi-input" placeholder="Lacak Nomor Waybill (Resi)...">
-            <button onclick="lacakManual()">LACAK</button>
-        </div>
-
-        <div class="category-grid">
-            <div class="category-box" onclick="bukaMenu('nasi-mie')"><i class="fa-solid fa-bowl-rice"></i><span>NASI & MIE</span></div>
-            <div class="category-box" onclick="bukaMenu('bakso')"><i class="fa-solid fa-bowl-food"></i><span>BAKSO</span></div>
-            <div class="category-box" onclick="bukaMenu('lalapan')"><i class="fa-solid fa-drumstick-bite"></i><span>LALAPAN</span></div>
-            <div class="category-box" onclick="bukaMenu('cemilan')"><i class="fa-solid fa-cookie"></i><span>CEMILAN</span></div>
-            <div class="category-box" onclick="bukaMenu('minuman')"><i class="fa-solid fa-glass-water"></i><span>MINUMAN</span></div>
-            <div class="category-box" onclick="lihatDaftarPesanan()"><div class="badge" id="order-badge">0</div><i class="fa-solid fa-receipt" style="color: var(--info)"></i><span>PESANAN</span></div>
-        </div>
-
-        <div class="card">
-            <h3 style="margin-bottom: 20px; color: var(--accent); font-weight: 800;">DATA PENGIRIMAN</h3>
-            <form onsubmit="kirimSekarang(event)">
-                <input type="text" id="f-nama" class="input-style" placeholder="Nama Penerima" required>
-                <input type="tel" id="f-hp" class="input-style" placeholder="Nomor WhatsApp" required>
-                <textarea id="f-alamat" class="input-style" placeholder="Alamat & Patokan Lokasi" style="height: 100px;" required></textarea>
-                <input type="text" id="f-note" class="input-style" placeholder="Catatan (Contoh: Pedas)">
-                <div class="price-summary">
-                    <div id="cart-list-preview" style="margin-bottom: 15px; font-size: 13px; color: var(--text-muted);">Keranjang belanja kosong</div>
-                    <div class="summary-row"><span>Subtotal Menu</span><span id="sub-val">Rp 0</span></div>
-                    <div class="summary-row"><span>Ongkos Kirim</span><span>Rp 5.000</span></div>
-                    <div class="summary-row total-bold"><span>Total Bayar</span><span id="f-total">Rp 5.000</span></div>
-                </div>
-                <button type="submit" class="btn-order">KONFIRMASI PESANAN</button>
-            </form>
+        <p style="color: var(--text-muted); margin-bottom: 35px;">Login untuk mulai memesan</p>
+        <div class="auth-card">
+            <div class="input-group"><label>Nomor WhatsApp</label><input type="tel" id="login-phone" class="input-style" placeholder="08xxx"></div>
+            <div class="input-group"><label>Kata Sandi</label><input type="password" id="login-pass" class="input-style" placeholder="••••••••"></div>
+            <button class="btn-order" onclick="prosesLogin()" style="background: var(--accent); color: #000;">MASUK SEKARANG</button>
+            <p style="margin-top: 25px; font-size: 13px; color: var(--text-muted);">Belum punya akun? <a href="#" onclick="showView('register')" style="color: var(--accent); font-weight: 800; text-decoration: none;">Daftar</a></p>
         </div>
     </div>
 
+    <!-- 2. VIEW REGISTER -->
+    <div id="view-register" class="auth-view animate">
+        <h2 style="margin-bottom: 30px; font-weight: 800;">Daftar Akun Baru</h2>
+        <div class="auth-card">
+            <div class="input-group"><label>Nama Lengkap</label><input type="text" id="reg-name" class="input-style"></div>
+            <div class="input-group"><label>Nomor WhatsApp</label><input type="tel" id="reg-phone" class="input-style"></div>
+            <div class="input-group"><label>Buat Password</label><input type="password" id="reg-pass" class="input-style"></div>
+            <button class="btn-order" onclick="prosesDaftar()" style="background: var(--accent); color: #000;">DAFTAR SEKARANG</button>
+            <button onclick="showView('login')" style="margin-top: 15px; background: transparent; color: var(--text-muted); border: none; font-weight: 800; cursor: pointer; width: 100%;">Kembali Login</button>
+        </div>
+    </div>
+
+    <!-- 3. VIEW MAIN APP -->
+    <div id="view-main" class="main-view animate">
+        <header>
+            <h1>A&L <span>EXPRESS</span></h1>
+            <p id="welcome-user">Halo, Alwan</p>
+        </header>
+
+        <div class="container">
+            <div class="category-grid">
+                <div class="category-box" onclick="bukaMenu('nasi-mie')"><i class="fa-solid fa-bowl-rice"></i><span>NASI & MIE</span></div>
+                <div class="category-box" onclick="bukaMenu('bakso')"><i class="fa-solid fa-bowl-food"></i><span>BAKSO</span></div>
+                <div class="category-box" onclick="bukaMenu('lalapan')"><i class="fa-solid fa-drumstick-bite"></i><span>LALAPAN</span></div>
+                <div class="category-box" onclick="bukaMenu('cemilan')"><i class="fa-solid fa-cookie"></i><span>CEMILAN</span></div>
+                <div class="category-box" onclick="bukaMenu('minuman')"><i class="fa-solid fa-glass-water"></i><span>MINUMAN</span></div>
+                <div class="category-box" onclick="showView('history')">
+                    <div id="history-badge" class="badge-notif">0</div>
+                    <i class="fa-solid fa-receipt" style="color:var(--info)"></i><span>RIWAYAT</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="color:var(--accent); font-weight:800; margin-bottom:15px;"><i class="fa-solid fa-truck-fast"></i> DATA PENGIRIMAN</div>
+                <form onsubmit="kirimSekarang(event)">
+                    <div class="input-group"><label>Nama Penerima</label><input type="text" id="f-nama" class="input-style" required></div>
+                    <div class="input-group"><label>WhatsApp Penerima</label><input type="tel" id="f-hp-penerima" class="input-style" required></div>
+                    <div class="input-group"><label>Alamat Lengkap & Patokan</label><textarea id="f-alamat" class="input-style" style="height: 80px;" required></textarea></div>
+                    <div class="input-group"><label>Catatan Pesanan</label><input type="text" id="f-note" class="input-style" placeholder="Contoh: Pedas sekali"></div>
+                    
+                    <div class="price-summary">
+                        <div id="cart-items-list"></div>
+                        <div class="summary-row" style="margin-top:10px; color:var(--text-muted);"><span>Ongkos Kirim</span><span>Rp 5.000</span></div>
+                        <div class="total-bold"><span>Total Bayar</span><span id="f-total">Rp 5.000</span></div>
+                    </div>
+                    <button type="submit" class="btn-order">KONFIRMASI PESANAN</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIWAYAT VIEW -->
+    <div id="view-history" class="main-view animate container" style="padding-top: 20px;">
+        <h2 style="margin-bottom: 25px; font-weight: 800; color: var(--info);">PESANAN SAYA</h2>
+        <div id="history-list"></div>
+    </div>
+
+    <!-- AKUN VIEW -->
+    <div id="view-profile" class="main-view animate container" style="padding-top: 50px;">
+        <h2 style="margin-bottom: 30px; text-align: center; font-weight: 800;">AKUN SAYA</h2>
+        <div class="auth-card">
+            <div class="input-group"><label>Nama</label><input type="text" id="p-name" class="input-style" readonly></div>
+            <div class="input-group"><label>WhatsApp</label><input type="text" id="p-phone" class="input-style" readonly></div>
+            <button class="btn-order" onclick="logout()" style="background: var(--danger); margin-top: 20px;">KELUAR AKUN</button>
+        </div>
+    </div>
+
+    <!-- MODAL MENU -->
     <div id="mainModal" class="modal-overlay" onclick="tutupModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div id="modal-body"></div>
-            <button onclick="tutupModal()" style="width: 100%; background: #334155; color: white; border: none; padding: 18px; border-radius: 15px; margin-top: 25px; font-weight: 800;">KEMBALI</button>
+            <div id="modal-body-content"></div>
+            <button onclick="tutupModal()" style="width: 100%; background: #334155; color: white; border: none; padding: 18px; border-radius: 15px; margin-top: 25px; font-weight: 800; cursor:pointer;">KEMBALI</button>
         </div>
     </div>
 
+    <!-- SUCCESS POPUP -->
     <div id="success-popup">
-        <div style="background: var(--success); width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;"><i class="fa-solid fa-check" style="font-size: 50px; color: white;"></i></div>
-        <h2 style="color: white; font-weight: 800; font-size: 28px;">Pesanan Berhasil!</h2>
-        <p style="color: var(--text-muted); margin: 15px 0; font-size: 16px;">Segera hubungi driver agar pesanan cepat diproses.</p>
-        <div style="background: var(--bg-card); padding: 25px; border-radius: 20px; width: 100%; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
-            <small style="color: var(--text-muted)">Nomor Waybill:</small><br>
-            <b id="final-resi" style="color: var(--accent); font-size: 20px; word-break: break-all;">AL...</b><br>
-            <button onclick="salinResi(document.getElementById('final-resi').innerText)" style="margin-top: 15px; background: rgba(245, 158, 11, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 12px; font-weight: 800; cursor: pointer;">SALIN RESI</button>
+        <div style="background: var(--success); width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);">
+            <i class="fa-solid fa-check" style="font-size: 45px; color: white;"></i>
         </div>
-        <a id="btn-wa-final" href="#" target="_blank" class="btn-wa-shared"><i class="fa-brands fa-whatsapp"></i> HUBUNGI DRIVER</a>
-        <button onclick="location.reload()" class="btn-close-large">Tutup Halaman</button>
+        <h2 style="color: white; font-weight: 800; font-size: 26px;">Pesanan Berhasil!</h2>
+        <div style="background: rgba(15, 23, 42, 0.8); padding: 25px; border-radius: 25px; width: 100%; margin: 20px 0; border: 1px solid rgba(255,255,255,0.1);">
+            <small style="color: var(--text-muted); font-weight: 700;">NOMOR RESI PELACAKAN</small><br>
+            <b id="final-resi" style="color: var(--accent); font-size: 19px; word-break: break-all; display: block; margin-top: 10px;">AL...</b>
+            <button onclick="salinResi(document.getElementById('final-resi').innerText)" style="margin-top: 15px; background: rgba(245, 158, 11, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 12px;">SALIN RESI</button>
+        </div>
+        <a id="btn-wa-final" href="#" target="_blank" class="btn-wa-final"><i class="fa-brands fa-whatsapp"></i> HUBUNGI DRIVER</a>
+        <button onclick="location.reload()" style="width: 100%; background: transparent; color: var(--text-muted); border: 2px solid #334155; padding: 18px; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 15px;">TUTUP</button>
     </div>
 
-    <div id="toast">Notifikasi</div>
+    <!-- NAVBAR -->
+    <div id="bottom-navbar" class="navbar" style="display: none;">
+        <div id="nav-home" class="nav-item active" onclick="showView('main')"><i class="fa-solid fa-house"></i>Home</div>
+        <div id="nav-orders" class="nav-item" onclick="showView('history')"><i class="fa-solid fa-receipt"></i>Pesanan</div>
+        <div id="nav-profile" class="nav-item" onclick="showView('profile')"><i class="fa-solid fa-user-circle"></i>Akun</div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -190,175 +232,189 @@
         const DRIVER_WA = "6281807151531"; 
         const ONGKIR = 5000;
         let keranjang = {};
-        let myOrderIDs = JSON.parse(localStorage.getItem('my_orders')) || [];
         let dataMenuGlobal = null;
+        let currentUser = JSON.parse(localStorage.getItem('customer_session')) || null;
+        let currentKategoriOpen = "";
 
-        // FUNGSI UTAMA: Load data menu dengan proteksi agar tidak kosong
-        function muatMenu() {
-            database.ref('master_menu').on('value', (snap) => {
-                if(snap.exists()) {
-                    dataMenuGlobal = snap.val();
-                } else {
-                    // JIKA FIREBASE KOSONG, ISI OTOMATIS
-                    const initMenu = {
-                        "nasi-mie": [{"id":"n1", "nama":"Nasi Goreng Spesial", "harga":15000}],
-                        "bakso": [{"id":"b1", "nama":"Bakso Urat Jumbo", "harga":15000}],
-                        "lalapan": [{"id":"l1", "nama":"Lalapan Ayam", "harga":15000}],
-                        "cemilan": [{"id":"c1", "nama":"Dimsum Ayam (4pcs)", "harga":12000}],
-                        "minuman": [{"id":"m1", "nama":"Es Teh Manis", "harga":3000}]
-                    };
-                    database.ref('master_menu').set(initMenu);
-                    dataMenuGlobal = initMenu;
-                }
+        window.onload = () => { if(currentUser) { showView('main'); initCustomer(); } else { showView('login'); } muatMenu(); };
+
+        function showNotif(msg, type = "error") {
+            const notif = document.getElementById('modern-notif');
+            notif.className = type; 
+            document.getElementById('notif-msg').innerText = msg;
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 3000);
+        }
+
+        function showView(viewId) {
+            document.querySelectorAll('.auth-view, .main-view').forEach(v => v.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const target = document.getElementById('view-' + viewId);
+            if(viewId === 'main' || viewId === 'profile' || viewId === 'history') {
+                target.style.display = 'block'; document.getElementById('bottom-navbar').style.display = 'flex';
+                const navId = 'nav-' + (viewId === 'main' ? 'home' : (viewId === 'history' ? 'orders' : 'profile'));
+                document.getElementById(navId).classList.add('active');
+            } else { target.style.display = 'flex'; document.getElementById('bottom-navbar').style.display = 'none'; }
+            if(viewId === 'profile') { document.getElementById('p-name').value = currentUser.nama; document.getElementById('p-phone').value = currentUser.hp; }
+            if(viewId === 'history') muatRiwayat();
+        }
+
+        function prosesDaftar() {
+            const nama = document.getElementById('reg-name').value;
+            const hp = document.getElementById('reg-phone').value;
+            const pass = document.getElementById('reg-pass').value;
+            if(!nama || !hp || pass.length < 6) return showNotif("Data tidak lengkap (Pass min 6)!");
+            database.ref('customer_accounts/' + hp).set({ nama, hp, pass }).then(() => { showNotif("Daftar Berhasil!", "success"); showView('login'); });
+        }
+
+        function prosesLogin() {
+            const hp = document.getElementById('login-phone').value;
+            const pass = document.getElementById('login-pass').value;
+            database.ref('customer_accounts/' + hp).once('value', (s) => {
+                const data = s.val();
+                if(data && data.pass === pass) {
+                    currentUser = data; localStorage.setItem('customer_session', JSON.stringify(data));
+                    initCustomer(); showView('main'); showNotif("Login Berhasil!", "success");
+                } else { showNotif("WhatsApp atau Password salah!"); }
             });
         }
 
-        window.onload = () => { muatMenu(); syncBadge(); };
-
-        function bukaMenu(kat) {
-            const body = document.getElementById('modal-body');
-            body.innerHTML = `<h2 style="margin-bottom:20px; font-weight:800; color:var(--accent)">${kat.toUpperCase().replace('-',' ')}</h2><div id="m-list"></div>`;
-            const list = document.getElementById('m-list');
-            
-            // CEK APAKAH DATA SUDAH LOAD
-            if(!dataMenuGlobal) {
-                list.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:20px;">Menghubungkan ke server...</p>`;
-                setTimeout(() => bukaMenu(kat), 500); // Coba lagi otomatis setelah 0.5 detik
-            } else if (!dataMenuGlobal[kat]) {
-                list.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:20px;">Menu belum tersedia.</p>`;
-            } else {
-                dataMenuGlobal[kat].forEach(item => {
-                    const qty = keranjang[item.id] ? keranjang[item.id].qty : 0;
-                    list.innerHTML += `<div class="menu-item"><div class="menu-info"><b>${item.nama}</b><br><span style="color:var(--accent); font-weight:800;">Rp ${item.harga.toLocaleString()}</span></div><div id="target-${item.id}">${qty > 0 ? buatCounter(item.id, qty, kat) : `<button class="btn-add" onclick="tambahKeCart('${item.id}','${item.nama}',${item.harga},'${kat}')">Tambah</button>`}</div></div>`;
-                });
-            }
-            document.getElementById('mainModal').style.display = 'flex';
-        }
-
-        function buatCounter(id, qty, kat) { return `<div class="counter"><button class="btn-qty" onclick="updateQty('${id}',-1,'${kat}')">-</button><b>${qty}</b><button class="btn-qty" onclick="updateQty('${id}',1,'${kat}')">+</button></div>`; }
+        function logout() { localStorage.removeItem('customer_session'); location.reload(); }
         
-        function tambahKeCart(id, nama, harga, kat) { 
-            keranjang[id] = { nama, harga, qty: 1 }; 
-            refreshUI(); 
-            renderHanyaList(kat); // Update list tanpa menutup modal
+        function initCustomer() {
+            document.getElementById('welcome-user').innerText = "Halo, " + currentUser.nama;
+            document.getElementById('f-nama').value = currentUser.nama;
+            document.getElementById('f-hp-penerima').value = currentUser.hp;
+            updateHistoryBadge();
         }
 
-        function updateQty(id, delta, kat) { 
+        function muatMenu() {
+            database.ref('master_menu').on('value', (snap) => { if(snap.exists()) { dataMenuGlobal = snap.val(); if(document.getElementById('mainModal').style.display === 'flex') renderUlangMenu(); } });
+        }
+
+        function updateHistoryBadge() {
+            if(!currentUser) return;
+            database.ref('semua_pesanan').orderByChild('customer_phone').equalTo(currentUser.hp).on('value', (snap) => {
+                let count = 0; if(snap.exists()){ Object.values(snap.val()).forEach(o => { if(o.status !== "Selesai" && o.status !== "Batal") count++; }); }
+                const b = document.getElementById('history-badge');
+                if(count > 0) { b.innerText = count; b.style.display = 'flex'; } else { b.style.display = 'none'; }
+            });
+        }
+
+        // --- FUNGSI MENU (FIXED PLUS MINUS) ---
+        function bukaMenu(kat) {
+            currentKategoriOpen = kat;
+            document.getElementById('mainModal').style.display = 'flex';
+            renderUlangMenu();
+        }
+
+        function renderUlangMenu() {
+            const kat = currentKategoriOpen;
+            const container = document.getElementById('modal-body-content');
+            if(!dataMenuGlobal || !dataMenuGlobal[kat]) { container.innerHTML = `<p style="text-align:center; padding:20px;">Menghubungkan...</p>`; return; }
+            
+            let html = `<h2 style="margin-bottom:20px; font-weight:800; color:var(--accent); text-transform:uppercase;">${kat.replace('-',' ')}</h2>`;
+            dataMenuGlobal[kat].forEach(item => {
+                const qty = keranjang[item.id] ? keranjang[item.id].qty : 0;
+                let btnHtml = (qty > 0) ? 
+                    `<div class="counter-container"><button class="btn-qty" onclick="ubahQty('${item.id}', -1)">-</button><b class="qty-val">${qty}</b><button class="btn-qty" onclick="ubahQty('${item.id}', 1)">+</button></div>` :
+                    `<button class="btn-add" onclick="tambahItem('${item.id}','${item.nama}',${item.harga})">Tambah</button>`;
+
+                html += `<div class="menu-item"><div class="menu-info"><b>${item.nama}</b><span>Rp ${item.harga.toLocaleString()}</span></div><div id="btn-area-${item.id}">${btnHtml}</div></div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function tambahItem(id, nama, harga) { keranjang[id] = { nama, harga, qty: 1 }; renderUlangMenu(); refreshUI(); }
+        
+        function ubahQty(id, delta) { 
             if(keranjang[id]) { 
                 keranjang[id].qty += delta; 
                 if(keranjang[id].qty <= 0) delete keranjang[id]; 
-                refreshUI(); 
-                renderHanyaList(kat); 
+                renderUlangMenu(); refreshUI(); 
             } 
         }
 
-        // Agar tidak kedip, kita hanya render ulang isi listnya saja
-        function renderHanyaList(kat) {
-            const list = document.getElementById('m-list');
-            if(!list || !dataMenuGlobal[kat]) return;
-            list.innerHTML = '';
-            dataMenuGlobal[kat].forEach(item => {
-                const qty = keranjang[item.id] ? keranjang[item.id].qty : 0;
-                list.innerHTML += `<div class="menu-item"><div class="menu-info"><b>${item.nama}</b><br><span style="color:var(--accent); font-weight:800;">Rp ${item.harga.toLocaleString()}</span></div><div id="target-${item.id}">${qty > 0 ? buatCounter(item.id, qty, kat) : `<button class="btn-add" onclick="tambahKeCart('${item.id}','${item.nama}',${item.harga},'${kat}')">Tambah</button>`}</div></div>`;
-            });
-        }
-
         function refreshUI() {
-            const preview = document.getElementById('cart-list-preview');
-            let sub = 0; preview.innerHTML = '';
-            const keys = Object.keys(keranjang);
-            if(keys.length === 0) preview.innerHTML = 'Keranjang belanja kosong';
-            else {
-                keys.forEach(id => {
-                    const item = keranjang[id];
-                    sub += item.harga * item.qty;
-                    preview.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${item.nama} (x${item.qty})</span><span>Rp ${(item.harga * item.qty).toLocaleString()}</span></div>`;
-                });
-            }
-            document.getElementById('sub-val').innerText = 'Rp ' + sub.toLocaleString();
-            document.getElementById('f-total').innerText = 'Rp ' + (sub + ONGKIR).toLocaleString();
+            const container = document.getElementById('cart-items-list');
+            let sub = 0; container.innerHTML = '';
+            Object.keys(keranjang).forEach(id => {
+                const item = keranjang[id]; const totalItem = item.harga * item.qty; sub += totalItem;
+                container.innerHTML += `<div class="cart-item-row" style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;"><span>${item.nama} <span style="color:var(--accent)">x${item.qty}</span></span><span>Rp ${totalItem.toLocaleString('id-ID')}</span></div>`;
+            });
+            document.getElementById('f-total').innerText = 'Rp ' + (sub + ONGKIR).toLocaleString('id-ID');
         }
 
         function kirimSekarang(e) {
             e.preventDefault();
-            if(Object.keys(keranjang).length === 0) return showToast("Pilih menu dulu!");
+            if(Object.keys(keranjang).length === 0) return showNotif("Pilih menu dulu!");
             const resi = 'AL' + Date.now() + Math.floor(Math.random() * 100);
-            let detailWA = "";
-            for(let id in keranjang) detailWA += `- ${keranjang[id].nama} (x${keranjang[id].qty})\n`;
+            let detailWA = ""; for(let id in keranjang) detailWA += `- ${keranjang[id].nama} (x${keranjang[id].qty})\n`;
             const orderData = {
-                id: resi, nama: document.getElementById('f-nama').value,
-                hp: document.getElementById('f-hp').value, alamat: document.getElementById('f-alamat').value,
-                catatan: document.getElementById('f-note').value || "-",
-                pesanan_detail: keranjang, total_biaya: document.getElementById('f-total').innerText,
-                status: "Menunggu Driver",
-                waktu_order: new Date().toLocaleString('id-ID', {day:'numeric', month:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'}).replace(/\./g, ':')
+                id: resi, customer_phone: currentUser.hp, nama: document.getElementById('f-nama').value,
+                hp: document.getElementById('f-hp-penerima').value, alamat: document.getElementById('f-alamat').value,
+                catatan: document.getElementById('f-note').value || "-", pesanan_detail: keranjang, total_biaya: document.getElementById('f-total').innerText,
+                status: "Menunggu Driver", waktu_order: new Date().toLocaleString('id-ID')
             };
             database.ref('semua_pesanan/' + resi).set(orderData).then(() => {
-                myOrderIDs.push(resi);
-                localStorage.setItem('my_orders', JSON.stringify(myOrderIDs));
-                const waLink = `https://api.whatsapp.com/send?phone=${DRIVER_WA}&text=${encodeURIComponent('Halo A&L Express! Konfirmasi Pesanan:\n\n*RESI:* #' + resi + '\n*NAMA:* ' + orderData.nama + '\n*MENU:*\n' + detailWA + '\n*ALAMAT:* ' + orderData.alamat + '\n*TOTAL:* ' + orderData.total_biaya)}`;
-                document.getElementById('btn-wa-final').href = waLink;
+                const waMsg = `Halo A&L Express! Konfirmasi Pesanan:\n\n*RESI:* #${resi}\n*NAMA:* ${orderData.nama}\n*MENU:*\n${detailWA}\n*TOTAL:* ${orderData.total_biaya}`;
+                document.getElementById('btn-wa-final').href = `https://api.whatsapp.com/send?phone=${DRIVER_WA}&text=${encodeURIComponent(waMsg)}`;
                 document.getElementById('final-resi').innerText = resi;
                 document.getElementById('success-popup').style.display = 'flex';
+                keranjang = {}; refreshUI();
             });
         }
 
-        function salinResi(text) { navigator.clipboard.writeText(text).then(() => showToast("Resi disalin!")); }
-
-        function lacakManual() {
-            const resi = document.getElementById('resi-input').value.toUpperCase().trim();
-            if(!resi) return showToast("Masukkan nomor resi!");
-            database.ref('semua_pesanan/' + resi).once('value', snapshot => {
-                if(snapshot.exists()) renderTracking(snapshot.val());
-                else showToast("Resi tidak ditemukan!");
+        function muatRiwayat() {
+            const list = document.getElementById('history-list'); list.innerHTML = '<p style="text-align:center; color:gray;">Mencari data...</p>';
+            database.ref('semua_pesanan').orderByChild('customer_phone').equalTo(currentUser.hp).on('value', (snap) => {
+                list.innerHTML = ''; if(!snap.exists()) return list.innerHTML = '<p style="text-align:center; color:gray; padding:30px;">Belum ada pesanan.</p>';
+                Object.keys(snap.val()).reverse().forEach(key => {
+                    const d = snap.val()[key];
+                    list.innerHTML += `<div onclick='renderTracking(${JSON.stringify(d)})' style="background:var(--bg-card); padding:20px; border-radius:20px; margin-bottom:15px; border:1px solid rgba(255,255,255,0.05); cursor:pointer;"><div style="display:flex; justify-content:space-between; margin-bottom:10px;"><b style="color:var(--accent); font-size:12px;">#${d.id.substring(0,18)}...</b><span style="font-size:10px; background:var(--info); color:white; padding:3px 10px; border-radius:50px; font-weight:800;">${d.status}</span></div><div style="font-size:14px; font-weight:700;">${d.total_biaya}</div></div>`;
+                });
             });
         }
 
         function renderTracking(data) {
-            const body = document.getElementById('modal-body');
-            const waChatLink = `https://api.whatsapp.com/send?phone=${DRIVER_WA}&text=${encodeURIComponent('Halo Driver A&L Express! Saya ingin menanyakan status pesanan dengan Resi: #' + data.id)}`;
+            const body = document.getElementById('modal-body-content');
+            const seq = ["Menunggu Driver", "Pesanan Diproses Driver", "Dalam Perjalanan", "Selesai"];
+            const curIdx = seq.indexOf(data.status);
+            const steps = [
+                { l: "Pesanan Dibuat", d: "Pesanan diterima dan menunggu konfirmasi driver." },
+                { l: "Diproses Driver", d: "Driver sedang menyiapkan barang/makanan Anda." },
+                { l: "Dalam Perjalanan", d: "Pesanan sedang dalam perjalanan menuju lokasi Anda." },
+                { l: "Sudah Sampai", d: "Paket diterima dengan baik. Terima kasih!" }
+            ];
+
+            let timelineHtml = "";
+            if (data.status === "Batal") {
+                timelineHtml = `<div class="timeline-step active"><div class="step-dot" style="background:var(--danger)"></div><div class="step-content"><b style="color:var(--danger)">DIBATALKAN</b><p>Pesanan telah dibatalkan.</p></div></div>`;
+            } else {
+                steps.forEach((s, i) => {
+                    if (i <= curIdx) timelineHtml += `<div class="timeline-step ${i === curIdx ? 'active' : 'done'}"><div class="step-dot"></div><div class="step-content"><b>${s.l.toUpperCase()}</b><p style="font-size:11px; margin-top:4px; opacity:0.8;">${s.d}</p></div></div>`;
+                });
+            }
+
             body.innerHTML = `
-                <h2 style="margin-bottom:20px; font-weight:800;">LACAK PESANAN</h2>
-                <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:15px; margin-bottom:20px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>No. Resi:</span><b style="word-break: break-all; margin-left: 10px;">${data.id}</b></div>
-                    <div style="display:flex; justify-content:space-between;"><span>Status:</span><b style="color:var(--accent)">${data.status}</b></div>
+                <h2 style="margin-bottom:20px; font-weight:800; color:white;">LACAK DETAIL</h2>
+                <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:20px; margin-bottom:20px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px;"><span>No. Resi:</span><b style="word-break:break-all; margin-left:15px;">${data.id}</b></div>
+                    <div style="display:flex; justify-content:space-between; font-size:13px;"><span>Status:</span><b style="color:var(--accent)">${data.status}</b></div>
                 </div>
-                <div style="padding-left:20px; border-left:3px solid var(--success); margin-left:10px; margin-bottom: 25px;">
-                    <b style="color:white; font-size:15px;">${data.status}</b><br>
-                    <small style="color:var(--text-muted)">Update: ${data.waktu_order || 'Baru Saja'}</small>
-                </div>
-                <a href="${waChatLink}" target="_blank" class="btn-wa-shared"><i class="fa-brands fa-whatsapp"></i> HUBUNGI DRIVER SEKARANG</a>
+                <div class="tracking-timeline">${timelineHtml}</div>
+                <a href="https://api.whatsapp.com/send?phone=${DRIVER_WA}&text=${encodeURIComponent('Halo Driver! Chat terkait resi: #' + data.id)}" target="_blank" class="btn-wa-final" style="margin-top:0;"><i class="fa-brands fa-whatsapp"></i> HUBUNGI DRIVER</a>
             `;
             document.getElementById('mainModal').style.display = 'flex';
         }
 
-        function lihatDaftarPesanan() {
-            const body = document.getElementById('modal-body');
-            body.innerHTML = `<h2 style="margin-bottom:20px; font-weight:800; color:var(--info)">PESANAN SAYA</h2>`;
-            if(myOrderIDs.length === 0) body.innerHTML += '<p style="text-align:center; color:var(--text-muted); padding:30px;">Belum ada riwayat.</p>';
-            else {
-                [...myOrderIDs].reverse().forEach(resi => {
-                    database.ref('semua_pesanan/' + resi).once('value', s => {
-                        const d = s.val();
-                        if(d) body.innerHTML += `<div onclick='renderTracking(${JSON.stringify(d)})' style="background:rgba(255,255,255,0.05); padding:15px; border-radius:15px; margin-bottom:12px; cursor:pointer; border:1px solid rgba(255,255,255,0.05);"><div style="display:flex; justify-content:space-between;"><b>#${d.id.substring(0,12)}...</b><span style="font-size:11px; background:var(--info); color:white; padding:3px 10px; border-radius:50px; font-weight:700;">${d.status}</span></div><div style="font-size:12px; color:var(--text-muted); margin-top:8px;">${d.total_biaya} • Klik untuk Detail</div></div>`;
-                    });
-                });
-            }
-            document.getElementById('mainModal').style.display = 'flex';
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg; t.style.display = 'block';
-            setTimeout(() => { t.style.display = 'none'; }, 2500);
-        }
-
-        function syncBadge() {
-            const b = document.getElementById('order-badge');
-            if(myOrderIDs.length > 0) { b.innerText = myOrderIDs.length; b.style.display = 'flex'; }
-        }
-
+        function salinResi(text) { navigator.clipboard.writeText(text).then(() => showNotif("Resi disalin!", "success")); }
         function tutupModal() { document.getElementById('mainModal').style.display = 'none'; }
+        function lacakManual() {
+            const resi = document.getElementById('resi-input').value.toUpperCase().trim();
+            if(!resi) return showNotif("Masukkan resi!");
+            database.ref('semua_pesanan/' + resi).once('value', snapshot => { if(snapshot.exists()) renderTracking(snapshot.val()); else showNotif("Resi tidak ditemukan!"); });
+        }
     </script>
 </body>
 </html>
