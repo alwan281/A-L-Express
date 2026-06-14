@@ -3,72 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>A&L EXPRESS PANEL</title>
+    <title>A&L EXPRESS - Driver Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #0f172a;
+            --bg-main: #020617;
             --bg-card: #1e293b;
+            --bg-input: #0f172a;
             --accent: #f59e0b;
             --success: #10b981;
             --info: #3b82f6;
+            --danger: #ef4444;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 30px; }
-        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        header h1 { font-size: 24px; font-weight: 800; letter-spacing: 1px; }
-        header h1 span { color: var(--accent); }
-        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: -30px; margin-bottom: 25px; }
-        .stat-box { background: var(--bg-card); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .stat-box small { font-size: 10px; font-weight: 800; opacity: 0.7; text-transform: uppercase; }
-        .stat-box h2 { font-size: 18px; margin-top: 5px; color: var(--accent); }
-        .tab-menu { display: flex; background: var(--bg-card); padding: 5px; border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: none; color: var(--text-muted); font-weight: 700; cursor: pointer; border-radius: 12px; font-size: 13px; transition: 0.3s; }
-        .tab-btn.active { background: var(--accent); color: #000; }
-        .order-card { background: var(--bg-card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); animation: fadeInUp 0.4s ease; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .order-header { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; }
-        .status-pill { padding: 4px 12px; border-radius: 50px; font-size: 10px; font-weight: 800; color: white; text-transform: uppercase; }
-        .info-row { display: flex; gap: 10px; margin-bottom: 8px; font-size: 14px; }
-        .info-row i { color: var(--accent); width: 18px; text-align: center; margin-top: 3px; }
-        .detail-box { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; margin: 15px 0; font-size: 13px; line-height: 1.6; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { padding: 16px; border-radius: 15px; border: none; font-weight: 800; font-size: 12px; cursor: pointer; text-decoration: none; text-align: center; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn:active { transform: scale(0.95); }
-        .btn-wa { background: var(--success); color: white; }
-        .btn-action { background: #fff; color: #000; }
-        .btn-finish { background: var(--info); color: white; }
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 10px 25px; border-radius: 50px; font-weight: 800; display: none; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-main); color: var(--text-main); overflow-x: hidden; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+
+        /* AUTH VIEWS */
+        .auth-view { display: none; min-height: 100vh; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+        .auth-card { background: var(--bg-card); width: 100%; padding: 35px 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px; margin-left: 5px; }
+        .input-style { width: 100%; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 15px; color: white; outline: none; transition: 0.3s; }
+        .input-style:focus { border-color: var(--accent); }
+        
+        /* MAIN DASHBOARD */
+        .main-view { display: none; padding-bottom: 100px; }
+        header { background: linear-gradient(180deg, #1e1b4b 0%, #020617 100%); padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(245, 158, 11, 0.2); margin-bottom: 25px; border-radius: 0 0 40px 40px; }
+        
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; margin-top: -10px; }
+        .stat-box { background: var(--bg-card); padding: 20px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-box small { font-size: 10px; font-weight: 800; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-box h2 { font-size: 18px; color: var(--accent); margin-top: 8px; font-weight: 800; }
+
+        .tab-menu { display: flex; background: var(--bg-card); padding: 6px; border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; color: var(--text-muted); font-weight: 700; cursor: pointer; border-radius: 15px; font-size: 13px; transition: 0.3s; }
+        .tab-btn.active { background: var(--accent); color: #000; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+
+        /* ORDER CARDS */
+        .order-card { background: var(--bg-card); border-radius: 28px; padding: 22px; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.05); position: relative; animation: slideUp 0.4s ease; }
+        .status-pill { position: absolute; top: 22px; right: 22px; padding: 5px 12px; border-radius: 50px; font-size: 10px; font-weight: 800; color: white; text-transform: uppercase; }
+        .info-row { display: flex; gap: 12px; margin-bottom: 10px; font-size: 14px; align-items: flex-start; }
+        .info-row i { color: var(--accent); width: 16px; text-align: center; margin-top: 3px; }
+        .item-list { background: rgba(0,0,0,0.25); padding: 15px; border-radius: 18px; margin: 18px 0; font-size: 13px; line-height: 1.6; border-left: 3px solid var(--accent); }
+
+        /* BUTTONS */
+        .btn { width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-info { background: var(--info); color: white; }
+        .btn-outline { background: transparent; border: 2px solid #334155; color: var(--text-muted); }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        /* NAVBAR */
+        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px 10px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
+        .nav-item { color: var(--text-muted); text-align: center; font-size: 10px; font-weight: 700; cursor: pointer; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); }
+        .nav-item i { font-size: 20px; margin-bottom: 6px; display: block; }
+
+        /* MODERN MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 9999; padding: 25px; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 400px; padding: 30px; border-radius: 35px; text-align: center; border: 1px solid rgba(255,255,255,0.1); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-icon { width: 70px; height: 70px; background: rgba(239, 68, 68, 0.1); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 0 auto 20px; }
+
+        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 12px 30px; border-radius: 50px; font-weight: 800; display: none; z-index: 100000; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; }
+        
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate { animation: slideUp 0.4s ease; }
     </style>
 </head>
 <body>
 
-    <header><h1>A&L EXPRESS <span>PANEL</span></h1></header>
-    <div class="container">
-        <!-- STATS -->
-        <div class="stats-grid">
-            <div class="stat-box"><small>Pendapatan</small><h2 id="stat-income">Rp 0</h2></div>
-            <div class="stat-box"><small>Sukses</small><h2 id="stat-count">0 Order</h2></div>
+    <!-- VIEW LOGIN -->
+    <div id="view-login" class="auth-view animate">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="font-size: 32px; font-weight: 800;">A&L <span style="color: var(--accent);">DRIVER</span></h1>
+            <p style="color: var(--text-muted); font-size: 14px;">Masuk ke sistem pengiriman</p>
         </div>
-
-        <!-- TABS -->
-        <div class="tab-menu">
-            <button class="tab-btn active" onclick="switchTab('Menunggu Driver', this)">Baru</button>
-            <button class="tab-btn" onclick="switchTab('Dalam Proses', this)">Proses</button>
-            <button class="tab-btn" onclick="switchTab('Selesai', this)">Selesai</button>
+        <div class="auth-card">
+            <div class="input-group">
+                <label>NOMOR WHATSAPP</label>
+                <input type="tel" id="login-phone" class="input-style" placeholder="08xxx">
+            </div>
+            <div class="input-group">
+                <label>KATA SANDI</label>
+                <input type="password" id="login-pass" class="input-style" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary" onclick="prosesLogin()">MASUK</button>
+            <p style="margin-top: 25px; font-size: 13px; color: var(--text-muted);">
+                Driver baru? <a href="#" onclick="showView('register')" style="color: var(--accent); font-weight: 800; text-decoration: none;">Daftar Disini</a>
+            </p>
         </div>
-
-        <!-- LIST ORDER -->
-        <div id="list-container"></div>
     </div>
 
-    <div id="toast">Berhasil Diperbarui!</div>
+    <!-- VIEW REGISTER -->
+    <div id="view-register" class="auth-view animate">
+        <h2 style="margin-bottom: 25px; font-weight: 800;">Daftar Akun</h2>
+        <div class="auth-card">
+            <div class="input-group">
+                <label>NAMA LENGKAP</label>
+                <input type="text" id="reg-name" class="input-style" placeholder="Nama Driver">
+            </div>
+            <div class="input-group">
+                <label>NOMOR WHATSAPP</label>
+                <input type="tel" id="reg-phone" class="input-style" placeholder="08xxx">
+            </div>
+            <div class="input-group">
+                <label>KATA SANDI</label>
+                <input type="password" id="reg-pass" class="input-style" placeholder="Min. 6 Karakter">
+            </div>
+            <button class="btn btn-primary" onclick="prosesDaftar()">DAFTAR SEKARANG</button>
+            <button class="btn btn-outline" style="margin-top: 12px; border:none;" onclick="showView('login')">Sudah punya akun? Login</button>
+        </div>
+    </div>
 
-    <!-- FIREBASE -->
+    <!-- VIEW MAIN DASHBOARD -->
+    <div id="view-main" class="main-view animate">
+        <header>
+            <h1 id="header-name" style="font-weight: 800;">Halo, Driver</h1>
+            <p style="font-size: 12px; opacity: 0.7; letter-spacing: 1px;" id="header-phone">08xxxx</p>
+        </header>
+
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <small>PENDAPATAN</small>
+                    <h2 id="stat-income">Rp 0</h2>
+                </div>
+                <div class="stat-box">
+                    <small>ORDER SUKSES</small>
+                    <h2 id="stat-count">0</h2>
+                </div>
+            </div>
+
+            <div class="tab-menu">
+                <button class="tab-btn active" onclick="switchTab('Menunggu Driver', this)">Baru</button>
+                <button class="tab-btn" onclick="switchTab('Dalam Proses', this)">Proses</button>
+                <button class="tab-btn" onclick="switchTab('Selesai', this)">Selesai</button>
+            </div>
+
+            <div id="order-list"></div>
+        </div>
+
+        <div class="navbar">
+            <div id="nav-home" class="nav-item active" onclick="showView('main')"><i class="fa-solid fa-house"></i>Home</div>
+            <div id="nav-profile" class="nav-item" onclick="showView('profile')"><i class="fa-solid fa-user-gear"></i>Akun</div>
+            <div class="nav-item" onclick="openLogoutModal()"><i class="fa-solid fa-right-from-bracket"></i>Keluar</div>
+        </div>
+    </div>
+
+    <!-- VIEW PROFILE -->
+    <div id="view-profile" class="main-view animate">
+        <div class="container" style="padding-top: 50px;">
+            <h2 style="margin-bottom: 30px; text-align: center; font-weight: 800;">Pengaturan Akun</h2>
+            <div class="auth-card">
+                <div class="input-group">
+                    <label>NAMA LENGKAP</label>
+                    <input type="text" id="profile-name" class="input-style" style="opacity: 0.6;" readonly>
+                </div>
+                <hr style="opacity: 0.05; margin: 25px 0;">
+                <h3 style="font-size: 14px; margin-bottom: 20px; color: var(--text-muted);">Ubah Kata Sandi</h3>
+                <div class="input-group">
+                    <label>PASSWORD BARU</label>
+                    <input type="password" id="new-pass" class="input-style" placeholder="Minimal 6 karakter">
+                </div>
+                <button class="btn btn-primary" onclick="prosesGantiPass()">SIMPAN PERUBAHAN</button>
+            </div>
+            <button class="btn btn-outline" style="margin-top: 20px; border:none;" onclick="showView('main')">KEMBALI</button>
+        </div>
+    </div>
+
+    <!-- MODERN LOGOUT MODAL -->
+    <div id="logoutModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+            <h3 style="font-weight: 800; font-size: 20px; margin-bottom: 10px;">Konfirmasi Keluar</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">Apakah Anda yakin ingin keluar dari akun Driver?</p>
+            <div class="btn-grid">
+                <button class="btn btn-outline" onclick="closeLogoutModal()">BATAL</button>
+                <button class="btn btn-danger" onclick="confirmLogout()">YA, KELUAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">Berhasil!</div>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -85,135 +211,200 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        let currentUser = JSON.parse(localStorage.getItem('driver_session')) || null;
         let currentTab = "Menunggu Driver";
 
+        window.onload = () => {
+            if(currentUser) {
+                showView('main');
+                initDashboard();
+            } else {
+                showView('login');
+            }
+        };
+
+        // NAVIGATION
+        function showView(viewId) {
+            document.querySelectorAll('.auth-view, .main-view').forEach(v => v.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            const target = document.getElementById('view-' + viewId);
+            if(viewId === 'main' || viewId === 'profile') {
+                target.style.display = 'block';
+                document.getElementById('nav-' + (viewId === 'main' ? 'home' : 'profile')).classList.add('active');
+            } else {
+                target.style.display = 'flex';
+            }
+
+            if(viewId === 'profile' && currentUser) {
+                document.getElementById('profile-name').value = currentUser.nama;
+            }
+        }
+
+        // LOGOUT MODAL LOGIC
+        function openLogoutModal() { document.getElementById('logoutModal').style.display = 'flex'; }
+        function closeLogoutModal() { document.getElementById('logoutModal').style.display = 'none'; }
+        function confirmLogout() {
+            localStorage.removeItem('driver_session');
+            currentUser = null;
+            closeLogoutModal();
+            location.reload();
+        }
+
+        // AUTH
+        function prosesDaftar() {
+            const nama = document.getElementById('reg-name').value;
+            const hp = document.getElementById('reg-phone').value;
+            const pass = document.getElementById('reg-pass').value;
+            if(!nama || !hp || pass.length < 6) return showToast("Lengkapi data (Pass min 6)!");
+            database.ref('driver_accounts/' + hp).once('value', (s) => {
+                if(s.exists()) {
+                    showToast("Nomor HP sudah terdaftar!");
+                } else {
+                    const data = { nama, hp, pass };
+                    database.ref('driver_accounts/' + hp).set(data).then(() => {
+                        showToast("Pendaftaran Berhasil!");
+                        showView('login');
+                    });
+                }
+            });
+        }
+
+        function prosesLogin() {
+            const hp = document.getElementById('login-phone').value;
+            const pass = document.getElementById('login-pass').value;
+            if(!hp || !pass) return showToast("Masukkan HP & Password!");
+            database.ref('driver_accounts/' + hp).once('value', (s) => {
+                const data = s.val();
+                if(data && data.pass === pass) {
+                    currentUser = data;
+                    localStorage.setItem('driver_session', JSON.stringify(data));
+                    showToast("Login Berhasil!");
+                    showView('main');
+                    initDashboard();
+                } else {
+                    showToast("HP atau Password salah!");
+                }
+            });
+        }
+
+        function prosesGantiPass() {
+            const newPass = document.getElementById('new-pass').value;
+            if(newPass.length < 6) return showToast("Password min 6 karakter!");
+            database.ref('driver_accounts/' + currentUser.hp).update({ pass: newPass }).then(() => {
+                showToast("Password Diperbarui!");
+                currentUser.pass = newPass;
+                localStorage.setItem('driver_session', JSON.stringify(currentUser));
+                document.getElementById('new-pass').value = "";
+                showView('main');
+            });
+        }
+
+        // DASHBOARD
         function switchTab(tab, btn) {
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            muatData();
+            muatOrderan();
         }
 
-        function muatData() {
-            const container = document.getElementById('list-container');
-            database.ref('semua_pesanan').on('value', (snapshot) => {
-                container.innerHTML = "";
-                let income = 0; let totalSuccess = 0; let hasOrder = false;
-                const data = snapshot.val();
-                
-                if (data) {
-                    const sortedKeys = Object.keys(data).reverse();
-                    sortedKeys.forEach(key => {
+        function initDashboard() {
+            document.getElementById('header-name').innerText = "Halo, " + currentUser.nama;
+            document.getElementById('header-phone').innerText = currentUser.hp;
+            muatOrderan();
+        }
+
+        function muatOrderan() {
+            const list = document.getElementById('order-list');
+            database.ref('semua_pesanan').on('value', (snap) => {
+                list.innerHTML = "";
+                let income = 0; let successCount = 0; let found = false;
+                const data = snap.val();
+                if(data) {
+                    Object.keys(data).reverse().forEach(key => {
                         const order = data[key];
-                        
-                        if (order.status === "Selesai") {
-                            totalSuccess++;
-                            const nominal = parseInt(order.total_biaya.replace(/[^0-9]/g, '')) || 0;
-                            income += nominal;
+                        // Hitung Stats
+                        if(order.status === "Selesai") {
+                            successCount++;
+                            income += parseInt(order.total_biaya.replace(/[^0-9]/g, '')) || 0;
                         }
+                        
+                        // TAB LOGIC (Selesai & Batal masuk tab Selesai)
+                        let match = false;
+                        if(currentTab === "Menunggu Driver" && order.status === "Menunggu Driver") match = true;
+                        if(currentTab === "Dalam Proses" && (order.status === "Pesanan Diproses Driver" || order.status === "Dalam Perjalanan")) match = true;
+                        if(currentTab === "Selesai" && (order.status === "Selesai" || order.status === "Batal")) match = true;
 
-                        let show = false;
-                        if (currentTab === "Menunggu Driver" && order.status === "Menunggu Driver") show = true;
-                        if (currentTab === "Dalam Proses" && (order.status === "Pesanan Diproses Driver" || order.status === "Dalam Perjalanan")) show = true;
-                        if (currentTab === "Selesai" && order.status === "Selesai") show = true;
-
-                        if (show) {
-                            hasOrder = true;
+                        if(match) {
+                            found = true;
                             renderCard(key, order);
                         }
                     });
                 }
-                
                 document.getElementById('stat-income').innerText = "Rp " + income.toLocaleString('id-ID');
-                document.getElementById('stat-count').innerText = totalSuccess + " Order";
-                if (!hasOrder) container.innerHTML = `<div style="text-align:center; padding:100px 20px; color:gray; font-size:14px;">Tidak ada pesanan di tab ini.</div>`;
+                document.getElementById('stat-count').innerText = successCount;
+                if(!found) list.innerHTML = `<div style="text-align:center; padding:80px 20px; color:var(--text-muted); font-size:14px;"><i class="fa-solid fa-box-open" style="display:block; font-size:40px; margin-bottom:15px; opacity:0.3;"></i>Kosong</div>`;
             });
         }
 
         function renderCard(key, order) {
-            const container = document.getElementById('list-container');
-            
-            // Render Items Proteksi Undefined
+            const list = document.getElementById('order-list');
             let items = "";
-            try {
-                if (order.pesanan_detail) {
-                    for(let iKey in order.pesanan_detail) {
-                        const val = order.pesanan_detail[iKey];
-                        if (typeof val === 'object' && val !== null) {
-                            items += `<div>• ${val.nama || iKey} (x${val.qty || 1})</div>`;
-                        } else {
-                            items += `<div>• ${iKey} (x${val})</div>`;
-                        }
-                    }
-                }
-            } catch(e) { items = "Gagal memuat detail menu."; }
+            for(let i in order.pesanan_detail) {
+                const val = order.pesanan_detail[i];
+                items += `<div>• ${typeof val === 'object' ? val.nama : i} (x${typeof val === 'object' ? val.qty : val})</div>`;
+            }
 
-            // Format WhatsApp Dinamis
             const phone = order.hp ? (order.hp.startsWith('0') ? '62' + order.hp.slice(1) : order.hp) : '';
-            const teksWA = `Halo Kak *${order.nama}*,\n` +
-                           `Saya dari *A&L Express*, Mau konfirmasi pesanan dengan nomor resi *#${order.id}* ke alamat:\n` +
-                           `*${order.alamat}*\n\n` +
-                           `Totalnya *${order.total_biaya}*\n` +
-                           `Mohon konfirmasinya ya, apakah benar pesanan ini milik Kakak?\n\n` +
-                           `Terima kasih`;
+            const teksWA = `Halo Kak *${order.nama}*,\nSaya Driver *A&L Express*. Konfirmasi pesanan Resi *#${order.id}* ke alamat *${order.alamat}*. Totalnya *${order.total_biaya}*.\n\nMohon ditunggu ya!`;
             const waLink = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(teksWA)}`;
 
             const card = document.createElement('div');
-            card.className = "order-card";
+            card.className = "order-card animate";
 
-            let actionBtn = "";
-            if (order.status === "Menunggu Driver") {
-                actionBtn = `<button class="btn btn-action" style="grid-column: span 2; background: var(--accent);" onclick="updateStatus('${key}', 'Pesanan Diproses Driver', this)">AMBIL PESANAN</button>`;
-            } else if (order.status === "Pesanan Diproses Driver") {
-                actionBtn = `<a href="${waLink}" target="_blank" class="btn btn-wa"><i class="fa-brands fa-whatsapp"></i> CHAT</a>
-                             <button class="btn btn-action" onclick="updateStatus('${key}', 'Dalam Perjalanan', this)">MULAI KIRIM</button>`;
-            } else if (order.status === "Dalam Perjalanan") {
-                actionBtn = `<a href="${waLink}" target="_blank" class="btn btn-wa"><i class="fa-brands fa-whatsapp"></i> CHAT</a>
-                             <button class="btn btn-finish" onclick="updateStatus('${key}', 'Selesai', this)">MARK SELESAI</button>`;
+            let buttons = "";
+            if(order.status === "Menunggu Driver") {
+                buttons = `<div class="btn-grid"><button class="btn btn-danger" onclick="updateStatus('${key}', 'Batal')">BATALKAN</button><button class="btn btn-primary" onclick="updateStatus('${key}', 'Pesanan Diproses Driver')">AMBIL</button></div>`;
+            } else if(order.status === "Pesanan Diproses Driver") {
+                buttons = `<div class="btn-grid"><a href="${waLink}" target="_blank" class="btn btn-success"><i class="fa-brands fa-whatsapp"></i> CHAT</a><button class="btn btn-primary" onclick="updateStatus('${key}', 'Dalam Perjalanan')">KIRIM</button></div>`;
+            } else if(order.status === "Dalam Perjalanan") {
+                buttons = `<div class="btn-grid"><a href="${waLink}" target="_blank" class="btn btn-success"><i class="fa-brands fa-whatsapp"></i> CHAT</a><button class="btn btn-info" onclick="updateStatus('${key}', 'Selesai')">MARK SELESAI</button></div>`;
             } else {
-                actionBtn = `<a href="${waLink}" target="_blank" class="btn btn-wa" style="grid-column: span 2"><i class="fa-brands fa-whatsapp"></i> HUBUNGI PELANGGAN</a>`;
+                buttons = `<a href="${waLink}" target="_blank" class="btn btn-success"><i class="fa-brands fa-whatsapp"></i> HUBUNGI LAGI</a>`;
             }
 
             card.innerHTML = `
-                <div class="order-header">
-                    <span style="font-size:11px; font-weight:800; color:var(--text-muted);">#${(order.id || key).substring(0,18)}</span>
-                    <span class="status-pill" style="background:${getStatusCol(order.status)}">${order.status}</span>
+                <span class="status-pill" style="background:${getStatusCol(order.status)}">${order.status}</span>
+                <div class="info-row" style="margin-top:10px;"><b style="color:var(--text-muted); font-size:11px;">#${order.id.substring(0,18)}...</b></div>
+                <div class="info-row"><i class="fa-solid fa-user"></i> <b>${order.nama}</b></div>
+                <div class="info-row"><i class="fa-solid fa-location-dot"></i> <span>${order.alamat}</span></div>
+                <div class="info-row" style="color:var(--accent)"><i class="fa-solid fa-comment-dots"></i> <i>"${order.catatan || '-'}"</i></div>
+                <div class="item-list">${items}</div>
+                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:16px; margin-bottom:15px; color:var(--accent)">
+                    <span>Total Bayar:</span><span>${order.total_biaya}</span>
                 </div>
-                <div class="info-row"><i class="fa-solid fa-user"></i> <b>${order.nama || 'Anonim'}</b></div>
-                <div class="info-row"><i class="fa-solid fa-location-dot"></i> <span>${order.alamat || 'Alamat kosong'}</span></div>
-                <div class="info-row" style="color:var(--accent)"><i class="fa-solid fa-comment"></i> <i>"${order.catatan || '-'}"</i></div>
-                <div class="detail-box">${items}</div>
-                <div style="display:flex; justify-content:space-between; font-weight:800; margin-bottom:15px; font-size:16px;">
-                    <span>Total Tagihan:</span><span style="color:var(--accent)">${order.total_biaya || 'Rp 0'}</span>
-                </div>
-                <div class="btn-group">${actionBtn}</div>
+                ${buttons}
             `;
-            container.appendChild(card);
+            list.appendChild(card);
         }
 
-        function updateStatus(keyResi, statusBaru, btnElement) {
-            btnElement.disabled = true;
-            btnElement.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
-            database.ref('semua_pesanan/' + keyResi).update({ status: statusBaru })
-            .then(() => {
-                const toast = document.getElementById('toast');
-                toast.style.display = 'block';
-                setTimeout(() => { toast.style.display = 'none'; }, 2000);
-            }).catch(err => {
-                alert("Gagal: " + err.message);
-                btnElement.disabled = false;
-                btnElement.innerText = "COBA LAGI";
-            });
+        function updateStatus(key, status) {
+            database.ref('semua_pesanan/' + key).update({ status }).then(() => showToast("Status Diperbarui!"));
         }
 
         function getStatusCol(s) {
             if(s === "Menunggu Driver") return "#ef4444";
             if(s === "Pesanan Diproses Driver") return "#3b82f6";
             if(s === "Dalam Perjalanan") return "#f59e0b";
+            if(s === "Batal") return "#64748b";
             return "#10b981";
         }
 
-        muatData();
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2000);
+        }
     </script>
 </body>
 </html>
