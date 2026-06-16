@@ -147,7 +147,7 @@
         .btn-outline { background: transparent; border: 2px solid #334155; color: var(--text-muted); }
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-        /* EDGE-TO-EDGE FLAT NAVBAR (MENEMPEL PAS DI BAGIAN PALING BAWAH LAYAR) */
+        /* EDGE-TO-EDGE FLAT NAVBAR */
         .navbar { 
             flex: 0 0 auto; 
             background: rgba(30, 41, 59, 0.95); 
@@ -155,7 +155,7 @@
             -webkit-backdrop-filter: blur(12px);
             display: flex; 
             justify-content: space-around; 
-            padding: 12px 10px 24px 10px; /* Padding bawah ditinggikan agar tombol tidak terhalang gestur usap Android */
+            padding: 12px 10px 16px 10px; 
             border-top: 1px solid rgba(255, 255, 255, 0.08); 
             box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.4);
             width: 100%;
@@ -185,7 +185,7 @@
             transform: translateY(-2px);
         }
 
-        /* MODAL OVERLAY (Z-INDEX KELUAR DINAIKKAN MAKSIMAL AGAR BERADA DI ATAS SEMUA ELEMEN) */
+        /* MODERN MODAL DENGAN Z-INDEX MAKSIMAL */
         .modal-overlay { 
             position: fixed; 
             top: 0; 
@@ -199,7 +199,7 @@
             display: none; 
             justify-content: center; 
             align-items: center; 
-            z-index: 200050; /* Diatur sangat tinggi agar tidak tertimbun */
+            z-index: 200050; /* Z-Index sangat tinggi agar tidak tertimbun */
             padding: 25px; 
         }
         .modal-content { background: var(--bg-card); width: 100%; max-width: 400px; padding: 30px; border-radius: 35px; text-align: center; border: 1px solid rgba(255,255,255,0.1); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -216,6 +216,7 @@
 
     <!-- NOTIFIKASI LAYAR ATAS VIRTUAL (GAYA SHOPEE / BRIMO) -->
     <div id="virtual-notification" style="position: fixed; top: -120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; padding: 15px; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 200010; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2); cursor: pointer;" onclick="bukaNotifVirtual()">
+        <!-- Logo Ikon Aplikasi Makanan Asli -->
         <img src="https://i.ibb.co.com/8gW9fG5x/AL-Icon.png" id="notif-app-icon" style="width: 45px; height: 45px; border-radius: 12px; object-fit: cover;" alt="App Icon">
         <div style="flex: 1; text-align: left;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
@@ -447,7 +448,6 @@
             <!-- Tombol Kamera Shutter -->
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 0 10px;">
                 <button class="btn btn-outline" onclick="closeCameraModal()" style="border-color: #ef4444; color: #ef4444; padding: 12px; font-size: 12px; flex: 1;">BATAL</button>
-                <!-- Tombol Jepret Bulat Native -->
                 <button onclick="ambilFotoDariStream()" style="width: 60px; height: 60px; border-radius: 50%; background: white; border: 5px solid #475569; cursor: pointer; outline: none; transition: 0.2s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"></button>
                 <div style="flex: 1;"></div> 
             </div>
@@ -705,23 +705,22 @@
             return formatter.format(new Date());
         }
 
+        // Perhitungan perbandingan tanggal WIB manual (100% kebal bug WebView HP) [2]
         function isTodayWIB(orderId) {
             if (!orderId || !orderId.startsWith('AL')) return false;
             
             const timestamp = parseInt(orderId.substring(2, 15));
             if (isNaN(timestamp)) return false;
 
-            const formatter = new Intl.DateTimeFormat('id-ID', {
-                timeZone: 'Asia/Jakarta',
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric'
-            });
+            // Offset penambahan 7 jam (WIB) [2]
+            const offsetWIB = 7 * 60 * 60 * 1000;
             
-            const orderDateStr = formatter.format(new Date(timestamp));
-            const todayDateStr = formatter.format(new Date());
-            
-            return orderDateStr === todayDateStr;
+            const dateOrder = new Date(timestamp + offsetWIB);
+            const dateToday = new Date(Date.now() + offsetWIB);
+
+            return dateOrder.getUTCFullYear() === dateToday.getUTCFullYear() &&
+                   dateOrder.getUTCMonth() === dateToday.getUTCMonth() &&
+                   dateOrder.getUTCDate() === dateToday.getUTCDate();
         }
 
         // NAVIGATION
@@ -759,7 +758,6 @@
             });
         }
 
-        // Membandingkan format versi semantik (Contoh: "1.0.1" vs "1.0.0") [2]
         function isNewerVersion(latest, current) {
             const lParts = latest.split('.').map(Number);
             const cParts = current.split('.').map(Number);
@@ -870,6 +868,20 @@
             });
         }
 
+        // --- LOGOUT MODAL LOGIC (DIPASTIKAN 100% RESPONSIF) ---
+        function openLogoutModal() { 
+            document.getElementById('logoutModal').style.display = 'flex'; 
+        }
+        function closeLogoutModal() { 
+            document.getElementById('logoutModal').style.display = 'none'; 
+        }
+        function confirmLogout() {
+            localStorage.removeItem('driver_session');
+            currentUser = null;
+            closeLogoutModal();
+            location.reload();
+        }
+
         // AUTH
         function prosesDaftar() {
             const nama = document.getElementById('reg-name').value;
@@ -922,20 +934,6 @@
                 document.getElementById('new-pass').value = "";
                 clickHome();
             });
-        }
-
-        // LOGOUT MODAL LOGIC (MODAL KELUAR MENJADI 100% RESPONSIF)
-        function openLogoutModal() { 
-            document.getElementById('logoutModal').style.display = 'flex'; 
-        }
-        function closeLogoutModal() { 
-            document.getElementById('logoutModal').style.display = 'none'; 
-        }
-        function confirmLogout() {
-            localStorage.removeItem('driver_session');
-            currentUser = null;
-            closeLogoutModal();
-            location.reload();
         }
 
         // DASHBOARD
