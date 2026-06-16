@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
     <title>A&L EXPRESS - Driver Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -185,7 +185,7 @@
             transform: translateY(-2px);
         }
 
-        /* MODAL OVERLAY (SISTEM LAYOUT UTAMA) */
+        /* MODERN MODAL DENGAN Z-INDEX TERATAS */
         .modal-overlay { 
             position: fixed; 
             top: 0; 
@@ -199,7 +199,7 @@
             display: none; 
             justify-content: center; 
             align-items: center; 
-            z-index: 200050; /* Z-Index sangat tinggi agar tidak tertimbun */
+            z-index: 200050; /* Dikunci sangat tinggi agar berada di atas halaman utama */
             padding: 25px; 
         }
         .modal-content { background: var(--bg-card); width: 100%; max-width: 400px; padding: 30px; border-radius: 35px; text-align: center; border: 1px solid rgba(255,255,255,0.1); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -469,7 +469,7 @@
                     <span id="update-status-text">Mengunduh berkas...</span>
                     <span id="update-percent">0%</span>
                 </div>
-                <div style="background: var(--bg-input); width: 100%; height: 8px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="background: var(--bg-input); width: 100%; height: 8px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(16, 185, 129, 0.15);">
                     <div id="update-progress-bar" style="background: var(--accent); width: 0%; height: 100%; transition: width 0.1s linear; border-radius: 10px;"></div>
                 </div>
             </div>
@@ -734,21 +734,46 @@
         }
 
         // Perhitungan perbandingan tanggal WIB manual (100% kebal bug WebView HP) [2]
-        function isTodayWIB(orderId) {
-            if (!orderId || !orderId.startsWith('AL')) return false;
+        function isTodayWIB(order) {
+            if (!order) return false;
             
-            const timestamp = parseInt(orderId.substring(2, 15));
-            if (isNaN(timestamp)) return false;
-
-            // Offset penambahan 7 jam (WIB) [2]
             const offsetWIB = 7 * 60 * 60 * 1000;
-            
-            const dateOrder = new Date(timestamp + offsetWIB);
             const dateToday = new Date(Date.now() + offsetWIB);
+            const todayDay = dateToday.getUTCDate();
+            const todayMonth = dateToday.getUTCMonth() + 1;
+            const todayYear = dateToday.getUTCFullYear();
 
-            return dateOrder.getUTCFullYear() === dateToday.getUTCFullYear() &&
-                   dateOrder.getUTCMonth() === dateToday.getUTCMonth() &&
-                   dateOrder.getUTCDate() === dateToday.getUTCDate();
+            // Metode 1: Berdasarkan timestamp ID Resi
+            if (order.id && order.id.startsWith('AL')) {
+                const timestamp = parseInt(order.id.substring(2, 15));
+                if (!isNaN(timestamp) && timestamp > 1700000000000) { 
+                    const dateOrder = new Date(timestamp + offsetWIB);
+                    if (dateOrder.getUTCFullYear() === todayYear &&
+                        dateOrder.getUTCMonth() + 1 === todayMonth &&
+                        dateOrder.getUTCDate() === todayDay) {
+                        return true;
+                    }
+                }
+            }
+
+            // Metode 2 (Bypass/Fallback): Berdasarkan pembacaan string waktu_order (Uji coba manual Firebase) [2]
+            if (order.waktu_order) {
+                const timeStr = String(order.waktu_order);
+                const datePart = timeStr.split(',')[0].trim(); 
+                
+                const parts = datePart.split(/[\/\-]/);
+                if (parts.length >= 3) {
+                    const oDay = parseInt(parts[0]);
+                    const oMonth = parseInt(parts[1]);
+                    const oYear = parseInt(parts[2]);
+                    
+                    if (oDay === todayDay && oMonth === todayMonth && oYear === todayYear) {
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
         }
 
         // NAVIGATION
@@ -769,7 +794,7 @@
             }
         }
 
-        // --- SISTEM PEMBARUAN OTOMATIS DRIVER (REAL-TIME KONEKSI AKURAT) ---
+        // --- SISTEM PEMBARUAN OTOMATIS DRIVER ---
         function cekPembaruanAplikasi() {
             database.ref('app_config/latest_version_driver').on('value', (snap) => {
                 if (snap.exists()) {
@@ -861,7 +886,44 @@
             document.getElementById('withdrawModal').style.display = 'flex';
         }
 
-        // LOGOUT MODAL LOGIC (DIPASTIKAN 100% RESPONSIF)
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').style.display = 'none';
+        }
+
+        function prosesWithdraw() {
+            const amount = parseInt(document.getElementById('wd-amount').value);
+            const method = document.getElementById('wd-method').value;
+            const target = document.getElementById('wd-target').value;
+            
+            if (isNaN(amount) || amount < ONGKIR) {
+                return showToast("Jumlah tidak valid!");
+            }
+            if (amount > currentDompetSaldo) {
+                return showToast("Saldo dompet tidak mencukupi!");
+            }
+            if (!target) {
+                return showToast("Isi nomor rekening/e-wallet tujuan!");
+            }
+
+            const wdId = 'WD' + Date.now();
+            const wdData = {
+                id: wdId,
+                driver_phone: currentUser.hp,
+                driver_name: currentUser.nama,
+                jumlah: amount,
+                metode: method,
+                tujuan: target,
+                status: "Pending",
+                waktu: new Date().toLocaleString('id-ID')
+            };
+
+            database.ref('pengajuan_withdraw/' + wdId).set(wdData).then(() => {
+                showToast("Pengajuan dikirim! Menunggu konfirmasi Admin.");
+                closeWithdrawModal();
+            });
+        }
+
+        // --- MANAJEMEN KELUAR AKUN (LOGOUT NYATA 100% RESPONSIF) ---
         function openLogoutModal() { 
             document.getElementById('logoutModal').style.display = 'flex'; 
         }
@@ -974,7 +1036,7 @@
                     // PINDAI JALUR MASUK ORDERAN BARU UNTUK PEMICU NOTIFIKASI
                     Object.keys(data).forEach(key => {
                         const order = data[key];
-                        const isOrderToday = isTodayWIB(order.id);
+                        const isOrderToday = isTodayWIB(order);
 
                         // Hitung jumlah data aktif real-time untuk badge tab menu
                         if (order.status === "Menunggu Driver") {
@@ -1002,7 +1064,7 @@
                     // RENDERING KARTU DAN PENGHITUNGAN KOMISI
                     Object.keys(data).reverse().forEach(key => {
                         const order = data[key];
-                        const isOrderToday = isTodayWIB(order.id);
+                        const isOrderToday = isTodayWIB(order);
 
                         // Driver berhak mendapatkan Rp 5.000 jika pesanan berhasil diselesaikan atas namanya
                         // Menggunakan fallback jika driver_phone kosong (toleransi data uji coba lama Anda)
@@ -1129,7 +1191,6 @@
             if(!resi) return showToast("Masukkan resi!");
             database.ref('semua_pesanan/' + resi).once('value', snapshot => { 
                 if(snapshot.exists()) {
-                    // Tampilkan hanya satu kartu orderan ini saja
                     const list = document.getElementById('order-list');
                     list.innerHTML = "";
                     renderCard(resi, snapshot.val());
