@@ -201,7 +201,6 @@
 
     <!-- NOTIFIKASI LAYAR ATAS VIRTUAL (GAYA SHOPEE / BRIMO) -->
     <div id="virtual-notification" style="position: fixed; top: -120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; padding: 15px; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 200010; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2); cursor: pointer;" onclick="bukaNotifVirtual()">
-        <!-- Logo Ikon Aplikasi Makanan Asli -->
         <img src="https://i.ibb.co.com/8gW9fG5x/AL-Icon.png" id="notif-app-icon" style="width: 45px; height: 45px; border-radius: 12px; object-fit: cover;" alt="App Icon">
         <div style="flex: 1; text-align: left;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
@@ -363,7 +362,7 @@
                         <label>PASSWORD BARU</label>
                         <input type="password" id="new-pass" class="input-style" placeholder="Minimal 6 karakter">
                     </div>
-                    <button class="btn btn-primary" onclick="prosesGantiPass()">SIMPAN HERUBAHAN</button>
+                    <button class="btn btn-primary" onclick="prosesGantiPass()">SIMPAN PERUBAHAN</button>
                 </div>
                 <button class="btn btn-outline" style="margin-top: 20px; border:none;" onclick="clickHome()">KEMBALI</button>
             </div>
@@ -433,7 +432,6 @@
             <!-- Tombol Kamera Shutter -->
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 0 10px;">
                 <button class="btn btn-outline" onclick="closeCameraModal()" style="border-color: #ef4444; color: #ef4444; padding: 12px; font-size: 12px; flex: 1;">BATAL</button>
-                <!-- Tombol Jepret Bulat Native -->
                 <button onclick="ambilFotoDariStream()" style="width: 60px; height: 60px; border-radius: 50%; background: white; border: 5px solid #475569; cursor: pointer; outline: none; transition: 0.2s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"></button>
                 <div style="flex: 1;"></div> 
             </div>
@@ -483,7 +481,7 @@
         let currentActiveOrderKey = null;
 
         window.onload = () => {
-            periksaIzinNotifikasi(); // Periksa status izin notifikasi sistem saat buka app
+            periksaIzinNotifikasi(); 
             cekPembaruanAplikasi(); 
             if(currentUser) {
                 showView('main');
@@ -730,7 +728,7 @@
 
         // --- SISTEM PEMBARUAN OTOMATIS DRIVER ---
         function cekPembaruanAplikasi() {
-            database.ref('app_config/latest_version_driver').once('value', (snap) => {
+            database.ref('app_config/latest_version_driver').on('value', (snap) => {
                 if (snap.exists()) {
                     const latestVersion = snap.val();
                     latestVersionGlobal = latestVersion;
@@ -738,6 +736,8 @@
                     if (isNewerVersion(latestVersion, ACTIVE_VERSION)) {
                         document.getElementById('update-desc').innerText = `Versi baru (${latestVersion}) telah tersedia untuk Driver dengan peningkatan stabilitas sistem. Silakan perbarui sekarang.`;
                         document.getElementById('update-modal').style.display = 'flex';
+                    } else {
+                        document.getElementById('update-modal').style.display = 'none';
                     }
                 }
             });
@@ -791,7 +791,8 @@
                         localStorage.setItem('driver_installed_version', latestVersionGlobal);
                         
                         setTimeout(() => {
-                            location.reload(true); 
+                            // Melakukan reload dengan menyuntikkan parameter acak waktu (cache-buster) untuk melompati cache WebView Android
+                            window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now();
                         }, 1000);
                     }, 800);
                 } else {
@@ -936,7 +937,10 @@
                         const isOrderToday = isTodayWIB(order.id);
 
                         // Driver berhak mendapatkan Rp 5.000 jika pesanan berhasil diselesaikan atas namanya
-                        if(order.status === "Selesai" && order.driver_phone === currentUser.hp) {
+                        // Menggunakan fallback jika driver_phone kosong (toleransi data uji coba lama Anda)
+                        const isMyOrder = !order.driver_phone || order.driver_phone === currentUser.hp;
+
+                        if(order.status === "Selesai" && isMyOrder) {
                             dompet += ONGKIR; 
 
                             if (isOrderToday) {
@@ -1023,8 +1027,7 @@
                     completeBtn = `<button class="btn btn-success" onclick="updateStatus('${key}', 'Selesai')"><i class="fa-solid fa-circle-check"></i> MARK SELESAI</button>`;
                 } else {
                     completeBtn = `
-                        <!-- MENGHAPUS ATRIBUT accept="image/*" AGAR SISTEM MEMAKSA KAMERA LANGSUNG DAN MELEWATI POPUP PILIHAN BERKAS -->
-                        <input type="file" id="camera-input-${key}" capture="environment" style="display: none;" onchange="prosesFotoBukti('${key}', this)">
+                        <!-- MENGHAPUS ATRIBUT accept="image/*" SECARA TOTAL UNTUK LANGSUNG MEMBUKA KAMERA BELAKANG HP -->
                         <button class="btn btn-outline" style="border-color:var(--accent); color:var(--accent);" onclick="openCameraModal('${key}')"><i class="fa-solid fa-camera"></i> FOTO BUKTI</button>
                     `;
                 }
