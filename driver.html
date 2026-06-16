@@ -17,10 +17,19 @@
             --danger: #ef4444;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-main); color: var(--text-main); overflow-x: hidden; }
+        
+        body { 
+            background-color: var(--bg-main); 
+            color: var(--text-main); 
+            overflow-x: hidden; 
+            position: relative;
+            transition: transform 0.15s ease-out;
+            padding-bottom: 120px; /* Jarak bawah agar tidak tertutup bar melayang */
+        }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
 
         /* AUTH VIEWS */
@@ -32,7 +41,7 @@
         .input-style:focus { border-color: var(--accent); }
         
         /* MAIN DASHBOARD */
-        .main-view { display: none; padding-bottom: 100px; }
+        .main-view { display: none; padding-bottom: 40px; }
         header { background: linear-gradient(180deg, #1e1b4b 0%, #020617 100%); padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(245, 158, 11, 0.2); margin-bottom: 25px; border-radius: 0 0 40px 40px; }
         
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; margin-top: -10px; }
@@ -61,11 +70,44 @@
         .btn-outline { background: transparent; border: 2px solid #334155; color: var(--text-muted); }
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-        /* NAVBAR */
-        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px 10px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
-        .nav-item { color: var(--text-muted); text-align: center; font-size: 10px; font-weight: 700; cursor: pointer; flex: 1; transition: 0.3s; }
-        .nav-item.active { color: var(--accent); }
-        .nav-item i { font-size: 20px; margin-bottom: 6px; display: block; }
+        /* FLOATING GLASSMORPHISM NAVBAR */
+        .navbar { 
+            position: fixed; 
+            bottom: 20px; 
+            left: 20px; 
+            right: 20px; 
+            background: rgba(30, 41, 59, 0.9); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            display: flex; 
+            justify-content: space-around; 
+            padding: 12px 10px; 
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 1000; 
+        }
+        .nav-item { 
+            color: var(--text-muted); 
+            text-align: center; 
+            font-size: 10px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            flex: 1; 
+            transition: 0.3s; 
+        }
+        .nav-item.active { 
+            color: var(--accent); 
+        }
+        .nav-item i { 
+            font-size: 18px; 
+            margin-bottom: 4px; 
+            display: block; 
+            transition: transform 0.2s ease;
+        }
+        .nav-item.active i {
+            transform: translateY(-2px);
+        }
 
         /* MODERN MODAL */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 9999; padding: 25px; }
@@ -81,6 +123,13 @@
 </head>
 <body>
 
+    <!-- INDIKATOR TARIK UNTUK REFRESH (PULL TO REFRESH) -->
+    <div id="ptr-indicator" style="position: absolute; top: -50px; left: 0; width: 100%; height: 50px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 100000;">
+        <div style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+            <i id="ptr-icon" class="fa-solid fa-arrows-rotate" style="color: var(--accent); font-size: 16px; transition: transform 0.1s;"></i>
+        </div>
+    </div>
+
     <!-- VIEW LOGIN -->
     <div id="view-login" class="auth-view animate">
         <div style="text-align: center; margin-bottom: 30px;">
@@ -90,11 +139,11 @@
         <div class="auth-card">
             <div class="input-group">
                 <label>NOMOR WHATSAPP</label>
-                <input type="tel" id="login-phone" class="input-style" placeholder="08xxx">
+                <input type="tel" id="login-phone" class="input-style" placeholder="08xxx" required>
             </div>
             <div class="input-group">
                 <label>KATA SANDI</label>
-                <input type="password" id="login-pass" class="input-style" placeholder="••••••••">
+                <input type="password" id="login-pass" class="input-style" placeholder="••••••••" required>
             </div>
             <button class="btn btn-primary" onclick="prosesLogin()">MASUK</button>
             <p style="margin-top: 25px; font-size: 13px; color: var(--text-muted);">
@@ -109,15 +158,15 @@
         <div class="auth-card">
             <div class="input-group">
                 <label>NAMA LENGKAP</label>
-                <input type="text" id="reg-name" class="input-style" placeholder="Nama Driver">
+                <input type="text" id="reg-name" class="input-style" placeholder="Nama Driver" required>
             </div>
             <div class="input-group">
                 <label>NOMOR WHATSAPP</label>
-                <input type="tel" id="reg-phone" class="input-style" placeholder="08xxx">
+                <input type="tel" id="reg-phone" class="input-style" placeholder="08xxx" required>
             </div>
             <div class="input-group">
                 <label>KATA SANDI</label>
-                <input type="password" id="reg-pass" class="input-style" placeholder="Min. 6 Karakter">
+                <input type="password" id="reg-pass" class="input-style" placeholder="Min. 6 Karakter" required>
             </div>
             <button class="btn btn-primary" onclick="prosesDaftar()">DAFTAR SEKARANG</button>
             <button class="btn btn-outline" style="margin-top: 12px; border:none;" onclick="showView('login')">Sudah punya akun? Login</button>
@@ -134,11 +183,11 @@
         <div class="container">
             <div class="stats-grid">
                 <div class="stat-box">
-                    <small>PENDAPATAN</small>
+                    <small>PENDAPATAN ONGKIR HARI INI</small>
                     <h2 id="stat-income">Rp 0</h2>
                 </div>
                 <div class="stat-box">
-                    <small>ORDER SUKSES</small>
+                    <small>ORDER SUKSES HARI INI</small>
                     <h2 id="stat-count">0</h2>
                 </div>
             </div>
@@ -193,6 +242,34 @@
         </div>
     </div>
 
+    <!-- MODAL MEMUAT PEMBARUAN (UPDATE OVERLAY) -->
+    <div id="update-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.95); z-index: 100005; display: none; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(10px);">
+        <div style="background: var(--bg-card); width: 100%; max-width: 400px; padding: 30px; border-radius: 35px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: var(--shadow);" class="animate">
+            <div style="background: rgba(245, 158, 11, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fa-solid fa-cloud-arrow-down" style="font-size: 35px; color: var(--accent);"></i>
+            </div>
+            <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 10px;">Pembaruan Tersedia!</h3>
+            <p id="update-desc" style="color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 25px;">Versi baru telah dirilis dengan peningkatan stabilitas dan performa. Perbarui sekarang untuk pengalaman terbaik.</p>
+            
+            <!-- BAR PROGRES PENGUNDUHAN -->
+            <div id="update-progress-container" style="display: none; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--accent); margin-bottom: 8px; text-transform: uppercase;">
+                    <span id="update-status-text">Mengunduh berkas...</span>
+                    <span id="update-percent">0%</span>
+                </div>
+                <div style="background: var(--bg-input); width: 100%; height: 8px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                    <div id="update-progress-bar" style="background: var(--accent); width: 0%; height: 100%; transition: width 0.1s linear; border-radius: 10px;"></div>
+                </div>
+            </div>
+
+            <!-- TOMBOL AKSI -->
+            <div id="update-actions" style="display: flex; gap: 12px;">
+                <button onclick="tundaUpdate()" style="flex: 1; background: #334155; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 13px;">TUNDA</button>
+                <button onclick="mulaiUpdate()" style="flex: 1; background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 13px;">PERBARUI</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast">Berhasil!</div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -211,17 +288,119 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // SISTEM VERSI & PROTEKSI LOOP (DRIVER)
+        const CURRENT_VERSION = "1.0.0"; 
+        const ACTIVE_VERSION = localStorage.getItem('driver_installed_version') || CURRENT_VERSION;
+        const ONGKIR = 5000; 
+
         let currentUser = JSON.parse(localStorage.getItem('driver_session')) || null;
         let currentTab = "Menunggu Driver";
+        let latestVersionGlobal = CURRENT_VERSION;
+        let lastCheckedDay = getWIBDay(); 
+
+        // VARIABEL KHUSUS MONITORING ORDER BARU (REAL-TIME NOTIFICATION)
+        let orderanTerproses = new Set();
+        let isFirstLoad = true;
 
         window.onload = () => {
+            mintaIzinNotifikasi(); // Minta izin notifikasi atas layar saat dibuka
+            cekPembaruanAplikasi(); 
             if(currentUser) {
                 showView('main');
                 initDashboard();
             } else {
                 showView('login');
             }
+
+            // Interval pendeteksi pergantian hari otomatis ke 00:00 WIB
+            setInterval(() => {
+                let currentDay = getWIBDay();
+                if (currentDay !== lastCheckedDay) {
+                    lastCheckedDay = currentDay;
+                    muatOrderan(); 
+                    showToast("Hari baru dimulai! Statistik di-reset ke Rp 0.");
+                }
+            }, 5000);
+
+            // Memicu sinkronisasi asinkronus pengisi suara sistem pada Android WebView/Chrome
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.getVoices();
+                window.speechSynthesis.onvoiceschanged = () => {
+                    window.speechSynthesis.getVoices();
+                };
+            }
         };
+
+        // --- SISTEM SUARA WANITA LEMBUT "ADA ORDERAN MASUK" ---
+        function bunyikanSuaraNotif() {
+            if ('speechSynthesis' in window) {
+                // Teks yang akan dibacakan
+                const ucapan = new SpeechSynthesisUtterance("Ada orderan masuk. Silakan periksa aplikasi Anda.");
+                ucapan.lang = 'id-ID';
+                ucapan.rate = 0.85; // Sedikit diperlambat agar terkesan anggun & lembut
+                ucapan.pitch = 1.15; // Sedikit ditinggikan untuk mensimulasikan suara wanita lembut
+
+                // Mencari suara wanita Indonesia jika tersedia di dalam sistem Android/HP
+                const voices = window.speechSynthesis.getVoices();
+                const indonesianFemaleVoice = voices.find(v => v.lang.startsWith('id') && v.name.toLowerCase().includes('female'));
+                
+                if (indonesianFemaleVoice) {
+                    ucapan.voice = indonesianFemaleVoice;
+                } else {
+                    const fallbackId = voices.find(v => v.lang.startsWith('id'));
+                    if (fallbackId) ucapan.voice = fallbackId;
+                }
+
+                window.speechSynthesis.speak(ucapan);
+            }
+        }
+
+        // --- SISTEM NOTIFIKASI LAYAR ATAS (SYSTEM PUSH) ---
+        function mintaIzinNotifikasi() {
+            if ("Notification" in window) {
+                Notification.requestPermission();
+            }
+        }
+
+        function kirimNotifikasiSistem(order) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                const notif = new Notification("A&L EXPRESS - Orderan Baru!", {
+                    body: `Ada orderan baru masuk dari ${order.nama} dengan tarif ${order.total_biaya}.`,
+                    icon: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/truck-fast.svg"
+                });
+                notif.onclick = () => {
+                    window.focus();
+                    showView('main');
+                };
+            }
+        }
+
+        function getWIBDay() {
+            const formatter = new Intl.DateTimeFormat('id-ID', {
+                timeZone: 'Asia/Jakarta',
+                day: 'numeric'
+            });
+            return formatter.format(new Date());
+        }
+
+        function isTodayWIB(orderId) {
+            if (!orderId || !orderId.startsWith('AL')) return false;
+            
+            const timestamp = parseInt(orderId.substring(2, 15));
+            if (isNaN(timestamp)) return false;
+
+            const formatter = new Intl.DateTimeFormat('id-ID', {
+                timeZone: 'Asia/Jakarta',
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+            });
+            
+            const orderDateStr = formatter.format(new Date(timestamp));
+            const todayDateStr = formatter.format(new Date());
+            
+            return orderDateStr === todayDateStr;
+        }
 
         // NAVIGATION
         function showView(viewId) {
@@ -239,6 +418,84 @@
             if(viewId === 'profile' && currentUser) {
                 document.getElementById('profile-name').value = currentUser.nama;
             }
+        }
+
+        // --- SISTEM PEMBARUAN OTOMATIS ---
+        function cekPembaruanAplikasi() {
+            database.ref('app_config/latest_version_driver').once('value', (snap) => {
+                if (snap.exists()) {
+                    const latestVersion = snap.val();
+                    latestVersionGlobal = latestVersion;
+                    
+                    if (isNewerVersion(latestVersion, ACTIVE_VERSION)) {
+                        document.getElementById('update-desc').innerText = `Versi baru (${latestVersion}) telah tersedia untuk Driver dengan peningkatan stabilitas sistem. Silakan perbarui sekarang.`;
+                        document.getElementById('update-modal').style.display = 'flex';
+                    }
+                }
+            });
+        }
+
+        function isNewerVersion(latest, current) {
+            const lParts = latest.split('.').map(Number);
+            const cParts = current.split('.').map(Number);
+            for (let i = 0; i < Math.max(lParts.length, cParts.length); i++) {
+                const l = lParts[i] || 0;
+                const c = cParts[i] || 0;
+                if (l > c) return true;
+                if (l < c) return false;
+            }
+            return false;
+        }
+
+        function tundaUpdate() {
+            document.getElementById('update-modal').style.display = 'none';
+        }
+
+        function mulaiUpdate() {
+            document.getElementById('update-actions').style.display = 'none';
+            document.getElementById('update-progress-container').style.display = 'block';
+
+            let progress = 0;
+            const progressBar = document.getElementById('update-progress-bar');
+            const percentText = document.getElementById('update-percent');
+            const statusText = document.getElementById('update-status-text');
+
+            const stages = [
+                { limit: 30, text: "Mengunduh file sistem..." },
+                { limit: 65, text: "Mengekstrak berkas..." },
+                { limit: 85, text: "Memasang pembaruan..." },
+                { limit: 100, text: "Menyelesaikan pemasangan..." }
+            ];
+
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 6) + 3; 
+                
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    progressBar.style.width = '100%';
+                    percentText.innerText = '100%';
+                    statusText.innerText = "Memasang selesai!";
+
+                    setTimeout(() => {
+                        statusText.innerText = "Aplikasi berhasil diperbarui!";
+                        localStorage.setItem('driver_installed_version', latestVersionGlobal);
+                        
+                        setTimeout(() => {
+                            location.reload(true); 
+                        }, 1000);
+                    }, 800);
+                } else {
+                    progressBar.style.width = progress + '%';
+                    percentText.innerText = progress + '%';
+                    
+                    const stage = stages.find(s => progress <= s.limit);
+                    if (stage) {
+                        statusText.innerText = stage.text;
+                    }
+                }
+            }, 180); 
         }
 
         // LOGOUT MODAL LOGIC
@@ -320,26 +577,56 @@
                 list.innerHTML = "";
                 let income = 0; let successCount = 0; let found = false;
                 const data = snap.val();
+                
                 if(data) {
+                    // 1. PINDAI TRANSISI ORDERAN BARU UNTUK SUARA & NOTIFIKASI
+                    Object.keys(data).forEach(key => {
+                        const order = data[key];
+                        // Deteksi orderan "Menunggu Driver" yang benar-benar baru masuk
+                        if (order.status === "Menunggu Driver") {
+                            if (!isFirstLoad && !orderanTerproses.has(key)) {
+                                bunyikanSuaraNotif();       // Pemicu Suara Wanita Lembut "Ada orderan masuk..."
+                                kirimNotifikasiSistem(order); // Pemicu Notifikasi Atas Layar Android/HP
+                            }
+                            orderanTerproses.add(key);
+                        } else {
+                            orderanTerproses.add(key);
+                        }
+                    });
+
+                    // Penanda pemindaian data historis awal telah selesai dijalankan
+                    isFirstLoad = false;
+
+                    // 2. RENDERING DAN PENGHITUNGAN STATISTIK HARIAN
                     Object.keys(data).reverse().forEach(key => {
                         const order = data[key];
-                        // Hitung Stats
-                        if(order.status === "Selesai") {
+                        const isOrderToday = isTodayWIB(order.id);
+
+                        if(order.status === "Selesai" && isOrderToday) {
                             successCount++;
-                            income += parseInt(order.total_biaya.replace(/[^0-9]/g, '')) || 0;
+                            income += ONGKIR; 
                         }
                         
-                        // TAB LOGIC (Selesai & Batal masuk tab Selesai)
                         let match = false;
-                        if(currentTab === "Menunggu Driver" && order.status === "Menunggu Driver") match = true;
-                        if(currentTab === "Dalam Proses" && (order.status === "Pesanan Diproses Driver" || order.status === "Dalam Perjalanan")) match = true;
-                        if(currentTab === "Selesai" && (order.status === "Selesai" || order.status === "Batal")) match = true;
+                        if(currentTab === "Menunggu Driver" && order.status === "Menunggu Driver") {
+                            match = true; 
+                        }
+                        if(currentTab === "Dalam Proses" && (order.status === "Pesanan Diproses Driver" || order.status === "Dalam Perjalanan")) {
+                            match = true; 
+                        }
+                        if(currentTab === "Selesai" && (order.status === "Selesai" || order.status === "Batal")) {
+                            if (isOrderToday) {
+                                match = true;
+                            }
+                        }
 
                         if(match) {
                             found = true;
                             renderCard(key, order);
                         }
                     });
+                } else {
+                    isFirstLoad = false;
                 }
                 document.getElementById('stat-income').innerText = "Rp " + income.toLocaleString('id-ID');
                 document.getElementById('stat-count').innerText = successCount;
@@ -405,6 +692,56 @@
             t.innerText = msg; t.style.display = 'block';
             setTimeout(() => t.style.display = 'none', 2000);
         }
+
+        // --- SISTEM DETEKSI GESER KE BAWAH UNTUK REFRESH (PULL TO REFRESH) ---
+        let startY = 0;
+        let pulling = false;
+        const ptrIndicator = document.getElementById('ptr-indicator');
+        const ptrIcon = document.getElementById('ptr-icon');
+
+        window.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) {
+                startY = e.touches[0].clientY;
+                pulling = true;
+                document.body.style.transition = 'none';
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!pulling) return;
+            const currentY = e.touches[0].clientY;
+            const diff = currentY - startY;
+
+            if (diff > 0) {
+                const drag = Math.min(diff * 0.4, 80); 
+                document.body.style.transform = `translateY(${drag}px)`;
+                ptrIcon.style.transform = `rotate(${drag * 4}deg)`;
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchend', (e) => {
+            if (!pulling) return;
+            pulling = false;
+            
+            const currentY = e.changedTouches[0].clientY;
+            const diff = currentY - startY;
+
+            document.body.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.8, 0.3, 1)';
+            document.body.style.transform = 'translateY(0)';
+            
+            if (diff > 120) {
+                ptrIcon.classList.add('fa-spin'); 
+                showToast("Menyegarkan halaman...");
+                
+                setTimeout(() => {
+                    location.reload(true); 
+                }, 800);
+            } else {
+                setTimeout(() => {
+                    ptrIcon.style.transform = 'rotate(0deg)';
+                }, 300);
+            }
+        });
     </script>
 </body>
 </html>
