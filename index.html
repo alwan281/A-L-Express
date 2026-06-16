@@ -269,7 +269,10 @@
 
         const DRIVER_WA = "6281807151531"; 
         const ONGKIR = 5000;
-        const CURRENT_VERSION = "1.0.0"; // Versi hardcoded aplikasi saat ini
+        
+        // SISTEM VERSI & PROTEKSI LOOP
+        const CURRENT_VERSION = "1.0.0"; 
+        const ACTIVE_VERSION = localStorage.getItem('installed_version') || CURRENT_VERSION;
 
         let keranjang = {};
         let dataMenuGlobal = null;
@@ -279,7 +282,7 @@
         let latestVersionGlobal = CURRENT_VERSION;
 
         window.onload = () => { 
-            cekPembaruanAplikasi(); // Periksa pembaruan saat memuat aplikasi
+            cekPembaruanAplikasi(); // Diperiksa setiap kali aplikasi dibuka
             if(currentUser) { showView('main'); initCustomer(); } else { showView('login'); } 
             muatMenu(); 
         };
@@ -292,26 +295,24 @@
             setTimeout(() => notif.classList.remove('show'), 3000);
         }
 
-        // --- SISTEM PEMBARUAN OTOMATIS (IN-APP UPDATE) ---
+        // --- SISTEM PEMBARUAN SEBELUM DI-UPDATE ---
         function cekPembaruanAplikasi() {
             database.ref('app_config/latest_version').once('value', (snap) => {
                 if (snap.exists()) {
                     const latestVersion = snap.val();
                     latestVersionGlobal = latestVersion;
                     
-                    if (isNewerVersion(latestVersion, CURRENT_VERSION)) {
-                        // Periksa apakah pengguna sebelumnya menunda versi ini
-                        const postponedVersion = localStorage.getItem('update_postponed');
-                        if (postponedVersion !== latestVersion) {
-                            document.getElementById('update-desc').innerText = `Versi baru (${latestVersion}) telah tersedia dengan peningkatan fitur dan performa. Silakan perbarui agar aplikasi berjalan optimal.`;
-                            document.getElementById('update-modal').style.display = 'flex';
-                        }
+                    // Membandingkan dengan versi aktif sistem (mendeteksi jika versi database lebih tinggi)
+                    if (isNewerVersion(latestVersion, ACTIVE_VERSION)) {
+                        // Tidak ada bypass penyimpanan permanen di localStorage lagi.
+                        // Modal ini selalu dipaksa muncul setiap kali halaman dibuka/dimuat ulang.
+                        document.getElementById('update-desc').innerText = `Versi baru (${latestVersion}) telah tersedia dengan peningkatan fitur dan performa. Silakan perbarui agar aplikasi berjalan optimal.`;
+                        document.getElementById('update-modal').style.display = 'flex';
                     }
                 }
             });
         }
 
-        // Membandingkan format versi semantik (Contoh: "1.0.1" vs "1.0.0") [2]
         function isNewerVersion(latest, current) {
             const lParts = latest.split('.').map(Number);
             const cParts = current.split('.').map(Number);
@@ -325,13 +326,12 @@
         }
 
         function tundaUpdate() {
-            // Simpan status ditunda hanya untuk versi spesifik ini
-            localStorage.setItem('update_postponed', latestVersionGlobal);
+            // Hanya menyembunyikan modal untuk sementara (sesi saat ini)
+            // Tidak menyimpan bypass di localStorage sehingga jika direfresh atau dibuka lagi, modal langsung muncul kembali.
             document.getElementById('update-modal').style.display = 'none';
         }
 
         function mulaiUpdate() {
-            // Sembunyikan tombol tunda & perbarui, ganti dengan bar progres pengunduhan
             document.getElementById('update-actions').style.display = 'none';
             document.getElementById('update-progress-container').style.display = 'block';
 
@@ -348,7 +348,7 @@
             ];
 
             const interval = setInterval(() => {
-                progress += Math.floor(Math.random() * 6) + 3; // Tambah progres acak 3-8%
+                progress += Math.floor(Math.random() * 6) + 3; 
                 
                 if (progress >= 100) {
                     progress = 100;
@@ -360,10 +360,11 @@
 
                     setTimeout(() => {
                         statusText.innerText = "Aplikasi berhasil diperbarui!";
-                        localStorage.removeItem('update_postponed'); // Hapus status penundaan versi sebelumnya
+                        
+                        // Simpan versi terpasang ke memori browser untuk mencegah loop uji coba lokal
+                        localStorage.setItem('installed_version', latestVersionGlobal);
                         
                         setTimeout(() => {
-                            // Muat ulang aplikasi secara paksa untuk menerapkan pembaruan (clear browser cache)
                             location.reload(true); 
                         }, 1000);
                     }, 800);
@@ -371,13 +372,12 @@
                     progressBar.style.width = progress + '%';
                     percentText.innerText = progress + '%';
                     
-                    // Sesuaikan teks status berdasarkan persentase unduhan saat ini
                     const stage = stages.find(s => progress <= s.limit);
                     if (stage) {
                         statusText.innerText = stage.text;
                     }
                 }
-            }, 180); // Berlangsung sekitar 4-6 detik demi pengalaman visual yang mulus
+            }, 180); 
         }
 
         function showView(viewId) {
@@ -496,7 +496,6 @@
                 document.getElementById('final-resi').innerText = resi;
                 document.getElementById('success-popup').style.display = 'flex';
                 
-                // Reset keranjang belanja & input form pengiriman
                 keranjang = {}; 
                 refreshUI();
                 document.getElementById('f-alamat').value = '';
@@ -509,7 +508,6 @@
             database.ref('semua_pesanan').orderByChild('customer_phone').equalTo(currentUser.hp).on('value', (snap) => {
                 list.innerHTML = ''; if(!snap.exists()) return list.innerHTML = '<p style="text-align:center; color:gray; padding:30px;">Belum ada pesanan.</p>';
                 
-                // Simpan data ke cache lokal
                 cachePesanan = snap.val();
                 
                 Object.keys(cachePesanan).reverse().forEach(key => {
@@ -519,7 +517,6 @@
             });
         }
 
-        // Buka pelacakan berdasarkan key cache
         function bukaTracking(key) {
             const data = cachePesanan[key];
             if (data) {
