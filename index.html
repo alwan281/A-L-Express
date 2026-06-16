@@ -169,7 +169,17 @@
 
     <!-- RIWAYAT VIEW -->
     <div id="view-history" class="main-view animate container" style="padding-top: 20px;">
-        <h2 style="margin-bottom: 25px; font-weight: 800; color: var(--info);">PESANAN SAYA</h2>
+        <h2 style="margin-bottom: 15px; font-weight: 800; color: var(--info);">PESANAN SAYA</h2>
+        
+        <!-- KOLOM LACAK MANUAL -->
+        <div style="background: var(--bg-card); padding: 15px; border-radius: 20px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="font-size: 10px; font-weight: 800; color: var(--accent); margin-bottom: 8px; text-transform: uppercase;">Lacak Manual No. Resi</div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="resi-input" class="input-style" placeholder="Masukkan nomor resi..." style="padding: 12px; font-size: 13px;">
+                <button onclick="lacakManual()" style="background: var(--accent); color: #000; border: none; padding: 0 20px; border-radius: 12px; font-weight: 800; font-size: 12px; cursor: pointer;">Lacak</button>
+            </div>
+        </div>
+
         <div id="history-list"></div>
     </div>
 
@@ -206,6 +216,34 @@
         <button onclick="location.reload()" style="width: 100%; background: transparent; color: var(--text-muted); border: 2px solid #334155; padding: 18px; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 15px;">TUTUP</button>
     </div>
 
+    <!-- MODAL MEMUAT PEMBARUAN (UPDATE OVERLAY) -->
+    <div id="update-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.95); z-index: 100005; display: none; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(10px);">
+        <div style="background: var(--bg-card); width: 100%; max-width: 400px; padding: 35px 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); text-align: center; box-shadow: var(--shadow);" class="animate">
+            <div style="background: rgba(245, 158, 11, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fa-solid fa-cloud-arrow-down" style="font-size: 35px; color: var(--accent);"></i>
+            </div>
+            <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 10px;">Pembaruan Tersedia!</h3>
+            <p id="update-desc" style="color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 25px;">Versi baru telah dirilis dengan peningkatan stabilitas dan performa. Perbarui sekarang untuk pengalaman terbaik.</p>
+            
+            <!-- BAR PROGRES PENGUNDUHAN (Awalnya Sembunyi) -->
+            <div id="update-progress-container" style="display: none; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--accent); margin-bottom: 8px; text-transform: uppercase;">
+                    <span id="update-status-text">Mengunduh berkas...</span>
+                    <span id="update-percent">0%</span>
+                </div>
+                <div style="background: var(--bg-input); width: 100%; height: 8px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                    <div id="update-progress-bar" style="background: var(--accent); width: 0%; height: 100%; transition: width 0.1s linear; border-radius: 10px;"></div>
+                </div>
+            </div>
+
+            <!-- TOMBOL AKSI -->
+            <div id="update-actions" style="display: flex; gap: 12px;">
+                <button onclick="tundaUpdate()" style="flex: 1; background: #334155; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 13px;">TUNDA</button>
+                <button onclick="mulaiUpdate()" style="flex: 1; background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 13px;">PERBARUI</button>
+            </div>
+        </div>
+    </div>
+
     <!-- NAVBAR -->
     <div id="bottom-navbar" class="navbar" style="display: none;">
         <div id="nav-home" class="nav-item active" onclick="showView('main')"><i class="fa-solid fa-house"></i>Home</div>
@@ -231,12 +269,20 @@
 
         const DRIVER_WA = "6281807151531"; 
         const ONGKIR = 5000;
+        const CURRENT_VERSION = "1.0.0"; // Versi hardcoded aplikasi saat ini
+
         let keranjang = {};
         let dataMenuGlobal = null;
         let currentUser = JSON.parse(localStorage.getItem('customer_session')) || null;
         let currentKategoriOpen = "";
+        let cachePesanan = {}; 
+        let latestVersionGlobal = CURRENT_VERSION;
 
-        window.onload = () => { if(currentUser) { showView('main'); initCustomer(); } else { showView('login'); } muatMenu(); };
+        window.onload = () => { 
+            cekPembaruanAplikasi(); // Periksa pembaruan saat memuat aplikasi
+            if(currentUser) { showView('main'); initCustomer(); } else { showView('login'); } 
+            muatMenu(); 
+        };
 
         function showNotif(msg, type = "error") {
             const notif = document.getElementById('modern-notif');
@@ -244,6 +290,94 @@
             document.getElementById('notif-msg').innerText = msg;
             notif.classList.add('show');
             setTimeout(() => notif.classList.remove('show'), 3000);
+        }
+
+        // --- SISTEM PEMBARUAN OTOMATIS (IN-APP UPDATE) ---
+        function cekPembaruanAplikasi() {
+            database.ref('app_config/latest_version').once('value', (snap) => {
+                if (snap.exists()) {
+                    const latestVersion = snap.val();
+                    latestVersionGlobal = latestVersion;
+                    
+                    if (isNewerVersion(latestVersion, CURRENT_VERSION)) {
+                        // Periksa apakah pengguna sebelumnya menunda versi ini
+                        const postponedVersion = localStorage.getItem('update_postponed');
+                        if (postponedVersion !== latestVersion) {
+                            document.getElementById('update-desc').innerText = `Versi baru (${latestVersion}) telah tersedia dengan peningkatan fitur dan performa. Silakan perbarui agar aplikasi berjalan optimal.`;
+                            document.getElementById('update-modal').style.display = 'flex';
+                        }
+                    }
+                }
+            });
+        }
+
+        // Membandingkan format versi semantik (Contoh: "1.0.1" vs "1.0.0") [2]
+        function isNewerVersion(latest, current) {
+            const lParts = latest.split('.').map(Number);
+            const cParts = current.split('.').map(Number);
+            for (let i = 0; i < Math.max(lParts.length, cParts.length); i++) {
+                const l = lParts[i] || 0;
+                const c = cParts[i] || 0;
+                if (l > c) return true;
+                if (l < c) return false;
+            }
+            return false;
+        }
+
+        function tundaUpdate() {
+            // Simpan status ditunda hanya untuk versi spesifik ini
+            localStorage.setItem('update_postponed', latestVersionGlobal);
+            document.getElementById('update-modal').style.display = 'none';
+        }
+
+        function mulaiUpdate() {
+            // Sembunyikan tombol tunda & perbarui, ganti dengan bar progres pengunduhan
+            document.getElementById('update-actions').style.display = 'none';
+            document.getElementById('update-progress-container').style.display = 'block';
+
+            let progress = 0;
+            const progressBar = document.getElementById('update-progress-bar');
+            const percentText = document.getElementById('update-percent');
+            const statusText = document.getElementById('update-status-text');
+
+            const stages = [
+                { limit: 30, text: "Mengunduh file sistem..." },
+                { limit: 65, text: "Mengekstrak berkas..." },
+                { limit: 85, text: "Memasang pembaruan..." },
+                { limit: 100, text: "Menyelesaikan pemasangan..." }
+            ];
+
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 6) + 3; // Tambah progres acak 3-8%
+                
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    progressBar.style.width = '100%';
+                    percentText.innerText = '100%';
+                    statusText.innerText = "Memasang selesai!";
+
+                    setTimeout(() => {
+                        statusText.innerText = "Aplikasi berhasil diperbarui!";
+                        localStorage.removeItem('update_postponed'); // Hapus status penundaan versi sebelumnya
+                        
+                        setTimeout(() => {
+                            // Muat ulang aplikasi secara paksa untuk menerapkan pembaruan (clear browser cache)
+                            location.reload(true); 
+                        }, 1000);
+                    }, 800);
+                } else {
+                    progressBar.style.width = progress + '%';
+                    percentText.innerText = progress + '%';
+                    
+                    // Sesuaikan teks status berdasarkan persentase unduhan saat ini
+                    const stage = stages.find(s => progress <= s.limit);
+                    if (stage) {
+                        statusText.innerText = stage.text;
+                    }
+                }
+            }, 180); // Berlangsung sekitar 4-6 detik demi pengalaman visual yang mulus
         }
 
         function showView(viewId) {
@@ -361,7 +495,12 @@
                 document.getElementById('btn-wa-final').href = `https://api.whatsapp.com/send?phone=${DRIVER_WA}&text=${encodeURIComponent(waMsg)}`;
                 document.getElementById('final-resi').innerText = resi;
                 document.getElementById('success-popup').style.display = 'flex';
-                keranjang = {}; refreshUI();
+                
+                // Reset keranjang belanja & input form pengiriman
+                keranjang = {}; 
+                refreshUI();
+                document.getElementById('f-alamat').value = '';
+                document.getElementById('f-note').value = '';
             });
         }
 
@@ -369,11 +508,31 @@
             const list = document.getElementById('history-list'); list.innerHTML = '<p style="text-align:center; color:gray;">Mencari data...</p>';
             database.ref('semua_pesanan').orderByChild('customer_phone').equalTo(currentUser.hp).on('value', (snap) => {
                 list.innerHTML = ''; if(!snap.exists()) return list.innerHTML = '<p style="text-align:center; color:gray; padding:30px;">Belum ada pesanan.</p>';
-                Object.keys(snap.val()).reverse().forEach(key => {
-                    const d = snap.val()[key];
-                    list.innerHTML += `<div onclick='renderTracking(${JSON.stringify(d)})' style="background:var(--bg-card); padding:20px; border-radius:20px; margin-bottom:15px; border:1px solid rgba(255,255,255,0.05); cursor:pointer;"><div style="display:flex; justify-content:space-between; margin-bottom:10px;"><b style="color:var(--accent); font-size:12px;">#${d.id.substring(0,18)}...</b><span style="font-size:10px; background:var(--info); color:white; padding:3px 10px; border-radius:50px; font-weight:800;">${d.status}</span></div><div style="font-size:14px; font-weight:700;">${d.total_biaya}</div></div>`;
+                
+                // Simpan data ke cache lokal
+                cachePesanan = snap.val();
+                
+                Object.keys(cachePesanan).reverse().forEach(key => {
+                    const d = cachePesanan[key];
+                    list.innerHTML += `<div onclick="bukaTracking('${key}')" style="background:var(--bg-card); padding:20px; border-radius:20px; margin-bottom:15px; border:1px solid rgba(255,255,255,0.05); cursor:pointer;"><div style="display:flex; justify-content:space-between; margin-bottom:10px;"><b style="color:var(--accent); font-size:12px;">#${d.id.substring(0,18)}...</b><span style="font-size:10px; background:var(--info); color:white; padding:3px 10px; border-radius:50px; font-weight:800;">${d.status}</span></div><div style="font-size:14px; font-weight:700;">${d.total_biaya}</div></div>`;
                 });
             });
+        }
+
+        // Buka pelacakan berdasarkan key cache
+        function bukaTracking(key) {
+            const data = cachePesanan[key];
+            if (data) {
+                renderTracking(data);
+            } else {
+                database.ref('semua_pesanan/' + key).once('value', snapshot => {
+                    if (snapshot.exists()) {
+                        renderTracking(snapshot.val());
+                    } else {
+                        showNotif("Pesanan tidak ditemukan!");
+                    }
+                });
+            }
         }
 
         function renderTracking(data) {
@@ -399,8 +558,19 @@
             body.innerHTML = `
                 <h2 style="margin-bottom:20px; font-weight:800; color:white;">LACAK DETAIL</h2>
                 <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:20px; margin-bottom:20px; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px;"><span>No. Resi:</span><b style="word-break:break-all; margin-left:15px;">${data.id}</b></div>
-                    <div style="display:flex; justify-content:space-between; font-size:13px;"><span>Status:</span><b style="color:var(--accent)">${data.status}</b></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:13px;">
+                        <span>No. Resi:</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <b style="word-break:break-all;">${data.id}</b>
+                            <button onclick="salinResi('${data.id}')" style="background:rgba(245, 158, 11, 0.15); border:1px solid var(--accent); color:var(--accent); width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer;" title="Salin Resi">
+                                <i class="fa-regular fa-copy" style="font-size:12px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px;">
+                        <span>Status:</span>
+                        <b style="color:var(--accent)">${data.status}</b>
+                    </div>
                 </div>
                 <div class="tracking-timeline">${timelineHtml}</div>
                 <a href="https://api.whatsapp.com/send?phone=${DRIVER_WA}&text=${encodeURIComponent('Halo Driver! Chat terkait resi: #' + data.id)}" target="_blank" class="btn-wa-final" style="margin-top:0;"><i class="fa-brands fa-whatsapp"></i> HUBUNGI DRIVER</a>
@@ -409,11 +579,19 @@
         }
 
         function salinResi(text) { navigator.clipboard.writeText(text).then(() => showNotif("Resi disalin!", "success")); }
+        
         function tutupModal() { document.getElementById('mainModal').style.display = 'none'; }
+        
         function lacakManual() {
             const resi = document.getElementById('resi-input').value.toUpperCase().trim();
             if(!resi) return showNotif("Masukkan resi!");
-            database.ref('semua_pesanan/' + resi).once('value', snapshot => { if(snapshot.exists()) renderTracking(snapshot.val()); else showNotif("Resi tidak ditemukan!"); });
+            database.ref('semua_pesanan/' + resi).once('value', snapshot => { 
+                if(snapshot.exists()) {
+                    renderTracking(snapshot.val()); 
+                } else { 
+                    showNotif("Resi tidak ditemukan!"); 
+                } 
+            });
         }
     </script>
 </body>
