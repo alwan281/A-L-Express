@@ -185,7 +185,7 @@
             transform: translateY(-2px);
         }
 
-        /* MODERN MODAL DENGAN Z-INDEX MAKSIMAL */
+        /* MODAL OVERLAY (SISTEM LAYOUT UTAMA) */
         .modal-overlay { 
             position: fixed; 
             top: 0; 
@@ -391,7 +391,7 @@
     </div>
 
     <!-- MODERN LOGOUT MODAL (Z-INDEX SANGAT TINGGI) -->
-    <div id="logoutModal" class="modal-overlay">
+    <div id="logoutModal" class="modal-overlay" style="z-index: 200050;">
         <div class="modal-content">
             <div class="modal-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
             <h3 style="font-weight: 800; font-size: 20px; margin-bottom: 10px; color: white;">Konfirmasi Keluar</h3>
@@ -403,8 +403,8 @@
         </div>
     </div>
 
-    <!-- WITHDRAWAL MODAL -->
-    <div id="withdrawModal" class="modal-overlay">
+    <!-- WITHDRAWAL MODAL (Z-INDEX SANGAT TINGGI) -->
+    <div id="withdrawModal" class="modal-overlay" style="z-index: 200050;">
         <div class="modal-content" style="text-align: left;">
             <h3 style="font-weight: 800; font-size: 20px; margin-bottom: 10px; text-align: center; color: white;">Penarikan Saldo</h3>
             <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px; text-align: center;">Silakan isi tujuan transfer saldo dompet Anda.</p>
@@ -450,6 +450,34 @@
                 <button class="btn btn-outline" onclick="closeCameraModal()" style="border-color: #ef4444; color: #ef4444; padding: 12px; font-size: 12px; flex: 1;">BATAL</button>
                 <button onclick="ambilFotoDariStream()" style="width: 60px; height: 60px; border-radius: 50%; background: white; border: 5px solid #475569; cursor: pointer; outline: none; transition: 0.2s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"></button>
                 <div style="flex: 1;"></div> 
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL MEMUAT PEMBARUAN (UPDATE OVERLAY - MEMILIKI Z-INDEX TERTINGGI 200060) -->
+    <div id="update-modal" class="modal-overlay" style="z-index: 200060; background: rgba(2, 6, 23, 0.97); padding: 25px;">
+        <div class="modal-content" style="max-width: 400px; padding: 30px; border-radius: 35px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: var(--shadow);" class="animate">
+            <div style="background: rgba(245, 158, 11, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fa-solid fa-cloud-arrow-down" style="font-size: 35px; color: var(--accent);"></i>
+            </div>
+            <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 10px; color: white;">Pembaruan Tersedia!</h3>
+            <p id="update-desc" style="color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 25px;">Versi baru telah dirilis dengan peningkatan stabilitas dan performa. Perbarui sekarang untuk pengalaman terbaik.</p>
+            
+            <!-- BAR PROGRES PENGUNDUHAN -->
+            <div id="update-progress-container" style="display: none; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--accent); margin-bottom: 8px; text-transform: uppercase;">
+                    <span id="update-status-text">Mengunduh berkas...</span>
+                    <span id="update-percent">0%</span>
+                </div>
+                <div style="background: var(--bg-input); width: 100%; height: 8px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                    <div id="update-progress-bar" style="background: var(--accent); width: 0%; height: 100%; transition: width 0.1s linear; border-radius: 10px;"></div>
+                </div>
+            </div>
+
+            <!-- TOMBOL AKSI -->
+            <div id="update-actions" style="display: flex; gap: 12px;">
+                <button onclick="tundaUpdate()" style="flex: 1; background: #334155; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 13px;">TUNDA</button>
+                <button onclick="mulaiUpdate()" style="flex: 1; background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 13px;">PERBARUI</button>
             </div>
         </div>
     </div>
@@ -741,7 +769,7 @@
             }
         }
 
-        // --- SISTEM PEMBARUAN OTOMATIS DRIVER ---
+        // --- SISTEM PEMBARUAN OTOMATIS DRIVER (REAL-TIME KONEKSI AKURAT) ---
         function cekPembaruanAplikasi() {
             database.ref('app_config/latest_version_driver').on('value', (snap) => {
                 if (snap.exists()) {
@@ -755,6 +783,8 @@
                         document.getElementById('update-modal').style.display = 'none';
                     }
                 }
+            }, (error) => {
+                console.warn("Pembaruan gagal dibaca (mungkin karena belum login):", error);
             });
         }
 
@@ -831,44 +861,7 @@
             document.getElementById('withdrawModal').style.display = 'flex';
         }
 
-        function closeWithdrawModal() {
-            document.getElementById('withdrawModal').style.display = 'none';
-        }
-
-        function prosesWithdraw() {
-            const amount = parseInt(document.getElementById('wd-amount').value);
-            const method = document.getElementById('wd-method').value;
-            const target = document.getElementById('wd-target').value;
-            
-            if (isNaN(amount) || amount < ONGKIR) {
-                return showToast("Jumlah tidak valid!");
-            }
-            if (amount > currentDompetSaldo) {
-                return showToast("Saldo dompet tidak mencukupi!");
-            }
-            if (!target) {
-                return showToast("Isi nomor rekening/e-wallet tujuan!");
-            }
-
-            const wdId = 'WD' + Date.now();
-            const wdData = {
-                id: wdId,
-                driver_phone: currentUser.hp,
-                driver_name: currentUser.nama,
-                jumlah: amount,
-                metode: method,
-                tujuan: target,
-                status: "Pending",
-                waktu: new Date().toLocaleString('id-ID')
-            };
-
-            database.ref('pengajuan_withdraw/' + wdId).set(wdData).then(() => {
-                showToast("Pengajuan dikirim! Menunggu konfirmasi Admin.");
-                closeWithdrawModal();
-            });
-        }
-
-        // --- LOGOUT MODAL LOGIC (DIPASTIKAN 100% RESPONSIF) ---
+        // LOGOUT MODAL LOGIC (DIPASTIKAN 100% RESPONSIF)
         function openLogoutModal() { 
             document.getElementById('logoutModal').style.display = 'flex'; 
         }
@@ -1128,6 +1121,23 @@
                 ${buttons}
             `;
             list.appendChild(card);
+        }
+
+        // --- SISTEM CARI RESI MANUAL DRIVER ---
+        function lacakManual() {
+            const resi = document.getElementById('resi-input').value.toUpperCase().trim();
+            if(!resi) return showToast("Masukkan resi!");
+            database.ref('semua_pesanan/' + resi).once('value', snapshot => { 
+                if(snapshot.exists()) {
+                    // Tampilkan hanya satu kartu orderan ini saja
+                    const list = document.getElementById('order-list');
+                    list.innerHTML = "";
+                    renderCard(resi, snapshot.val());
+                    showToast("Resi ditemukan!");
+                } else { 
+                    showToast("Resi tidak ditemukan!"); 
+                } 
+            });
         }
 
         function updateStatus(key, status) {
