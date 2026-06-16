@@ -147,7 +147,7 @@
         .btn-outline { background: transparent; border: 2px solid #334155; color: var(--text-muted); }
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-        /* EDGE-TO-EDGE FLAT NAVBAR */
+        /* EDGE-TO-EDGE FLAT NAVBAR (MENEMPEL PAS DI BAGIAN PALING BAWAH LAYAR) */
         .navbar { 
             flex: 0 0 auto; 
             background: rgba(30, 41, 59, 0.95); 
@@ -155,7 +155,7 @@
             -webkit-backdrop-filter: blur(12px);
             display: flex; 
             justify-content: space-around; 
-            padding: 12px 10px 16px 10px; 
+            padding: 12px 10px 24px 10px; /* Padding bawah ditinggikan agar tombol tidak terhalang gestur usap Android */
             border-top: 1px solid rgba(255, 255, 255, 0.08); 
             box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.4);
             width: 100%;
@@ -185,8 +185,23 @@
             transform: translateY(-2px);
         }
 
-        /* MODERN MODAL */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 9999; padding: 25px; }
+        /* MODAL OVERLAY (Z-INDEX KELUAR DINAIKKAN MAKSIMAL AGAR BERADA DI ATAS SEMUA ELEMEN) */
+        .modal-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0;
+            bottom: 0;
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.85); 
+            backdrop-filter: blur(8px); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 200050; /* Diatur sangat tinggi agar tidak tertimbun */
+            padding: 25px; 
+        }
         .modal-content { background: var(--bg-card); width: 100%; max-width: 400px; padding: 30px; border-radius: 35px; text-align: center; border: 1px solid rgba(255,255,255,0.1); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .modal-icon { width: 70px; height: 70px; background: rgba(239, 68, 68, 0.1); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 0 auto 20px; }
 
@@ -374,11 +389,11 @@
         </div>
     </div>
 
-    <!-- MODERN LOGOUT MODAL -->
+    <!-- MODERN LOGOUT MODAL (Z-INDEX SANGAT TINGGI) -->
     <div id="logoutModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
-            <h3 style="font-weight: 800; font-size: 20px; margin-bottom: 10px;">Konfirmasi Keluar</h3>
+            <h3 style="font-weight: 800; font-size: 20px; margin-bottom: 10px; color: white;">Konfirmasi Keluar</h3>
             <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">Apakah Anda yakin ingin keluar dari akun Driver?</p>
             <div class="btn-grid">
                 <button class="btn btn-outline" onclick="closeLogoutModal()">BATAL</button>
@@ -432,6 +447,7 @@
             <!-- Tombol Kamera Shutter -->
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 0 10px;">
                 <button class="btn btn-outline" onclick="closeCameraModal()" style="border-color: #ef4444; color: #ef4444; padding: 12px; font-size: 12px; flex: 1;">BATAL</button>
+                <!-- Tombol Jepret Bulat Native -->
                 <button onclick="ambilFotoDariStream()" style="width: 60px; height: 60px; border-radius: 50%; background: white; border: 5px solid #475569; cursor: pointer; outline: none; transition: 0.2s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"></button>
                 <div style="flex: 1;"></div> 
             </div>
@@ -481,7 +497,7 @@
         let currentActiveOrderKey = null;
 
         window.onload = () => {
-            periksaIzinNotifikasi(); 
+            periksaIzinNotifikasi(); // Periksa status izin notifikasi sistem saat buka app
             cekPembaruanAplikasi(); 
             if(currentUser) {
                 showView('main');
@@ -743,6 +759,7 @@
             });
         }
 
+        // Membandingkan format versi semantik (Contoh: "1.0.1" vs "1.0.0") [2]
         function isNewerVersion(latest, current) {
             const lParts = latest.split('.').map(Number);
             const cParts = current.split('.').map(Number);
@@ -807,6 +824,52 @@
             }, 180); 
         }
 
+        // --- MANAJEMEN PENARIKAN SALDO (WITHDRAW) ---
+        function openWithdrawModal() {
+            if (currentDompetSaldo < ONGKIR) {
+                return showToast(`Saldo minimal penarikan adalah Rp ${ONGKIR.toLocaleString('id-ID')}`);
+            }
+            document.getElementById('wd-amount').value = currentDompetSaldo;
+            document.getElementById('withdrawModal').style.display = 'flex';
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').style.display = 'none';
+        }
+
+        function prosesWithdraw() {
+            const amount = parseInt(document.getElementById('wd-amount').value);
+            const method = document.getElementById('wd-method').value;
+            const target = document.getElementById('wd-target').value;
+            
+            if (isNaN(amount) || amount < ONGKIR) {
+                return showToast("Jumlah tidak valid!");
+            }
+            if (amount > currentDompetSaldo) {
+                return showToast("Saldo dompet tidak mencukupi!");
+            }
+            if (!target) {
+                return showToast("Isi nomor rekening/e-wallet tujuan!");
+            }
+
+            const wdId = 'WD' + Date.now();
+            const wdData = {
+                id: wdId,
+                driver_phone: currentUser.hp,
+                driver_name: currentUser.nama,
+                jumlah: amount,
+                metode: method,
+                tujuan: target,
+                status: "Pending",
+                waktu: new Date().toLocaleString('id-ID')
+            };
+
+            database.ref('pengajuan_withdraw/' + wdId).set(wdData).then(() => {
+                showToast("Pengajuan dikirim! Menunggu konfirmasi Admin.");
+                closeWithdrawModal();
+            });
+        }
+
         // AUTH
         function prosesDaftar() {
             const nama = document.getElementById('reg-name').value;
@@ -859,6 +922,20 @@
                 document.getElementById('new-pass').value = "";
                 clickHome();
             });
+        }
+
+        // LOGOUT MODAL LOGIC (MODAL KELUAR MENJADI 100% RESPONSIF)
+        function openLogoutModal() { 
+            document.getElementById('logoutModal').style.display = 'flex'; 
+        }
+        function closeLogoutModal() { 
+            document.getElementById('logoutModal').style.display = 'none'; 
+        }
+        function confirmLogout() {
+            localStorage.removeItem('driver_session');
+            currentUser = null;
+            closeLogoutModal();
+            location.reload();
         }
 
         // DASHBOARD
@@ -1027,7 +1104,8 @@
                     completeBtn = `<button class="btn btn-success" onclick="updateStatus('${key}', 'Selesai')"><i class="fa-solid fa-circle-check"></i> MARK SELESAI</button>`;
                 } else {
                     completeBtn = `
-                        <!-- MENGHAPUS ATRIBUT accept="image/*" SECARA TOTAL UNTUK LANGSUNG MEMBUKA KAMERA BELAKANG HP -->
+                        <!-- MENGHAPUS ATRIBUT accept SECARA TOTAL SEHINGGA NATIVE ANDROID SEGERA MEMBUKA KAMERA UTAMA REAL-TIME -->
+                        <input type="file" id="camera-input-${key}" capture="environment" style="display: none;" onchange="prosesFotoBukti('${key}', this)">
                         <button class="btn btn-outline" style="border-color:var(--accent); color:var(--accent);" onclick="openCameraModal('${key}')"><i class="fa-solid fa-camera"></i> FOTO BUKTI</button>
                     `;
                 }
