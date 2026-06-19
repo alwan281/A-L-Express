@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>A&L EXPRESS - Official Customer App</title>
+    <title>A&L EXPRESS - Master Customer App</title>
     
+    <!-- EXTERNAL ASSETS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
+        /* -----------------------------------------------------------
+           1. CORE THEME & VARIABLES
+        ----------------------------------------------------------- */
         :root {
             --bg-main: #020617;
             --bg-card: #1e293b;
@@ -19,576 +23,727 @@
             --success: #10b981;
             --info: #3b82f6;
             --danger: #ef4444;
-            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
+        /* -----------------------------------------------------------
+           2. BASE STYLES
+        ----------------------------------------------------------- */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-main); color: var(--text-main); padding-bottom: 80px; overflow-x: hidden; }
+        
+        body { 
+            background-color: var(--bg-main); 
+            color: var(--text-main); 
+            overflow-x: hidden; 
+            min-height: 100vh;
+        }
 
-        /* TOAST NOTIF */
-        #modern-notif { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); z-index: 100000; width: 90%; max-width: 400px; padding: 15px 20px; border-radius: 20px; display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 13px; box-shadow: 0 15px 30px rgba(0,0,0,0.5); transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
-        #modern-notif.show { top: 20px; }
+        body.nav-active { 
+            padding-bottom: 120px; 
+        }
+
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-card); border-radius: 10px; }
+
+        /* -----------------------------------------------------------
+           3. ANIMATIONS & NOTIFICATIONS
+        ----------------------------------------------------------- */
+        .animate { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeInUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        #modern-notif { 
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%); 
+            z-index: 200000; width: 90%; max-width: 400px; padding: 18px 25px; 
+            border-radius: 20px; display: flex; align-items: center; gap: 15px; 
+            font-weight: 700; font-size: 13px; box-shadow: var(--shadow); 
+            transition: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+        }
+        #modern-notif.show { top: 25px; }
         #modern-notif.error { background: #7f1d1d; border: 1px solid var(--danger); color: #fecaca; }
         #modern-notif.success { background: #064e3b; border: 1px solid var(--success); color: #d1fae5; }
 
-        /* AUTH UI */
-        .auth-view { display: none; min-height: 100vh; flex-direction: column; justify-content: center; align-items: center; padding: 25px; }
-        .auth-card { background: var(--bg-card); width: 100%; max-width: 400px; padding: 35px 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); }
-        .input-group { margin-bottom: 18px; text-align: left; }
-        .input-group label { display: block; font-size: 10px; font-weight: 800; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; }
-        .input-style { width: 100%; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 15px; color: white; outline: none; transition: 0.3s; }
-
-        /* HEADER */
-        header { background: linear-gradient(135deg, #1e1b4b 0%, #020617 100%); padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(245, 158, 11, 0.3); border-radius: 0 0 30px 30px; margin-bottom: 20px; }
-        header h1 { font-size: 26px; font-weight: 800; }
-        header span { color: var(--accent); }
-
-        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
-
-        /* CATEGORIES & BADGE */
-        .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px; }
-        .category-box { position: relative; background: var(--bg-card); padding: 22px 5px; border-radius: 20px; text-align: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; box-shadow: var(--shadow); }
-        .category-box:active { transform: scale(0.95); background: var(--bg-input); }
-        .category-box i { font-size: 28px; color: var(--accent); margin-bottom: 10px; display: block; }
-        .category-box span { font-weight: 700; font-size: 10px; color: var(--text-main); }
-        .badge-notif { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 50%; font-size: 11px; font-weight: 800; display: none; align-items: center; justify-content: center; border: 2px solid var(--bg-card); box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
-
-        /* MENU MODAL UI */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: flex-end; z-index: 9998; backdrop-filter: blur(8px); }
-        .modal-content { background: var(--bg-card); width: 100%; max-width: 600px; padding: 30px 25px; border-radius: 35px 30px 0 0; max-height: 88vh; overflow-y: auto; border-top: 5px solid var(--accent); }
-        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .menu-info b { font-size: 15px; color: var(--text-main); display: block; }
-        .menu-info span { color: var(--accent); font-weight: 800; }
+        /* -----------------------------------------------------------
+           4. AUTHENTICATION & LOGIN UI
+        ----------------------------------------------------------- */
+        .view-screen { display: none; width: 100%; }
+        .auth-center { 
+            min-height: 100vh; display: none; flex-direction: column; 
+            justify-content: center; align-items: center; padding: 30px; 
+            overflow: hidden;
+        }
+        .auth-card { 
+            background: var(--bg-card); width: 100%; max-width: 400px; 
+            padding: 40px 30px; border-radius: 35px; border: 1px solid rgba(255,255,255,0.05); 
+            box-shadow: var(--shadow); position: relative; 
+        }
         
-        .btn-add { background: var(--accent); color: #000; border: none; padding: 10px 24px; border-radius: 12px; font-weight: 800; font-size: 12px; cursor: pointer; }
-        .counter-container { display: flex; align-items: center; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 4px; gap: 10px; }
-        .btn-qty { background: var(--accent); border: none; color: #000; width: 32px; height: 32px; border-radius: 8px; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .qty-val { font-weight: 800; font-size: 16px; color: white; min-width: 25px; text-align: center; }
+        .input-group { margin-bottom: 20px; text-align: left; width: 100%; }
+        .input-group label { 
+            display: block; font-size: 11px; font-weight: 800; color: var(--accent); 
+            margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1.5px; 
+        }
+        .input-style { 
+            width: 100%; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.1); 
+            padding: 18px; border-radius: 18px; color: white; outline: none; transition: 0.3s; font-size: 14px; 
+        }
+        .input-style:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(245,158,11,0.1); }
 
-        /* FORM & SUMMARY */
-        .card { background: var(--bg-card); padding: 25px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.05); }
-        .price-summary { background: rgba(15, 23, 42, 0.8); padding: 20px; border-radius: 20px; margin: 20px 0; border: 1px solid rgba(255,255,255,0.05); }
-        .cart-item-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: var(--text-main); }
-        .total-bold { border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 15px; margin-top: 10px; font-weight: 800; font-size: 18px; color: var(--accent); display: flex; justify-content: space-between; }
-        .btn-order { width: 100%; background: var(--success); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); }
+        header { 
+            background: linear-gradient(135deg, #1e1b4b 0%, #020617 100%); 
+            padding: 45px 25px; text-align: center; border-bottom: 1px solid rgba(245, 158, 11, 0.2); 
+            border-radius: 0 0 40px 40px; margin-bottom: 30px; 
+        }
+        header h1 { font-size: 28px; font-weight: 900; letter-spacing: -1.5px; }
+        header h1 span { color: var(--accent); }
 
-        /* TIMELINE TRACKING */
-        .tracking-timeline { margin: 25px 0 30px 15px; border-left: 2px solid #334155; padding-left: 25px; position: relative; text-align: left; }
-        .timeline-step { position: relative; margin-bottom: 30px; opacity: 0.3; }
-        .timeline-step.active { opacity: 1; }
-        .timeline-step.done { opacity: 0.7; }
-        .step-dot { position: absolute; left: -34px; top: 5px; width: 16px; height: 16px; border-radius: 50%; background: #475569; border: 3px solid var(--bg-card); }
-        .timeline-step.done .step-dot { background: var(--success); }
-        .timeline-step.active .step-dot { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
-        .step-content b { display: block; font-size: 14px; color: var(--text-main); margin-bottom: 2px; }
-        .step-content p { font-size: 12px; color: var(--text-muted); }
+        .container { max-width: 600px; margin: 0 auto; padding: 0 20px; }
 
-        /* NAVBAR */
-        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-card); display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 999; }
-        .nav-item { color: var(--text-muted); text-align: center; font-size: 10px; font-weight: 700; cursor: pointer; flex: 1; transition: 0.3s; }
+        /* -----------------------------------------------------------
+           5. DASHBOARD CATEGORIES & BADGE
+        ----------------------------------------------------------- */
+        .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
+        .category-box { 
+            position: relative; background: var(--bg-card); padding: 25px 5px; 
+            border-radius: 25px; text-align: center; cursor: pointer; 
+            border: 1px solid rgba(255,255,255,0.05); box-shadow: var(--shadow); transition: 0.3s; 
+            z-index: 10;
+        }
+        .category-box:active { transform: scale(0.92); background: var(--bg-input); }
+        .category-box i { font-size: 28px; color: var(--accent); margin-bottom: 12px; display: block; }
+        .category-box span { font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .badge-notif { 
+            position: absolute; top: -8px; right: -5px; background: var(--danger); 
+            color: white; min-width: 24px; height: 24px; border-radius: 50%; 
+            font-size: 12px; font-weight: 900; display: none; align-items: center; 
+            justify-content: center; border: 3px solid var(--bg-card); box-shadow: 0 0 15px rgba(239,68,68,0.4);
+        }
+
+        /* -----------------------------------------------------------
+           6. CART & PROFESSIONAL SUMMARY
+        ----------------------------------------------------------- */
+        .card { background: var(--bg-card); padding: 30px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; }
+        
+        .cart-row { 
+            display: flex; align-items: center; justify-content: space-between; 
+            background: rgba(255,255,255,0.03); padding: 18px; border-radius: 22px; 
+            margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); 
+        }
+        .qty-ctrl { display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 12px; }
+        .btn-qty { 
+            width: 32px; height: 32px; border-radius: 10px; border: none; 
+            background: var(--accent); color: black; font-weight: 900; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+        }
+
+        .summary-card { 
+            background: rgba(15, 23, 42, 0.6); padding: 22px; border-radius: 25px; 
+            margin: 20px 0; border: 1px solid rgba(255,255,255,0.1); 
+        }
+        .summary-header { 
+            color: var(--accent); font-weight: 800; font-size: 11px; text-transform: uppercase; 
+            margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; 
+        }
+        .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; }
+
+        /* -----------------------------------------------------------
+           7. DYNAMIC QRIS MASTER SCREEN (ANTI-FRAUD)
+        ----------------------------------------------------------- */
+        #view-payment-qris { 
+            background: #fff; color: #000; min-height: 100vh; display: none; 
+            flex-direction: column; align-items: center; padding: 50px 25px; overflow-y: auto; 
+        }
+        .qris-frame { 
+            width: 100%; max-width: 360px; background: #fff; border-radius: 45px; 
+            padding: 30px; border: 2px solid #e2e8f0; text-align: center; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15); 
+        }
+        .qris-img { width: 100%; border-radius: 15px; margin: 15px 0; border: 8px solid #f8fafc; }
+        .nominal-box { background: var(--bg-main); color: white; padding: 25px; border-radius: 25px; margin: 15px 0; }
+
+        .upload-area { 
+            border: 3px dashed #cbd5e1; border-radius: 25px; padding: 30px; 
+            margin: 25px 0; background: #f8fafc; cursor: pointer; text-align: center; 
+            transition: 0.4s;
+        }
+        .upload-area.active { border-color: var(--success); background: #f0fdf4; }
+        
+        .btn-pay-master { 
+            width: 100%; background: #020617; color: white; border: none; 
+            padding: 22px; border-radius: 22px; font-weight: 900; 
+            cursor: pointer; font-size: 16px; margin-top: 15px; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        .btn-pay-master:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
+
+        /* -----------------------------------------------------------
+           8. TRACKING & UPDATES
+        ----------------------------------------------------------- */
+        .timeline { border-left: 3px solid #334155; margin: 25px 0 25px 20px; padding-left: 30px; }
+        .t-step { position: relative; margin-bottom: 35px; font-size: 15px; color: var(--text-muted); opacity: 0.5; }
+        .t-step.active { color: white; font-weight: 800; opacity: 1; }
+        .t-step::before { 
+            content: ''; position: absolute; left: -41.5px; top: 4px; width: 20px; height: 20px; 
+            background: #334155; border-radius: 50%; border: 4px solid var(--bg-main); 
+        }
+        .t-step.active::before { 
+            background: var(--accent); box-shadow: 0 0 20px var(--accent); 
+        }
+
+        #update-modal { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #020617; z-index: 1000000; display: none; 
+            flex-direction: column; align-items: center; justify-content: center; padding: 40px; 
+        }
+        .up-progress-container { width: 100%; height: 14px; background: #0f172a; border-radius: 20px; margin: 30px 0; display: none; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        .up-progress-bar { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 25px var(--accent); transition: width 0.15s linear; }
+
+        /* -----------------------------------------------------------
+           9. NAVIGATION & MODALS
+        ----------------------------------------------------------- */
+        .navbar { 
+            position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-card); 
+            display: none; justify-content: space-around; padding: 18px 0; 
+            border-top: 1px solid rgba(255,255,255,0.05); z-index: 5000; backdrop-filter: blur(15px); 
+        }
+        .nav-item { color: var(--text-muted); text-align: center; font-size: 11px; font-weight: 800; cursor: pointer; flex: 1; transition: 0.3s; }
         .nav-item.active { color: var(--accent); }
-        .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
+        .nav-item i { font-size: 24px; display: block; margin-bottom: 6px; }
 
-        /* SUCCESS POPUP */
-        #success-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.98); z-index: 10001; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
-        .btn-wa-final { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; background: #25d366; color: white; padding: 18px; border-radius: 18px; text-decoration: none; font-weight: 800; font-size: 16px; margin-top: 20px; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2); }
-        
-        .animate { animation: slideUp 0.4s ease; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); display: none; justify-content: center; 
+            align-items: flex-end; z-index: 10000; backdrop-filter: blur(10px); 
+        }
+        .modal-content { 
+            background: var(--bg-card); width: 100%; max-width: 600px; 
+            padding: 35px 30px; border-radius: 40px 40px 0 0; max-height: 88vh; 
+            overflow-y: auto; border-top: 6px solid var(--accent); position: relative; 
+        }
+
+        #success-popup { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #020617; z-index: 10001; display: none; flex-direction: column; 
+            align-items: center; justify-content: center; padding: 30px; text-align: center; 
+        }
+
+        .btn-final-action { 
+            width: 100%; background: var(--success); color: white; border: none; 
+            padding: 22px; border-radius: 25px; font-weight: 900; font-size: 16px; 
+            cursor: pointer; box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3); 
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body id="app-body">
 
+    <!-- GLOBAL COMPONENTS -->
     <div id="modern-notif">
         <i id="notif-icon" class="fa-solid"></i>
         <span id="notif-msg"></span>
     </div>
 
     <!-- 1. VIEW LOGIN -->
-    <div id="view-login" class="auth-view animate">
-        <h1>A&L <span>EXPRESS</span></h1>
-        <p style="color: var(--text-muted); margin-bottom: 35px;">Login untuk mulai memesan</p>
+    <div id="view-login" class="view-screen auth-center animate">
+        <header style="background:transparent; border:none; padding: 20px;">
+            <h1>A&L <span>EXPRESS</span></h1>
+            <p style="color:var(--text-muted); font-size: 14px; font-weight: 600;">Merchant Alwan Cell Portal</p>
+        </header>
         <div class="auth-card">
             <div class="input-group"><label>Nomor WhatsApp</label><input type="tel" id="login-phone" class="input-style" placeholder="08xxx"></div>
-            <div class="input-group"><label>Kata Sandi</label><input type="password" id="login-pass" class="input-style" placeholder="••••••••"></div>
-            <button class="btn-order" onclick="prosesLogin()" style="background: var(--accent); color: #000;">MASUK SEKARANG</button>
-            <p style="margin-top: 25px; font-size: 13px; color: var(--text-muted);">Belum punya akun? <a href="#" onclick="showView('register')" style="color: var(--accent); font-weight: 800; text-decoration: none;">Daftar</a></p>
+            <div class="input-group"><label>Sandi Keamanan</label><input type="password" id="login-pass" class="input-style" placeholder="••••••••"></div>
+            <button class="btn-final-action" onclick="prosesLogin()" style="background:var(--accent); color:black;">MASUK KE SISTEM</button>
+            <p style="text-align:center; margin-top:25px; font-size:13px; color:var(--text-muted);">Baru disini? <a href="javascript:void(0)" onclick="switchView('view-register')" style="color:var(--accent); font-weight:800; text-decoration:none;">Daftar Akun</a></p>
+            <p style="text-align:center; margin-top:30px; font-size:10px; color:rgba(255,255,255,0.15); font-weight:900; letter-spacing:3px; text-transform:uppercase;">Dev adalah Alwan Cell</p>
         </div>
     </div>
 
     <!-- 2. VIEW REGISTER -->
-    <div id="view-register" class="auth-view animate">
-        <h2 style="margin-bottom: 30px; font-weight: 800;">Daftar Akun Baru</h2>
+    <div id="view-register" class="view-screen auth-center animate">
+        <h2 style="margin-bottom:30px; font-weight:900; letter-spacing:-1px;">Registrasi Master</h2>
         <div class="auth-card">
-            <div class="input-group"><label>Nama Lengkap</label><input type="text" id="reg-name" class="input-style"></div>
-            <div class="input-group"><label>Nomor WhatsApp</label><input type="tel" id="reg-phone" class="input-style"></div>
-            <div class="input-group"><label>Buat Password</label><input type="password" id="reg-pass" class="input-style"></div>
-            <button class="btn-order" onclick="prosesDaftar()" style="background: var(--accent); color: #000;">DAFTAR SEKARANG</button>
-            <button onclick="showView('login')" style="margin-top: 15px; background: transparent; color: var(--text-muted); border: none; font-weight: 800; cursor: pointer; width: 100%;">Kembali Login</button>
+            <div class="input-group"><label>Nama Lengkap</label><input type="text" id="reg-name" class="input-style" placeholder="Contoh: Budi Santoso"></div>
+            <div class="input-group"><label>WhatsApp</label><input type="tel" id="reg-phone" class="input-style" placeholder="08xxx"></div>
+            <div class="input-group"><label>Password</label><input type="password" id="reg-pass" class="input-style" placeholder="Min. 6 Karakter"></div>
+            <button class="btn-final-action" onclick="prosesDaftar()" style="background:var(--accent); color:black;">BUAT AKUN MASTER</button>
+            <button onclick="switchView('view-login')" style="width:100%; background:transparent; border:none; color:var(--text-muted); margin-top:20px; font-weight:800; cursor:pointer;">Batal & Kembali Login</button>
         </div>
     </div>
 
     <!-- 3. VIEW MAIN APP -->
-    <div id="view-main" class="main-view animate">
+    <div id="view-main" class="view-screen animate">
         <header>
             <h1>A&L <span>EXPRESS</span></h1>
-            <p id="welcome-user">Halo, Alwan</p>
+            <p id="welcome-txt" style="font-size:13px; opacity:0.8; margin-top:8px; font-weight:600;"></p>
         </header>
-
+        
         <div class="container">
+            <!-- Grid Categories -->
             <div class="category-grid">
-                <div class="category-box" onclick="bukaMenu('nasi-mie')"><i class="fa-solid fa-bowl-rice"></i><span>NASI & MIE</span></div>
-                <div class="category-box" onclick="bukaMenu('bakso')"><i class="fa-solid fa-bowl-food"></i><span>BAKSO</span></div>
-                <div class="category-box" onclick="bukaMenu('lalapan')"><i class="fa-solid fa-drumstick-bite"></i><span>LALAPAN</span></div>
-                <div class="category-box" onclick="bukaMenu('cemilan')"><i class="fa-solid fa-cookie"></i><span>CEMILAN</span></div>
-                <div class="category-box" onclick="bukaMenu('minuman')"><i class="fa-solid fa-glass-water"></i><span>MINUMAN</span></div>
-                <div class="category-box" onclick="showView('history')">
+                <div class="category-box" onclick="bukaKategori('nasi-mie')"><i class="fa-solid fa-utensils"></i><span>NASI & MIE</span></div>
+                <div class="category-box" onclick="bukaKategori('bakso')"><i class="fa-solid fa-bowl-food"></i><span>BAKSO</span></div>
+                <div class="category-box" onclick="bukaKategori('lalapan')"><i class="fa-solid fa-drumstick-bite"></i><span>LALAPAN</span></div>
+                <div class="category-box" onclick="bukaKategori('cemilan')"><i class="fa-solid fa-cookie"></i><span>CEMILAN</span></div>
+                <div class="category-box" onclick="bukaKategori('minuman')"><i class="fa-solid fa-wine-glass"></i><span>MINUMAN</span></div>
+                <div class="category-box" onclick="switchView('view-history')">
                     <div id="history-badge" class="badge-notif">0</div>
-                    <i class="fa-solid fa-receipt" style="color:var(--info)"></i><span>RIWAYAT</span>
+                    <i class="fa-solid fa-receipt" style="color:var(--info)"></i><span>PESANAN</span>
                 </div>
             </div>
 
+            <!-- Keranjang Section -->
             <div class="card">
-                <div style="color:var(--accent); font-weight:800; margin-bottom:15px;"><i class="fa-solid fa-truck-fast"></i> DATA PENGIRIMAN</div>
-                <form onsubmit="kirimSekarang(event)">
-                    <div class="input-group"><label>Nama Penerima</label><input type="text" id="f-nama" class="input-style" required></div>
-                    <div class="input-group"><label>WhatsApp Penerima</label><input type="tel" id="f-hp-penerima" class="input-style" required></div>
-                    <div class="input-group"><label>Alamat Lengkap & Patokan</label><textarea id="f-alamat" class="input-style" style="height: 80px;" required></textarea></div>
-                    <div class="input-group"><label>Catatan Pesanan</label><input type="text" id="f-note" class="input-style" placeholder="Contoh: Pedas sekali"></div>
-                    
-                    <div class="price-summary">
-                        <div id="cart-items-list"></div>
-                        <div class="summary-row" style="margin-top:10px; color:var(--text-muted);"><span>Ongkos Kirim</span><span>Rp 5.000</span></div>
-                        <div class="total-bold"><span>Total Bayar</span><span id="f-total">Rp 5.000</span></div>
+                <h4 style="color:var(--accent); margin-bottom:20px; font-size:15px; font-weight:900;"><i class="fa-solid fa-cart-shopping"></i> KERANJANG SAYA</h4>
+                <div id="cart-display-list"></div>
+                
+                <hr style="border:1px solid rgba(255,255,255,0.05); margin:25px 0;">
+                
+                <h4 style="color:var(--accent); margin-bottom:20px; font-size:15px; font-weight:900;"><i class="fa-solid fa-map-location-dot"></i> DETAIL PENGIRIMAN</h4>
+                <div class="input-group"><label>Nama Penerima</label><input type="text" id="f-nama" class="input-style"></div>
+                <div class="input-group"><label>Alamat Lengkap & Patokan</label><textarea id="f-alamat" class="input-style" style="height:80px; resize:none;" placeholder="Jl. Nama No., Patokan Warnanya..."></textarea></div>
+                
+                <div class="input-group">
+                    <label>Metode Pembayaran</label>
+                    <select id="f-metode" class="input-style" style="background:var(--bg-input); color:white;">
+                        <option value="COD">Bayar Tunai (COD)</option>
+                        <option value="Transfer">Otomatis QRIS / DANA</option>
+                    </select>
+                </div>
+
+                <!-- Rincian Pesanan Profesional -->
+                <div class="summary-card">
+                    <div class="summary-header">Rincian Pembelian</div>
+                    <div id="summary-items-list"></div>
+                    <div class="summary-item" style="margin-top:12px; opacity:0.6; font-style:italic;">
+                        <span>Biaya Pengantaran</span><span>Rp 5.000</span>
                     </div>
-                    <button type="submit" class="btn-order">KONFIRMASI PESANAN</button>
-                </form>
+                    <div style="display:flex; justify-content:space-between; margin-top:15px; padding-top:12px; border-top:1px dashed rgba(255,255,255,0.2); font-weight:900; font-size:20px; color:var(--accent);">
+                        <span>Total Bayar</span><span id="f-total">Rp 5.000</span>
+                    </div>
+                </div>
+                
+                <button class="btn-final-action" onclick="pemicuOrderSistem()">KONFIRMASI PESANAN</button>
             </div>
         </div>
     </div>
 
-    <!-- RIWAYAT VIEW -->
-    <div id="view-history" class="main-view animate container" style="padding-top: 20px;">
-        <h2 style="margin-bottom: 15px; font-weight: 800; color: var(--info);">PESANAN SAYA</h2>
-        
-        <!-- KOLOM LACAK MANUAL -->
-        <div style="background: var(--bg-card); padding: 15px; border-radius: 20px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05);">
-            <div style="font-size: 10px; font-weight: 800; color: var(--accent); margin-bottom: 8px; text-transform: uppercase;">Lacak Manual No. Resi</div>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="resi-input" class="input-style" placeholder="Masukkan nomor resi..." style="padding: 12px; font-size: 13px;">
-                <button onclick="lacakManual()" style="background: var(--accent); color: #000; border: none; padding: 0 20px; border-radius: 12px; font-weight: 800; font-size: 12px; cursor: pointer;">Lacak</button>
+    <!-- 4. VIEW PEMBAYARAN QRIS DINAMIS (ANTI-TIPU) -->
+    <div id="view-payment-qris" class="view-screen animate" style="background:#fff; color:#000;">
+        <div class="container" style="text-align:center; padding-top:40px;">
+            <h2 style="font-weight:900; letter-spacing:-1.5px; font-size: 28px;">ALWAN CELL</h2>
+            <p style="color:#64748b; font-size:12px; font-weight: 700;">Merchant ID: ID2023297236374</p>
+            
+            <div class="qris-frame" style="margin:20px auto;">
+                <!-- DYNAMIC QR IMAGE -->
+                <img id="dynamic-qris-image" src="" class="qris-img">
+                <div class="nominal-box">
+                    <small style="opacity:0.8; font-weight:900; text-transform:uppercase; letter-spacing:1px;">Tagihan Anda</small>
+                    <h1 id="payment-nominal-txt" style="font-weight:900; font-size:36px; color:var(--accent);">Rp 0</h1>
+                </div>
+                <p style="font-size:11px; color:#475569; font-weight:700; line-height:1.5; padding: 0 10px;">Scan Barcode di atas menggunakan Dana, OVO, ShopeePay atau Mobile Banking.</p>
+            </div>
+
+            <!-- UPLOAD BUKTI TF (MANDATORY) -->
+            <div class="upload-receipt-area" id="box-upload-tf" onclick="document.getElementById('input-bukti-file').click()">
+                <i class="fa-solid fa-camera-retro" style="font-size:40px; color:#94a3b8;"></i>
+                <p id="status-upload-txt" style="font-size:13px; color:#64748b; margin-top:12px; font-weight:800;">UNGGAH BUKTI TRANSFER (WAJIB)</p>
+                <input type="file" id="input-bukti-file" accept="image/*" hidden onchange="handleBuktiPay()">
+            </div>
+
+            <p style="font-size:11px; color:#ef4444; font-weight:800; margin-bottom:25px;">*Bukti palsu akan menyebabkan blokir akun permanen.</p>
+            
+            <div style="padding-bottom:50px;">
+                <button class="btn-pay-master" id="btn-finish-payment" disabled onclick="finalisasiOrderReal(true)">KONFIRMASI SELESAI</button>
+                <button onclick="switchView('view-main')" style="background:transparent; border:none; color:#ef4444; margin-top:25px; font-weight:900; cursor:pointer;">BATALKAN</button>
             </div>
         </div>
-
-        <div id="history-list"></div>
     </div>
 
-    <!-- AKUN VIEW -->
-    <div id="view-profile" class="main-view animate container" style="padding-top: 50px;">
-        <h2 style="margin-bottom: 30px; text-align: center; font-weight: 800;">AKUN SAYA</h2>
-        <div class="auth-card">
-            <div class="input-group"><label>Nama</label><input type="text" id="p-name" class="input-style" readonly></div>
-            <div class="input-group"><label>WhatsApp</label><input type="text" id="p-phone" class="input-style" readonly></div>
-            <button class="btn-order" onclick="logout()" style="background: var(--danger); margin-top: 20px;">KELUAR AKUN</button>
+    <!-- 5. VIEW HISTORY -->
+    <div id="view-history" class="view-screen animate container" style="padding-top:20px;">
+        <h2 style="margin-bottom:25px; font-weight:900; color:var(--info);">STATUS PESANAN</h2>
+        <div style="background:var(--bg-card); padding:20px; border-radius:25px; margin-bottom:25px; border:1px solid rgba(255,255,255,0.05);">
+            <div style="font-size:11px; font-weight:900; color:var(--accent); margin-bottom:12px; text-transform:uppercase;">Lacak Resi Manual</div>
+            <div style="display:flex; gap:12px;">
+                <input type="text" id="resi-manual-input" class="input-style" placeholder="Contoh: AL123456" style="padding:15px; font-size:14px;">
+                <button onclick="lacakManualResi()" style="background:var(--accent); color:black; border:none; padding:0 25px; border-radius:15px; font-weight:900; font-size:12px; cursor:pointer;">LACAK</button>
+            </div>
+        </div>
+        <div id="history-display-list"></div>
+    </div>
+
+    <!-- 6. PROFILE VIEW -->
+    <div id="view-profile" class="view-screen animate container" style="padding-top:60px;">
+        <h2 style="text-align:center; margin-bottom:35px; font-weight:900; letter-spacing:-1px;">AKUN SAYA</h2>
+        <div class="auth-card" style="margin:0 auto; text-align:center;">
+            <div style="width:90px; height:90px; background:var(--accent); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-bottom:20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+                <i class="fa-solid fa-user-shield" style="font-size:40px; color:black;"></i>
+            </div>
+            <h3 id="p-name-label" style="font-weight:800; font-size:20px;">Loading...</h3>
+            <p id="p-phone-label" style="color:var(--text-muted); margin-bottom:25px; font-weight:600;"></p>
+            <div style="background:var(--bg-input); padding:18px; border-radius:20px; font-size:12px; color:var(--text-muted); margin-bottom:25px;">
+                Tingkat Akun: <b style="color:var(--success);">MASTER CUSTOMER</b><br>
+                Versi: <b id="app-version-footer" style="color:var(--accent);">...</b>
+            </div>
+            <button onclick="logoutSistem()" style="width:100%; padding:18px; background:var(--danger); color:white; border:none; border-radius:18px; font-weight:900; cursor:pointer;">LOGOUT / KELUAR</button>
         </div>
     </div>
 
-    <!-- MODAL MENU -->
+    <!-- OVERLAYS (UPDATE & SUCCESS) -->
+    <div id="update-modal">
+        <div class="auth-card" style="text-align:center; padding: 40px 30px;">
+            <i class="fa-solid fa-cloud-arrow-down" style="font-size:50px; color:var(--accent); margin-bottom:20px;"></i>
+            <h3 style="color:white; font-weight:900;">Updating System...</h3>
+            <p id="up-msg" style="color:var(--text-muted); font-size:13px; margin:15px 0 10px;">Menyiapkan fitur QRIS Dinamis Alwan Cell Nasional. Harap jangan tutup aplikasi.</p>
+            
+            <div id="up-prog-box" class="up-progress-box"><div id="up-bar" class="up-progress-bar"></div></div>
+            <small id="up-stat-text" style="color:var(--accent); font-size:11px; font-weight:800; display:none; margin-bottom:15px;">Mendownload File 0%</small>
+
+            <button id="btn-update-start" onclick="jalankanProsesUpdateSistem()" style="width:100%; padding:20px; background:var(--accent); color:black; border:none; border-radius:20px; font-weight:900; cursor:pointer; font-size:15px;">PERBARUI SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="success-popup">
+        <div style="background:var(--success); width:90px; height:90px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:25px; box-shadow:0 0 30px rgba(16, 185, 129, 0.5);"><i class="fa-solid fa-check" style="font-size:45px; color:white;"></i></div>
+        <h2 id="suc-title" style="font-weight:900; font-size:26px;">Data Terkirim!</h2>
+        <p id="suc-msg" style="color:var(--text-muted); margin:15px 0; font-size:15px; line-height:1.7; padding: 0 10px;"></p>
+        <div class="auth-card" style="width:100%; background:var(--bg-input); border:1px solid var(--accent); padding: 25px;"><small style="font-weight:800; letter-spacing:1px;">NOMOR RESI ANDA</small><h3 id="suc-resi" style="color:var(--accent); font-size: 24px; margin-top: 10px; letter-spacing: 2px;">AL-000000</h3></div>
+        <a id="btn-wa-driver-final" href="#" target="_blank" class="btn-final-action" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:12px; background:#25d366; margin-top:25px; font-size:17px;"><i class="fa-brands fa-whatsapp"></i> HUBUNGI DRIVER</a>
+        <button onclick="location.reload()" style="background:transparent; border:none; color:white; margin-top:30px; font-weight:800; opacity:0.5; cursor:pointer;">KEMBALI KE BERANDA</button>
+    </div>
+
     <div id="mainModal" class="modal-overlay" onclick="tutupModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div id="modal-body-content"></div>
-            <button onclick="tutupModal()" style="width: 100%; background: #334155; color: white; border: none; padding: 18px; border-radius: 15px; margin-top: 25px; font-weight: 800; cursor:pointer;">KEMBALI</button>
+            <div id="modal-body"></div>
+            <button onclick="tutupModal()" style="width:100%; background:#334155; color:white; padding:20px; border-radius:20px; border:none; margin-top:30px; font-weight:900; font-size: 15px;">KEMBALI</button>
         </div>
     </div>
 
-    <!-- SUCCESS POPUP -->
-    <div id="success-popup">
-        <div style="background: var(--success); width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);">
-            <i class="fa-solid fa-check" style="font-size: 45px; color: white;"></i>
-        </div>
-        <h2 style="color: white; font-weight: 800; font-size: 26px;">Pesanan Berhasil!</h2>
-        <div style="background: rgba(15, 23, 42, 0.8); padding: 25px; border-radius: 25px; width: 100%; margin: 20px 0; border: 1px solid rgba(255,255,255,0.1);">
-            <small style="color: var(--text-muted); font-weight: 700;">NOMOR RESI PELACAKAN</small><br>
-            <b id="final-resi" style="color: var(--accent); font-size: 19px; word-break: break-all; display: block; margin-top: 10px;">AL...</b>
-            <button onclick="salinResi(document.getElementById('final-resi').innerText)" style="margin-top: 15px; background: rgba(245, 158, 11, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 12px;">SALIN RESI</button>
-        </div>
-        <a id="btn-wa-final" href="#" target="_blank" class="btn-wa-final"><i class="fa-brands fa-whatsapp"></i> HUBUNGI DRIVER</a>
-        <button onclick="location.reload()" style="width: 100%; background: transparent; color: var(--text-muted); border: 2px solid #334155; padding: 18px; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 15px;">TUTUP</button>
+    <!-- BOTTOM NAVBAR -->
+    <div id="navbar" class="navbar">
+        <div id="nav-home" class="nav-item active" onclick="switchView('view-main')"><i class="fa-solid fa-house"></i>Home</div>
+        <div id="nav-history" class="nav-item" onclick="switchView('view-history')"><i class="fa-solid fa-receipt"></i>Pesanan</div>
+        <div id="nav-profile" class="nav-item" onclick="switchView('view-profile')"><i class="fa-solid fa-user-circle"></i>Akun</div>
     </div>
 
-    <!-- MODAL MEMUAT PEMBARUAN (UPDATE OVERLAY) -->
-    <div id="update-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.95); z-index: 100005; display: none; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(10px);">
-        <div style="background: var(--bg-card); width: 100%; max-width: 400px; padding: 35px 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); text-align: center; box-shadow: var(--shadow);" class="animate">
-            <div style="background: rgba(245, 158, 11, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                <i class="fa-solid fa-cloud-arrow-down" style="font-size: 35px; color: var(--accent);"></i>
-            </div>
-            <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 10px;">Pembaruan Tersedia!</h3>
-            <p id="update-desc" style="color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 25px;">Versi baru telah dirilis dengan peningkatan stabilitas dan performa. Perbarui sekarang untuk pengalaman terbaik.</p>
-            
-            <!-- BAR PROGRES PENGUNDUHAN (Awalnya Sembunyi) -->
-            <div id="update-progress-container" style="display: none; margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--accent); margin-bottom: 8px; text-transform: uppercase;">
-                    <span id="update-status-text">Mengunduh berkas...</span>
-                    <span id="update-percent">0%</span>
-                </div>
-                <div style="background: var(--bg-input); width: 100%; height: 8px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
-                    <div id="update-progress-bar" style="background: var(--accent); width: 0%; height: 100%; transition: width 0.1s linear; border-radius: 10px;"></div>
-                </div>
-            </div>
+    <div id="footer-v" style="position:fixed; bottom:70px; width:100%; text-align:center; font-size:8px; color:rgba(255,255,255,0.1); pointer-events:none; z-index:1;">V.1.5.0 - Alwan Cell Master</div>
 
-            <!-- TOMBOL AKSI -->
-            <div id="update-actions" style="display: flex; gap: 12px;">
-                <button onclick="tundaUpdate()" style="flex: 1; background: #334155; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 13px;">TUNDA</button>
-                <button onclick="mulaiUpdate()" style="flex: 1; background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 13px;">PERBARUI</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- NAVBAR -->
-    <div id="bottom-navbar" class="navbar" style="display: none;">
-        <div id="nav-home" class="nav-item active" onclick="showView('main')"><i class="fa-solid fa-house"></i>Home</div>
-        <div id="nav-orders" class="nav-item" onclick="showView('history')"><i class="fa-solid fa-receipt"></i>Pesanan</div>
-        <div id="nav-profile" class="nav-item" onclick="showView('profile')"><i class="fa-solid fa-user-circle"></i>Akun</div>
-    </div>
-
+    <!-- FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        // --- 1. FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyCGhsZw1wyy1OyqfUiH-bvYqln7fMZyiYg",
             authDomain: "jnt-jastip.firebaseapp.com",
             databaseURL: "https://jnt-jastip-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "jnt-jastip",
             storageBucket: "jnt-jastip.firebasestorage.app",
-            messagingSenderId: "187685093180",
             appId: "1:187685093180:web:159e921771f2c8a5572839"
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        const DRIVER_WA = "6281807151531"; 
+        // --- 2. GLOBAL SETTINGS ---
+        const DRIVER_WA = "6281807151531";
         const ONGKIR = 5000;
-        
-        // SISTEM VERSI & PROTEKSI LOOP
-        const CURRENT_VERSION = "1.0.0"; 
-        const ACTIVE_VERSION = localStorage.getItem('installed_version') || CURRENT_VERSION;
-
+        let APP_VERSION = localStorage.getItem('al_app_version') || "1.5.0";
+        let serverVersion = "";
+        let currentUser = JSON.parse(localStorage.getItem('al_user')) || null;
         let keranjang = {};
         let dataMenuGlobal = null;
-        let currentUser = JSON.parse(localStorage.getItem('customer_session')) || null;
-        let currentKategoriOpen = "";
-        let cachePesanan = {}; 
-        let latestVersionGlobal = CURRENT_VERSION;
+        let totalCheckoutNumeric = 0;
 
-        window.onload = () => { 
-            cekPembaruanAplikasi(); // Diperiksa setiap kali aplikasi dibuka
-            if(currentUser) { showView('main'); initCustomer(); } else { showView('login'); } 
-            muatMenu(); 
+        // --- 3. SYSTEM STARTUP ---
+        window.onload = () => {
+            document.getElementById('app-version-footer').innerText = APP_VERSION;
+            cekPembaruanSistem();
+            if(currentUser) { 
+                switchView('view-main'); 
+                initUserDisplay(); 
+                listenBadgeNotif(); 
+            } else { 
+                switchView('view-login'); 
+            }
+            muatDataMenu();
+            renderHalamanKeranjang();
         };
 
-        function showNotif(msg, type = "error") {
-            const notif = document.getElementById('modern-notif');
-            notif.className = type; 
-            document.getElementById('notif-msg').innerText = msg;
-            notif.classList.add('show');
-            setTimeout(() => notif.classList.remove('show'), 3000);
-        }
-
-        // --- SISTEM PEMBARUAN SEBELUM DI-UPDATE ---
-        function cekPembaruanAplikasi() {
-            database.ref('app_config/latest_version').once('value', (snap) => {
-                if (snap.exists()) {
-                    const latestVersion = snap.val();
-                    latestVersionGlobal = latestVersion;
-                    
-                    // Membandingkan dengan versi aktif sistem (mendeteksi jika versi database lebih tinggi)
-                    if (isNewerVersion(latestVersion, ACTIVE_VERSION)) {
-                        // Tidak ada bypass penyimpanan permanen di localStorage lagi.
-                        // Modal ini selalu dipaksa muncul setiap kali halaman dibuka/dimuat ulang.
-                        document.getElementById('update-desc').innerText = `Versi baru (${latestVersion}) telah tersedia dengan peningkatan fitur dan performa. Silakan perbarui agar aplikasi berjalan optimal.`;
+        function cekPembaruanSistem() {
+            database.ref('app_config/latest_version').once('value', s => {
+                if(s.exists()) {
+                    serverVersion = s.val().toString().trim();
+                    if (serverVersion !== APP_VERSION) {
                         document.getElementById('update-modal').style.display = 'flex';
                     }
                 }
             });
         }
 
-        function isNewerVersion(latest, current) {
-            const lParts = latest.split('.').map(Number);
-            const cParts = current.split('.').map(Number);
-            for (let i = 0; i < Math.max(lParts.length, cParts.length); i++) {
-                const l = lParts[i] || 0;
-                const c = cParts[i] || 0;
-                if (l > c) return true;
-                if (l < c) return false;
-            }
-            return false;
-        }
-
-        function tundaUpdate() {
-            // Hanya menyembunyikan modal untuk sementara (sesi saat ini)
-            // Tidak menyimpan bypass di localStorage sehingga jika direfresh atau dibuka lagi, modal langsung muncul kembali.
-            document.getElementById('update-modal').style.display = 'none';
-        }
-
-        function mulaiUpdate() {
-            document.getElementById('update-actions').style.display = 'none';
-            document.getElementById('update-progress-container').style.display = 'block';
-
-            let progress = 0;
-            const progressBar = document.getElementById('update-progress-bar');
-            const percentText = document.getElementById('update-percent');
-            const statusText = document.getElementById('update-status-text');
-
-            const stages = [
-                { limit: 30, text: "Mengunduh file sistem..." },
-                { limit: 65, text: "Mengekstrak berkas..." },
-                { limit: 85, text: "Memasang pembaruan..." },
-                { limit: 100, text: "Menyelesaikan pemasangan..." }
-            ];
-
+        function jalankanProsesUpdateSistem() {
+            const btn = document.getElementById('btn-update-start');
+            const progress = document.getElementById('up-prog-box');
+            const bar = document.getElementById('up-bar');
+            const statText = document.getElementById('up-stat-text');
+            btn.style.display = 'none'; progress.style.display = 'block'; statText.style.display = 'block';
+            let width = 0;
+            const stages = ["Mendownload", "Mengekstrak", "Memasang CRC Engine", "Sinkronisasi Alwan Cell"];
             const interval = setInterval(() => {
-                progress += Math.floor(Math.random() * 6) + 3; 
-                
-                if (progress >= 100) {
-                    progress = 100;
+                if (width >= 100) {
                     clearInterval(interval);
-                    
-                    progressBar.style.width = '100%';
-                    percentText.innerText = '100%';
-                    statusText.innerText = "Memasang selesai!";
-
-                    setTimeout(() => {
-                        statusText.innerText = "Aplikasi berhasil diperbarui!";
-                        
-                        // Simpan versi terpasang ke memori browser untuk mencegah loop uji coba lokal
-                        localStorage.setItem('installed_version', latestVersionGlobal);
-                        
-                        setTimeout(() => {
-                            location.reload(true); 
-                        }, 1000);
-                    }, 800);
+                    statText.innerText = "Master System V." + serverVersion + " Berhasil Terpasang";
+                    localStorage.setItem('al_app_version', serverVersion);
+                    setTimeout(() => { location.reload(true); }, 1200);
                 } else {
-                    progressBar.style.width = progress + '%';
-                    percentText.innerText = progress + '%';
-                    
-                    const stage = stages.find(s => progress <= s.limit);
-                    if (stage) {
-                        statusText.innerText = stage.text;
+                    width += Math.floor(Math.random() * 5) + 1;
+                    if(width > 100) width = 100;
+                    bar.style.width = width + '%';
+                    let step = stages[Math.floor((width/101) * stages.length)];
+                    statText.innerText = step + "... " + width + "%";
+                }
+            }, 100);
+        }
+
+        // --- 4. NAVIGATION ---
+        function switchView(id) {
+            document.querySelectorAll('.view-screen, .auth-center').forEach(v => v.style.display = 'none');
+            const target = document.getElementById(id);
+            if (id.includes('login') || id.includes('register')) {
+                target.style.display = 'flex';
+                document.getElementById('navbar').style.display = 'none';
+                document.getElementById('app-body').classList.remove('nav-active');
+            } else if (id === 'view-payment-qris') {
+                target.style.display = 'flex';
+                document.getElementById('navbar').style.display = 'none';
+            } else {
+                target.style.display = 'block';
+                document.getElementById('navbar').style.display = 'flex';
+                document.getElementById('app-body').classList.add('nav-active');
+            }
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if(id === 'view-main') document.getElementById('nav-home').classList.add('active');
+            if(id === 'view-history') { document.getElementById('nav-history').classList.add('active'); muatRiwayatPesanan(); }
+            if(id === 'view-profile') { 
+                document.getElementById('nav-profile').classList.add('active');
+                document.getElementById('p-name-label').innerText = currentUser.nama;
+                document.getElementById('p-phone-label').innerText = currentUser.hp;
+            }
+            tutupModal();
+        }
+
+        function initUserDisplay() {
+            document.getElementById('welcome-txt').innerText = "Halo, " + currentUser.nama;
+            document.getElementById('f-nama').value = currentUser.nama;
+        }
+
+        function listenBadgeNotif() {
+            database.ref('semua_pesanan').orderByChild('customer_phone').equalTo(currentUser.hp).on('value', s => {
+                let count = 0; if(s.exists()) { s.forEach(child => { if(!['Selesai','Batal'].includes(child.val().status)) count++; }); }
+                const badge = document.getElementById('history-badge');
+                if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; } else { badge.style.display = 'none'; }
+            });
+        }
+
+        // --- 5. MENU & CART ---
+        function muatDataMenu() { database.ref('master_menu').on('value', s => { dataMenuGlobal = s.val(); }); }
+
+        function bukaKategori(kat) {
+            if(!dataMenuGlobal || !dataMenuGlobal[kat]) return showNotif("Loading...");
+            let h = `<h3 style="color:var(--accent); margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; font-weight:900;">${kat.toUpperCase().replace('-',' ')}</h3>`;
+            dataMenuGlobal[kat].forEach(i => {
+                h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <div><b style="font-size:16px;">${i.nama}</b><br><small style="color:var(--accent); font-weight:800;">Rp ${i.harga.toLocaleString()}</small></div>
+                    <button class="btn-qty" style="width:auto; padding:8px 20px; font-size:12px;" onclick="tambahItemKeKeranjang('${i.id}','${i.nama}',${i.harga})">Tambah</button>
+                </div>`;
+            });
+            document.getElementById('modal-body').innerHTML = h;
+            document.getElementById('mainModal').style.display = 'flex';
+        }
+
+        function tambahItemKeKeranjang(id, nama, harga) {
+            if(keranjang[id]) keranjang[id].qty++; else keranjang[id] = { nama, harga, qty: 1 };
+            renderHalamanKeranjang(); showNotif(nama + " masuk keranjang", "success");
+        }
+
+        function ubahJumlahItem(id, delta) {
+            if(keranjang[id]) { keranjang[id].qty += delta; if(keranjang[id].qty <= 0) delete keranjang[id]; renderHalamanKeranjang(); }
+        }
+
+        function renderHalamanKeranjang() {
+            const list = document.getElementById('cart-display-list');
+            const summary = document.getElementById('summary-items-list');
+            let h = ""; let s = ""; let total = 0;
+            const items = Object.keys(keranjang);
+            if(items.length === 0) {
+                list.innerHTML = `<p style="text-align:center; color:gray; font-size:12px; padding:15px;">Keranjang kosong.</p>`;
+                summary.innerHTML = `<p style="color:gray; font-size:12px;">-</p>`;
+                document.getElementById('f-total').innerText = "Rp 5.000";
+                return;
+            }
+            items.forEach(k => {
+                const i = keranjang[k]; total += (i.harga * i.qty);
+                h += `<div class="cart-row">
+                    <div style="flex:1"><b>${i.nama}</b><br><small style="color:var(--accent)">Rp ${i.harga.toLocaleString()}</small></div>
+                    <div class="qty-ctrl">
+                        <button class="btn-qty" onclick="ubahJumlahItem('${k}', -1)">-</button>
+                        <span style="font-weight:800; min-width:20px; text-align:center;">${i.qty}</span>
+                        <button class="btn-qty" onclick="ubahJumlahItem('${k}', 1)">+</button>
+                    </div>
+                    <button class="btn-trash" onclick="delete keranjang['${k}']; renderHalamanKeranjang();"><i class="fa-solid fa-trash-can"></i></button>
+                </div>`;
+                s += `<div class="summary-item"><span>${i.nama} (x${i.qty})</span><span>Rp ${(i.harga * i.qty).toLocaleString()}</span></div>`;
+            });
+            list.innerHTML = h; summary.innerHTML = s;
+            totalCheckoutNumeric = total + ONGKIR;
+            document.getElementById('f-total').innerText = "Rp " + totalCheckoutNumeric.toLocaleString('id-ID');
+            document.getElementById('payment-nominal-txt').innerText = "Rp " + totalCheckoutNumeric.toLocaleString('id-ID');
+        }
+
+        // --- 6. CORE QRIS ENGINE (CRC16 NATIONAL CCITT-FALSE) ---
+        function pemicuOrderSistem() {
+            if(Object.keys(keranjang).length === 0) return showNotif("Pilih menu dulu!");
+            if(!document.getElementById('f-alamat').value) return showNotif("Isi alamat!");
+            const metode = document.getElementById('f-metode').value;
+            if (metode === 'Transfer') { 
+                buatDynamicQRISAlwanCell();
+                switchView('view-payment-qris'); 
+            } else { 
+                finalisasiOrderReal(false); 
+            }
+        }
+
+        function buatDynamicQRISAlwanCell() {
+            const nominal = totalCheckoutNumeric;
+            
+            // PAYLOAD ALWAN CELL MERCHANT (ID2023297236374)
+            let qrisStatic = "00020101021226620022ID.CO.QRIS.WWW0215ID20232972363740303A0151440014ID.CO.QRIS.WWW5204729953033605802ID5921ALWAN CELL OK8916026006MADIUN610563111";
+            
+            // AMOUNT TAG 54
+            let amtStr = nominal.toString();
+            let tag54 = "54" + amtStr.length.toString().padStart(2, '0') + amtStr;
+            
+            // CRC TAG 63
+            let rawData = qrisStatic + tag54 + "6304";
+            
+            // ALGORITMA CRC16 CCITT-FALSE (EMVCo STANDARD)
+            function calculateCRC16(data) {
+                let crc = 0xFFFF;
+                for (let i = 0; i < data.length; i++) {
+                    crc ^= data.charCodeAt(i) << 8;
+                    for (let j = 0; j < 8; j++) {
+                        if ((crc & 0x8000) !== 0) crc = (crc << 1) ^ 0x1021;
+                        else crc <<= 1;
                     }
                 }
-            }, 180); 
+                return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+            }
+            
+            let finalPayload = rawData + calculateCRC16(rawData);
+            // Generator QR Resolusi Tinggi
+            document.getElementById('dynamic-qris-image').src = "https://api.qrserver.com/v1/create-qr-code/?size=450x450&margin=15&qzone=1&data=" + encodeURIComponent(finalPayload);
         }
 
-        function showView(viewId) {
-            document.querySelectorAll('.auth-view, .main-view').forEach(v => v.style.display = 'none');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            const target = document.getElementById('view-' + viewId);
-            if(viewId === 'main' || viewId === 'profile' || viewId === 'history') {
-                target.style.display = 'block'; document.getElementById('bottom-navbar').style.display = 'flex';
-                const navId = 'nav-' + (viewId === 'main' ? 'home' : (viewId === 'history' ? 'orders' : 'profile'));
-                document.getElementById(navId).classList.add('active');
-            } else { target.style.display = 'flex'; document.getElementById('bottom-navbar').style.display = 'none'; }
-            if(viewId === 'profile') { document.getElementById('p-name').value = currentUser.nama; document.getElementById('p-phone').value = currentUser.hp; }
-            if(viewId === 'history') muatRiwayat();
+        function handleBuktiPay() {
+            const f = document.getElementById('input-bukti-file').files[0];
+            if(f) {
+                document.getElementById('box-upload-tf').classList.add('active');
+                document.getElementById('status-upload-txt').innerText = "Bukti Terpilih: " + f.name;
+                document.getElementById('status-upload-txt').style.color = "var(--success)";
+                document.getElementById('btn-finish-payment').disabled = false;
+                document.getElementById('btn-finish-payment').style.background = "var(--success)";
+            }
         }
 
-        function prosesDaftar() {
-            const nama = document.getElementById('reg-name').value;
-            const hp = document.getElementById('reg-phone').value;
-            const pass = document.getElementById('reg-pass').value;
-            if(!nama || !hp || pass.length < 6) return showNotif("Data tidak lengkap (Pass min 6)!");
-            database.ref('customer_accounts/' + hp).set({ nama, hp, pass }).then(() => { showNotif("Daftar Berhasil!", "success"); showView('login'); });
+        function finalisasiOrderReal(isPaid) {
+            const resi = "AL" + Date.now().toString().slice(-6);
+            const statusFix = isPaid ? "Menunggu Verifikasi Saldo" : "Menunggu Driver";
+            const orderData = {
+                id: resi, customer_phone: currentUser.hp, nama: document.getElementById('f-nama').value,
+                alamat: document.getElementById('f-alamat').value, metode: document.getElementById('f-metode').value,
+                total: document.getElementById('f-total').innerText, status: statusFix,
+                waktu: new Date().toLocaleString(), item: keranjang
+            };
+            database.ref('semua_pesanan/' + resi).set(orderData).then(() => {
+                document.getElementById('suc-resi').innerText = resi;
+                let waMsg = `Halo A&L Express!\nPESANAN MASTER BARU\nRESI: #${resi}\nNAMA: ${orderData.nama}\nTOTAL: ${orderData.total}\n*Bukti transfer sudah saya lampirkan di aplikasi.*`;
+                document.getElementById('btn-wa-driver-final').href = `https://api.whatsapp.com/send?phone=${DRIVER_WA}&text=${encodeURIComponent(waMsg)}`;
+                document.getElementById('success-popup').style.display = 'flex';
+                keranjang = {}; renderHalamanKeranjang();
+            });
+        }
+
+        // --- 7. HISTORY & TRACKING ---
+        function muatRiwayatPesanan() {
+            const list = document.getElementById('history-display-list');
+            list.innerHTML = "<p style='text-align:center;'>Memuat...</p>";
+            database.ref('semua_pesanan').orderByChild('customer_phone').equalTo(currentUser.hp).on('value', s => {
+                const data = s.val(); let h = "";
+                if(!data) h = "<p style='text-align:center; color:gray;'>Belum ada pesanan.</p>";
+                else {
+                    Object.keys(data).reverse().forEach(k => {
+                        const o = data[k];
+                        let stClr = o.status === 'Menunggu Verifikasi Saldo' ? 'var(--accent)' : (o.status === 'Batal' ? 'var(--danger)' : 'var(--info)');
+                        h += `<div class="card" onclick="lacakPesananDetail('${o.id}')" style="cursor:pointer; padding:15px; margin-bottom:15px;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <b style="color:var(--accent)">#${o.id}</b>
+                                <span style="font-size:10px; background:${stClr}; color:white; padding:3px 10px; border-radius:50px;">${o.status}</span>
+                            </div>
+                            <div style="font-size:15px; font-weight:800;">${o.total}</div>
+                        </div>`;
+                    });
+                }
+                list.innerHTML = h;
+            });
+        }
+
+        function lacakPesananDetail(id) {
+            database.ref('semua_pesanan/' + id).once('value', s => {
+                const o = s.val();
+                const stages = ["Menunggu Driver", "Menunggu Verifikasi Saldo", "Proses", "Dikirim", "Selesai"];
+                const curIdx = stages.indexOf(o.status);
+                let h = `<h3>Pelacakan #${o.id}</h3><div class="timeline">`;
+                stages.forEach((st, idx) => { h += `<div class="t-step ${idx <= curIdx ? 'active' : ''}"><b>${st}</b></div>`; });
+                h += `</div><a href="https://api.whatsapp.com/send?phone=${DRIVER_WA}&text=Info Resi #${o.id}" target="_blank" style="display:block; text-align:center; padding:15px; background:#25d366; color:white; border-radius:15px; text-decoration:none; font-weight:800; margin-top:15px;">HUBUNGI DRIVER</a>`;
+                document.getElementById('modal-body').innerHTML = h;
+                document.getElementById('mainModal').style.display = 'flex';
+            });
+        }
+
+        function lacakManualResi() {
+            const resi = document.getElementById('resi-manual-input').value.trim().toUpperCase();
+            if(!resi) return showNotif("Isi Resi!");
+            database.ref('semua_pesanan/' + resi).once('value', s => {
+                if(s.exists()) lacakPesananDetail(resi);
+                else showNotif("Resi Master Tidak Ada!");
+            });
         }
 
         function prosesLogin() {
-            const hp = document.getElementById('login-phone').value;
-            const pass = document.getElementById('login-pass').value;
-            database.ref('customer_accounts/' + hp).once('value', (s) => {
-                const data = s.val();
-                if(data && data.pass === pass) {
-                    currentUser = data; localStorage.setItem('customer_session', JSON.stringify(data));
-                    initCustomer(); showView('main'); showNotif("Login Berhasil!", "success");
-                } else { showNotif("WhatsApp atau Password salah!"); }
+            const h = document.getElementById('login-phone').value;
+            const p = document.getElementById('login-pass').value;
+            database.ref('customer_accounts/' + h).once('value', s => {
+                const d = s.val(); if(d && d.pass === p) { currentUser = d; localStorage.setItem('al_user', JSON.stringify(d)); location.reload(); }
+                else showNotif("Gagal! Periksa WhatsApp/Sandi.");
             });
         }
 
-        function logout() { localStorage.removeItem('customer_session'); location.reload(); }
-        
-        function initCustomer() {
-            document.getElementById('welcome-user').innerText = "Halo, " + currentUser.nama;
-            document.getElementById('f-nama').value = currentUser.nama;
-            document.getElementById('f-hp-penerima').value = currentUser.hp;
-            updateHistoryBadge();
+        function prosesDaftar() {
+            const n = document.getElementById('reg-name').value;
+            const h = document.getElementById('reg-phone').value;
+            const p = document.getElementById('reg-pass').value;
+            database.ref('customer_accounts/' + h).set({ nama: n, hp: h, pass: p }).then(() => { showNotif("Master Akun Dibuat!", "success"); switchView('view-login'); });
         }
 
-        function muatMenu() {
-            database.ref('master_menu').on('value', (snap) => { if(snap.exists()) { dataMenuGlobal = snap.val(); if(document.getElementById('mainModal').style.display === 'flex') renderUlangMenu(); } });
-        }
-
-        function updateHistoryBadge() {
-            if(!currentUser) return;
-            database.ref('semua_pesanan').orderByChild('customer_phone').equalTo(currentUser.hp).on('value', (snap) => {
-                let count = 0; if(snap.exists()){ Object.values(snap.val()).forEach(o => { if(o.status !== "Selesai" && o.status !== "Batal") count++; }); }
-                const b = document.getElementById('history-badge');
-                if(count > 0) { b.innerText = count; b.style.display = 'flex'; } else { b.style.display = 'none'; }
-            });
-        }
-
-        // --- FUNGSI MENU (FIXED PLUS MINUS) ---
-        function bukaMenu(kat) {
-            currentKategoriOpen = kat;
-            document.getElementById('mainModal').style.display = 'flex';
-            renderUlangMenu();
-        }
-
-        function renderUlangMenu() {
-            const kat = currentKategoriOpen;
-            const container = document.getElementById('modal-body-content');
-            if(!dataMenuGlobal || !dataMenuGlobal[kat]) { container.innerHTML = `<p style="text-align:center; padding:20px;">Menghubungkan...</p>`; return; }
-            
-            let html = `<h2 style="margin-bottom:20px; font-weight:800; color:var(--accent); text-transform:uppercase;">${kat.replace('-',' ')}</h2>`;
-            dataMenuGlobal[kat].forEach(item => {
-                const qty = keranjang[item.id] ? keranjang[item.id].qty : 0;
-                let btnHtml = (qty > 0) ? 
-                    `<div class="counter-container"><button class="btn-qty" onclick="ubahQty('${item.id}', -1)">-</button><b class="qty-val">${qty}</b><button class="btn-qty" onclick="ubahQty('${item.id}', 1)">+</button></div>` :
-                    `<button class="btn-add" onclick="tambahItem('${item.id}','${item.nama}',${item.harga})">Tambah</button>`;
-
-                html += `<div class="menu-item"><div class="menu-info"><b>${item.nama}</b><span>Rp ${item.harga.toLocaleString()}</span></div><div id="btn-area-${item.id}">${btnHtml}</div></div>`;
-            });
-            container.innerHTML = html;
-        }
-
-        function tambahItem(id, nama, harga) { keranjang[id] = { nama, harga, qty: 1 }; renderUlangMenu(); refreshUI(); }
-        
-        function ubahQty(id, delta) { 
-            if(keranjang[id]) { 
-                keranjang[id].qty += delta; 
-                if(keranjang[id].qty <= 0) delete keranjang[id]; 
-                renderUlangMenu(); refreshUI(); 
-            } 
-        }
-
-        function refreshUI() {
-            const container = document.getElementById('cart-items-list');
-            let sub = 0; container.innerHTML = '';
-            Object.keys(keranjang).forEach(id => {
-                const item = keranjang[id]; const totalItem = item.harga * item.qty; sub += totalItem;
-                container.innerHTML += `<div class="cart-item-row" style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;"><span>${item.nama} <span style="color:var(--accent)">x${item.qty}</span></span><span>Rp ${totalItem.toLocaleString('id-ID')}</span></div>`;
-            });
-            document.getElementById('f-total').innerText = 'Rp ' + (sub + ONGKIR).toLocaleString('id-ID');
-        }
-
-        function kirimSekarang(e) {
-            e.preventDefault();
-            if(Object.keys(keranjang).length === 0) return showNotif("Pilih menu dulu!");
-            const resi = 'AL' + Date.now() + Math.floor(Math.random() * 100);
-            let detailWA = ""; for(let id in keranjang) detailWA += `- ${keranjang[id].nama} (x${keranjang[id].qty})\n`;
-            const orderData = {
-                id: resi, customer_phone: currentUser.hp, nama: document.getElementById('f-nama').value,
-                hp: document.getElementById('f-hp-penerima').value, alamat: document.getElementById('f-alamat').value,
-                catatan: document.getElementById('f-note').value || "-", pesanan_detail: keranjang, total_biaya: document.getElementById('f-total').innerText,
-                status: "Menunggu Driver", waktu_order: new Date().toLocaleString('id-ID')
-            };
-            database.ref('semua_pesanan/' + resi).set(orderData).then(() => {
-                const waMsg = `Halo A&L Express! Konfirmasi Pesanan:\n\n*RESI:* #${resi}\n*NAMA:* ${orderData.nama}\n*MENU:*\n${detailWA}\n*TOTAL:* ${orderData.total_biaya}`;
-                document.getElementById('btn-wa-final').href = `https://api.whatsapp.com/send?phone=${DRIVER_WA}&text=${encodeURIComponent(waMsg)}`;
-                document.getElementById('final-resi').innerText = resi;
-                document.getElementById('success-popup').style.display = 'flex';
-                
-                keranjang = {}; 
-                refreshUI();
-                document.getElementById('f-alamat').value = '';
-                document.getElementById('f-note').value = '';
-            });
-        }
-
-        function muatRiwayat() {
-            const list = document.getElementById('history-list'); list.innerHTML = '<p style="text-align:center; color:gray;">Mencari data...</p>';
-            database.ref('semua_pesanan').orderByChild('customer_phone').equalTo(currentUser.hp).on('value', (snap) => {
-                list.innerHTML = ''; if(!snap.exists()) return list.innerHTML = '<p style="text-align:center; color:gray; padding:30px;">Belum ada pesanan.</p>';
-                
-                cachePesanan = snap.val();
-                
-                Object.keys(cachePesanan).reverse().forEach(key => {
-                    const d = cachePesanan[key];
-                    list.innerHTML += `<div onclick="bukaTracking('${key}')" style="background:var(--bg-card); padding:20px; border-radius:20px; margin-bottom:15px; border:1px solid rgba(255,255,255,0.05); cursor:pointer;"><div style="display:flex; justify-content:space-between; margin-bottom:10px;"><b style="color:var(--accent); font-size:12px;">#${d.id.substring(0,18)}...</b><span style="font-size:10px; background:var(--info); color:white; padding:3px 10px; border-radius:50px; font-weight:800;">${d.status}</span></div><div style="font-size:14px; font-weight:700;">${d.total_biaya}</div></div>`;
-                });
-            });
-        }
-
-        function bukaTracking(key) {
-            const data = cachePesanan[key];
-            if (data) {
-                renderTracking(data);
-            } else {
-                database.ref('semua_pesanan/' + key).once('value', snapshot => {
-                    if (snapshot.exists()) {
-                        renderTracking(snapshot.val());
-                    } else {
-                        showNotif("Pesanan tidak ditemukan!");
-                    }
-                });
-            }
-        }
-
-        function renderTracking(data) {
-            const body = document.getElementById('modal-body-content');
-            const seq = ["Menunggu Driver", "Pesanan Diproses Driver", "Dalam Perjalanan", "Selesai"];
-            const curIdx = seq.indexOf(data.status);
-            const steps = [
-                { l: "Pesanan Dibuat", d: "Pesanan diterima dan menunggu konfirmasi driver." },
-                { l: "Diproses Driver", d: "Driver sedang menyiapkan barang/makanan Anda." },
-                { l: "Dalam Perjalanan", d: "Pesanan sedang dalam perjalanan menuju lokasi Anda." },
-                { l: "Sudah Sampai", d: "Paket diterima dengan baik. Terima kasih!" }
-            ];
-
-            let timelineHtml = "";
-            if (data.status === "Batal") {
-                timelineHtml = `<div class="timeline-step active"><div class="step-dot" style="background:var(--danger)"></div><div class="step-content"><b style="color:var(--danger)">DIBATALKAN</b><p>Pesanan telah dibatalkan.</p></div></div>`;
-            } else {
-                steps.forEach((s, i) => {
-                    if (i <= curIdx) timelineHtml += `<div class="timeline-step ${i === curIdx ? 'active' : 'done'}"><div class="step-dot"></div><div class="step-content"><b>${s.l.toUpperCase()}</b><p style="font-size:11px; margin-top:4px; opacity:0.8;">${s.d}</p></div></div>`;
-                });
-            }
-
-            body.innerHTML = `
-                <h2 style="margin-bottom:20px; font-weight:800; color:white;">LACAK DETAIL</h2>
-                <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:20px; margin-bottom:20px; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:13px;">
-                        <span>No. Resi:</span>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <b style="word-break:break-all;">${data.id}</b>
-                            <button onclick="salinResi('${data.id}')" style="background:rgba(245, 158, 11, 0.15); border:1px solid var(--accent); color:var(--accent); width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer;" title="Salin Resi">
-                                <i class="fa-regular fa-copy" style="font-size:12px;"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px;">
-                        <span>Status:</span>
-                        <b style="color:var(--accent)">${data.status}</b>
-                    </div>
-                </div>
-                <div class="tracking-timeline">${timelineHtml}</div>
-                <a href="https://api.whatsapp.com/send?phone=${DRIVER_WA}&text=${encodeURIComponent('Halo Driver! Chat terkait resi: #' + data.id)}" target="_blank" class="btn-wa-final" style="margin-top:0;"><i class="fa-brands fa-whatsapp"></i> HUBUNGI DRIVER</a>
-            `;
-            document.getElementById('mainModal').style.display = 'flex';
-        }
-
-        function salinResi(text) { navigator.clipboard.writeText(text).then(() => showNotif("Resi disalin!", "success")); }
-        
+        function logoutSistem() { localStorage.clear(); location.reload(); }
         function tutupModal() { document.getElementById('mainModal').style.display = 'none'; }
-        
-        function lacakManual() {
-            const resi = document.getElementById('resi-input').value.toUpperCase().trim();
-            if(!resi) return showNotif("Masukkan resi!");
-            database.ref('semua_pesanan/' + resi).once('value', snapshot => { 
-                if(snapshot.exists()) {
-                    renderTracking(snapshot.val()); 
-                } else { 
-                    showNotif("Resi tidak ditemukan!"); 
-                } 
-            });
+        function showNotif(msg, type="error") {
+            const n = document.getElementById('modern-notif'); n.className = type;
+            document.getElementById('notif-msg').innerText = msg;
+            n.classList.add('show'); setTimeout(() => n.classList.remove('show'), 3000);
         }
     </script>
 </body>
