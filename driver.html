@@ -2,11 +2,17 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
-    <title>A&L EXPRESS - Driver Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A&L EXPRESS - Master Driver Pro</title>
+    
+    <!-- LIBRARIES -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
+        /* -----------------------------------------------------------
+           1. CORE THEME & VARIABLES
+        ----------------------------------------------------------- */
         :root {
             --bg-main: #020617;
             --bg-card: #1e293b;
@@ -17,1269 +23,431 @@
             --danger: #ef4444;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
+        /* -----------------------------------------------------------
+           2. BASE STYLES & LAYOUT
+        ----------------------------------------------------------- */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden; 
-            background-color: var(--bg-main); 
-            color: var(--text-main); 
-            position: relative;
-        }
-        .container { max-width: 600px; margin: 0 auto; padding: 0 20px; }
-
-        /* AUTH VIEWS */
-        .auth-view { display: none; min-height: 100vh; flex-direction: column; justify-content: center; align-items: center; padding: 20px; overflow-y: auto; }
-        .auth-card { background: var(--bg-card); width: 100%; padding: 35px 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px; margin-left: 5px; }
-        .input-style { width: 100%; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 15px; color: white; outline: none; transition: 0.3s; }
-        .input-style:focus { border-color: var(--accent); }
-        
-        /* MAIN DASHBOARD LAYOUT FLEXBOX */
-        .main-view { 
-            display: none; 
+        html, body { 
             height: 100%; 
             width: 100%;
-            flex-direction: column; 
-            overflow: hidden;
+            background-color: var(--bg-main); 
+            color: var(--text-main); 
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
         }
+
+        .container { max-width: 600px; margin: 0 auto; padding: 0 20px; }
+
+        .animate { animation: fadeInUp 0.4s ease forwards; }
+        @keyframes fadeInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* TOAST NOTIFIKASI */
+        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 12px 30px; border-radius: 50px; font-weight: 800; display: none; z-index: 300000; box-shadow: var(--shadow); font-size: 13px; text-align: center; width: 85%; max-width: 400px; }
+
+        /* -----------------------------------------------------------
+           3. AUTHENTICATION & LOGIN UI
+        ----------------------------------------------------------- */
+        .auth-view { min-height: 100vh; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 25px; overflow-y: auto; }
+        .auth-card { background: var(--bg-card); width: 100%; max-width: 400px; padding: 40px 30px; border-radius: 35px; border: 1px solid rgba(255,255,255,0.05); box-shadow: var(--shadow); }
+        
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-size: 10px; font-weight: 800; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .input-style { width: 100%; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.1); padding: 18px; border-radius: 18px; color: white; outline: none; transition: 0.3s; font-size: 14px; }
+
+        /* -----------------------------------------------------------
+           4. MAIN DASHBOARD STRUCTURE
+        ----------------------------------------------------------- */
+        .view-screen { display: none; height: 100%; width: 100%; flex-direction: column; }
         
         header { 
             background: linear-gradient(180deg, #1e1b4b 0%, #020617 100%); 
-            padding: 25px 20px 20px 20px; 
-            text-align: center; 
-            border-bottom: 1px solid rgba(245, 158, 11, 0.2); 
-            border-radius: 0 0 30px 30px; 
-            flex: 0 0 auto; 
-            margin-bottom: 15px;
+            padding: 40px 20px 30px 20px; text-align: center; border-bottom: 1px solid rgba(245, 158, 11, 0.2); 
+            border-radius: 0 0 40px 40px; flex: 0 0 auto; 
         }
-        
-        .fixed-dashboard-controls {
-            flex: 0 0 auto; 
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* AREA GULIR INTERNAL */
+        header h1 { font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+        header p { font-size: 11px; opacity: 0.6; letter-spacing: 2px; margin-top: 5px; }
+
         .scroll-content {
-            flex: 1 1 auto; 
+            flex: 1; 
             overflow-y: auto; 
             -webkit-overflow-scrolling: touch; 
-            padding: 5px 20px 20px 20px;
+            padding: 20px 20px 140px 20px; 
             width: 100%;
             max-width: 600px;
             margin: 0 auto;
-            transition: transform 0.15s ease-out;
         }
+
+        /* STATS BOXES */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .stat-box { background: var(--bg-card); padding: 25px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); box-shadow: var(--shadow); }
+        .stat-box small { font-size: 9px; font-weight: 900; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; display: block; }
+        .stat-box h2 { font-size: 22px; color: var(--accent); margin-top: 8px; font-weight: 800; }
+
+        /* TABS MENU */
+        .tab-menu { display: flex; background: var(--bg-card); padding: 7px; border-radius: 25px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.05); box-shadow: var(--shadow); }
+        .tab-btn { flex: 1; padding: 15px 5px; border: none; background: none; color: var(--text-muted); font-weight: 800; cursor: pointer; border-radius: 20px; font-size: 13px; position: relative; transition: 0.3s; }
+        .tab-btn.active { background: var(--accent); color: #020617; box-shadow: 0 5px 15px rgba(245, 158, 11, 0.2); }
+        .tab-badge { position: absolute; top: -5px; right: 8px; background: var(--danger); color: white; min-width: 20px; height: 20px; border-radius: 50%; font-size: 10px; display: none; align-items: center; justify-content: center; border: 2px solid var(--bg-card); font-weight: 900; }
+
+        /* ORDER CARD DESIGN */
+        .order-card { background: var(--bg-card); border-radius: 32px; padding: 25px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); position: relative; box-shadow: var(--shadow); }
+        .status-tag { position: absolute; top: 25px; right: 25px; padding: 6px 14px; border-radius: 50px; font-size: 9px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .stat-box { background: var(--bg-card); padding: 15px 18px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
-        .stat-box small { font-size: 9px; font-weight: 800; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-box h2 { font-size: 16px; color: var(--accent); margin-top: 4px; font-weight: 800; }
+        .card-info { display: flex; gap: 12px; margin-bottom: 12px; font-size: 14px; align-items: flex-start; }
+        .card-info i { color: var(--accent); width: 18px; text-align: center; margin-top: 3px; font-size: 16px; }
         
-        /* TOMBOL TARIK SALDO SOLID */
-        .btn-wd-new { 
-            background: var(--accent); 
-            color: #000; 
-            border: none; 
-            width: 100%; 
-            padding: 8px 10px; 
-            border-radius: 12px; 
-            font-size: 10px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 6px; 
-            margin-top: 10px; 
-            transition: 0.2s; 
-            outline: none; 
-        }
-        .btn-wd-new:active { transform: scale(0.95); }
+        .item-list-container { background: rgba(0,0,0,0.25); padding: 18px; border-radius: 24px; margin: 18px 0; font-size: 13px; line-height: 1.7; border-left: 5px solid var(--accent); color: var(--text-main); }
 
-        .tab-menu { display: flex; background: var(--bg-card); padding: 6px; border-radius: 20px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); }
-        .tab-btn { flex: 1; padding: 12px 6px; border: none; background: none; color: var(--text-muted); font-weight: 700; cursor: pointer; border-radius: 15px; font-size: 13px; transition: 0.3s; }
-        .tab-btn.active { background: var(--accent); color: #000; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
-
-        .tab-badge {
-            position: absolute;
-            top: -6px;
-            right: 4px;
-            background: var(--danger);
-            color: white;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            border-radius: 50%;
-            font-size: 9px;
-            font-weight: 800;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--bg-card);
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
-            pointer-events: none;
-        }
-
-        /* ORDER CARDS */
-        .order-card { background: var(--bg-card); border-radius: 28px; padding: 22px; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.05); position: relative; animation: slideUp 0.4s ease; }
-        .status-pill { position: absolute; top: 22px; right: 22px; padding: 5px 12px; border-radius: 50px; font-size: 10px; font-weight: 800; color: white; text-transform: uppercase; }
-        .info-row { display: flex; gap: 12px; margin-bottom: 10px; font-size: 14px; align-items: flex-start; }
-        .info-row i { color: var(--accent); width: 16px; text-align: center; margin-top: 3px; }
-        .item-list { background: rgba(0,0,0,0.25); padding: 15px; border-radius: 18px; margin: 18px 0; font-size: 13px; line-height: 1.6; border-left: 3px solid var(--accent); }
-
-        /* BUTTONS */
-        .btn { width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        /* -----------------------------------------------------------
+           5. BUTTONS & NAVIGATION (FIXED BOTTOM)
+        ----------------------------------------------------------- */
+        .btn { width: 100%; padding: 20px; border-radius: 22px; border: none; font-weight: 900; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 12px; text-transform: uppercase; letter-spacing: 1px; }
         .btn:active { transform: scale(0.96); }
-        .btn-primary { background: var(--accent); color: #000; }
-        .btn-success { background: var(--success); color: white; }
+        .btn-primary { background: var(--accent); color: #020617; }
+        .btn-success { background: var(--success); color: white; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-info { background: var(--info); color: white; }
-        .btn-outline { background: transparent; border: 2px solid #334155; color: var(--text-muted); }
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-        /* EDGE-TO-EDGE FLAT NAVBAR */
+        /* NAVBAR FIXED */
         .navbar { 
-            flex: 0 0 auto; 
-            background: rgba(30, 41, 59, 0.95); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-            display: flex; 
-            justify-content: space-around; 
-            padding: 12px 10px 16px 10px; 
-            border-top: 1px solid rgba(255, 255, 255, 0.08); 
-            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.4);
-            width: 100%;
-            z-index: 1000; 
-            transform: translate3d(0, 0, 0);
-            -webkit-transform: translate3d(0, 0, 0);
-        }
-        .nav-item { 
-            color: var(--text-muted); 
-            text-align: center; 
-            font-size: 10px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            flex: 1; 
-            transition: 0.3s; 
-        }
-        .nav-item.active { 
-            color: var(--accent); 
-        }
-        .nav-item i { 
-            font-size: 18px; 
-            margin-bottom: 4px; 
-            display: block; 
-            transition: transform 0.2s ease;
-        }
-        .nav-item.active i {
-            transform: translateY(-2px);
-        }
-
-        /* MODERN MODAL DENGAN Z-INDEX TERATAS */
-        .modal-overlay { 
             position: fixed; 
-            top: 0; 
+            bottom: 0; 
             left: 0; 
-            right: 0;
-            bottom: 0;
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.85); 
-            backdrop-filter: blur(8px); 
+            right: 0; 
+            background: rgba(30, 41, 59, 0.98); 
+            backdrop-filter: blur(20px); 
             display: none; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 200050; /* Dikunci sangat tinggi agar berada di atas halaman utama */
-            padding: 25px; 
+            justify-content: space-around; 
+            padding: 15px 10px 35px 10px; 
+            border-top: 1px solid rgba(255,255,255,0.08); 
+            z-index: 10000; 
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.3); 
         }
-        .modal-content { background: var(--bg-card); width: 100%; max-width: 400px; padding: 30px; border-radius: 35px; text-align: center; border: 1px solid rgba(255,255,255,0.1); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .modal-icon { width: 70px; height: 70px; background: rgba(239, 68, 68, 0.1); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 0 auto 20px; }
+        .nav-item { color: var(--text-muted); text-align: center; font-size: 11px; font-weight: 800; cursor: pointer; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); }
+        .nav-item i { font-size: 24px; margin-bottom: 6px; display: block; }
 
-        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 12px 30px; border-radius: 50px; font-weight: 800; display: none; z-index: 100000; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; }
-        
-        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .animate { animation: slideUp 0.4s ease; }
+        /* UPDATE OVERLAY */
+        #update-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.98); z-index: 1000000; display: none; align-items: center; justify-content: center; padding: 40px; backdrop-filter: blur(15px); }
+        .up-progress-box { width: 100%; height: 12px; background: #0f172a; border-radius: 10px; margin: 25px 0; display: none; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        .up-progress-bar { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 20px var(--accent); transition: width 0.1s linear; }
+
     </style>
 </head>
-<body>
-
-    <!-- NOTIFIKASI LAYAR ATAS VIRTUAL (GAYA SHOPEE / BRIMO) -->
-    <div id="virtual-notification" style="position: fixed; top: -120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; padding: 15px; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 200010; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2); cursor: pointer;" onclick="bukaNotifVirtual()">
-        <!-- Logo Ikon Aplikasi Makanan Asli -->
-        <img src="https://i.ibb.co.com/8gW9fG5x/AL-Icon.png" id="notif-app-icon" style="width: 45px; height: 45px; border-radius: 12px; object-fit: cover;" alt="App Icon">
-        <div style="flex: 1; text-align: left;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-                <span style="font-size: 11px; font-weight: 800; color: var(--accent); letter-spacing: 0.5px;">A&L EXPRESS</span>
-                <span style="font-size: 9px; color: var(--text-muted);">baru saja</span>
-            </div>
-            <b style="font-size: 13px; color: white; display: block; font-weight: 800;">Orderan Baru Masuk! 🔔</b>
-            <p id="v-notif-body" style="font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-top: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 250px;">Ada pesanan baru menanti Anda.</p>
-        </div>
-    </div>
-
-    <!-- INDIKATOR TARIK UNTUK REFRESH -->
-    <div id="ptr-indicator" style="position: absolute; top: -50px; left: 0; width: 100%; height: 50px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 100000;">
-        <div style="background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
-            <i id="ptr-icon" class="fa-solid fa-arrows-rotate" style="color: var(--accent); font-size: 16px; transition: transform 0.1s;"></i>
-        </div>
-    </div>
-
-    <!-- VIEW LOGIN -->
-    <div id="view-login" class="auth-view animate">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="font-size: 32px; font-weight: 800;">A&L <span style="color: var(--accent);">DRIVER</span></h1>
-            <p style="color: var(--text-muted); font-size: 14px;">Masuk ke sistem pengiriman</p>
-        </div>
-        <div class="auth-card">
-            <div class="input-group">
-                <label>NOMOR WHATSAPP</label>
-                <input type="tel" id="login-phone" class="input-style" placeholder="08xxx" required>
-            </div>
-            <div class="input-group">
-                <label>KATA SANDI</label>
-                <input type="password" id="login-pass" class="input-style" placeholder="••••••••" required>
-            </div>
-            <button class="btn btn-primary" onclick="prosesLogin()">MASUK</button>
-            <p style="margin-top: 25px; font-size: 13px; color: var(--text-muted);">
-                Driver baru? <a href="#" onclick="showView('register')" style="color: var(--accent); font-weight: 800; text-decoration: none;">Daftar Disini</a>
-            </p>
-        </div>
-    </div>
-
-    <!-- VIEW REGISTER -->
-    <div id="view-register" class="auth-view animate">
-        <h2 style="margin-bottom: 25px; font-weight: 800;">Daftar Akun</h2>
-        <div class="auth-card">
-            <div class="input-group">
-                <label>NAMA LENGKAP</label>
-                <input type="text" id="reg-name" class="input-style" placeholder="Nama Driver" required>
-            </div>
-            <div class="input-group">
-                <label>NOMOR WHATSAPP</label>
-                <input type="tel" id="reg-phone" class="input-style" placeholder="08xxx" required>
-            </div>
-            <div class="input-group">
-                <label>KATA SANDI</label>
-                <input type="password" id="reg-pass" class="input-style" placeholder="Min. 6 Karakter" required>
-            </div>
-            <button class="btn btn-primary" onclick="prosesDaftar()">DAFTAR SEKARANG</button>
-            <button class="btn btn-outline" style="margin-top: 12px; border:none;" onclick="showView('login')">Sudah punya akun? Login</button>
-        </div>
-    </div>
-
-    <!-- VIEW PENDING APPROVAL -->
-    <div id="view-pending" class="auth-view animate">
-        <div class="auth-card" style="text-align: center;">
-            <div style="background: rgba(239, 68, 68, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                <i class="fa-solid fa-user-clock" style="font-size: 35px; color: var(--danger);"></i>
-            </div>
-            <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 10px;">Menunggu Verifikasi</h3>
-            <p style="color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 25px;">Akun Driver Anda sedang ditinjau oleh Admin. Silakan hubungi Admin untuk aktivasi cepat agar Anda bisa bekerja.</p>
-            <a id="btn-admin-wa" href="#" target="_blank" class="btn btn-success" style="text-decoration: none;"><i class="fa-brands fa-whatsapp"></i> HUBUNGI ADMIN</a>
-            <button class="btn btn-outline" style="margin-top: 15px; border: none;" onclick="showView('login')">KEMBALI KE LOGIN</button>
-        </div>
-    </div>
-
-    <!-- VIEW MAIN DASHBOARD -->
-    <div id="view-main" class="main-view animate">
-        <header>
-            <h1 id="header-name" style="font-weight: 800;">Halo, Driver</h1>
-            <p style="font-size: 12px; opacity: 0.7; letter-spacing: 1px;" id="header-phone">08xxxx</p>
-        </header>
-
-        <div class="fixed-dashboard-controls">
-            <!-- BANNER NOTIFIKASI SYSTEM -->
-            <div id="notif-permission-banner" style="display: none; background: rgba(245, 158, 11, 0.15); border: 1px solid var(--accent); padding: 18px; border-radius: 25px; margin-bottom: 20px; text-align: left; cursor: pointer;" onclick="mintaIzinNotifikasiManual()">
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <i class="fa-solid fa-bell-slash" style="color: var(--accent); font-size: 22px;"></i>
-                    <div style="flex: 1;">
-                        <b style="font-size: 13px; color: white; display: block; margin-bottom: 3px;">Aktifkan Notifikasi Atas Layar</b>
-                        <span style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">Ketuk di sini agar tetap tahu saat ada orderan masuk meskipun aplikasi sedang ditutup / HP dikunci.</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="stats-grid">
-                <!-- Box Dompet Aktif -->
-                <div class="stat-box" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 115px;">
-                    <div>
-                        <small>DOMPET AKTIF (AKUMULATIF)</small>
-                        <h2 id="stat-dompet" style="margin-top: 4px;">Rp 0</h2>
-                    </div>
-                    <!-- Tombol Tarik Saldo Solid Modern -->
-                    <button class="btn-wd-new" onclick="openWithdrawModal()">
-                        <i class="fa-solid fa-wallet"></i> TARIK SALDO
-                    </button>
-                </div>
-                
-                <!-- Box Order Sukses -->
-                <div class="stat-box" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 115px;">
-                    <div>
-                        <small>ORDER HARI INI (SUKSES)</small>
-                        <h2 id="stat-count" style="margin-top: 4px;">0</h2>
-                    </div>
-                    <!-- Label Status Driver Aktif -->
-                    <div style="font-size: 10px; font-weight: 800; color: var(--success); display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 0; margin-top: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.15);">
-                        <i class="fa-solid fa-circle-check"></i> DRIVER AKTIF
-                    </div>
-                </div>
-            </div>
-
-            <!-- MENU TAB DENGAN BADGE -->
-            <div class="tab-menu">
-                <button class="tab-btn active" id="tab-baru-btn" onclick="switchTab('Menunggu Driver', this)" style="position: relative;">
-                    Baru <span id="badge-baru" class="tab-badge">0</span>
-                </button>
-                <button class="tab-btn" id="tab-proses-btn" onclick="switchTab('Dalam Proses', this)" style="position: relative;">
-                    Proses <span id="badge-proses" class="tab-badge">0</span>
-                </button>
-                <button class="tab-btn" id="tab-selesai-btn" onclick="switchTab('Selesai', this)" style="position: relative;">
-                    Selesai <span id="badge-selesai" class="tab-badge">0</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- KONTEN GULIR INTERNAL -->
-        <div class="scroll-content">
-            <div id="order-list"></div>
-        </div>
-
-        <div class="navbar">
-            <div id="nav-home" class="nav-item active" onclick="clickHome()"><i class="fa-solid fa-house"></i>Home</div>
-            <div id="nav-profile" class="nav-item" onclick="showView('profile')"><i class="fa-solid fa-user-gear"></i>Akun</div>
-            <div class="nav-item" onclick="openLogoutModal()"><i class="fa-solid fa-right-from-bracket"></i>Keluar</div>
-        </div>
-    </div>
-
-    <!-- VIEW PROFILE -->
-    <div id="view-profile" class="main-view animate">
-        <div class="scroll-content" style="padding-top: 50px;">
-            <div class="container">
-                <h2 style="margin-bottom: 30px; text-align: center; font-weight: 800;">Pengaturan Akun</h2>
-                <div class="auth-card">
-                    <div class="input-group">
-                        <label>NAMA LENGKAP</label>
-                        <input type="text" id="profile-name" class="input-style" style="opacity: 0.6;" readonly>
-                    </div>
-                    <hr style="opacity: 0.05; margin: 25px 0;">
-                    <h3 style="font-size: 14px; margin-bottom: 20px; color: var(--text-muted);">Ubah Kata Sandi</h3>
-                    <div class="input-group">
-                        <label>PASSWORD BARU</label>
-                        <input type="password" id="new-pass" class="input-style" placeholder="Minimal 6 karakter">
-                    </div>
-                    <button class="btn btn-primary" onclick="prosesGantiPass()">SIMPAN PERUBAHAN</button>
-                </div>
-                <button class="btn btn-outline" style="margin-top: 20px; border:none;" onclick="clickHome()">KEMBALI</button>
-            </div>
-        </div>
-        <div class="navbar">
-            <div id="nav-home" class="nav-item" onclick="clickHome()"><i class="fa-solid fa-house"></i>Home</div>
-            <div id="nav-profile" class="nav-item active" onclick="showView('profile')"><i class="fa-solid fa-user-gear"></i>Akun</div>
-            <div class="nav-item" onclick="openLogoutModal()"><i class="fa-solid fa-right-from-bracket"></i>Keluar</div>
-        </div>
-    </div>
-
-    <!-- MODERN LOGOUT MODAL (Z-INDEX SANGAT TINGGI) -->
-    <div id="logoutModal" class="modal-overlay" style="z-index: 200050;">
-        <div class="modal-content">
-            <div class="modal-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
-            <h3 style="font-weight: 800; font-size: 20px; margin-bottom: 10px; color: white;">Konfirmasi Keluar</h3>
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">Apakah Anda yakin ingin keluar dari akun Driver?</p>
-            <div class="btn-grid">
-                <button class="btn btn-outline" onclick="closeLogoutModal()">BATAL</button>
-                <button class="btn btn-danger" onclick="confirmLogout()">YA, KELUAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- WITHDRAWAL MODAL (Z-INDEX SANGAT TINGGI) -->
-    <div id="withdrawModal" class="modal-overlay" style="z-index: 200050;">
-        <div class="modal-content" style="text-align: left;">
-            <h3 style="font-weight: 800; font-size: 20px; margin-bottom: 10px; text-align: center; color: white;">Penarikan Saldo</h3>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px; text-align: center;">Silakan isi tujuan transfer saldo dompet Anda.</p>
-            <div class="input-group">
-                <label>JUMLAH PENARIKAN (RP)</label>
-                <input type="number" id="wd-amount" class="input-style" placeholder="Contoh: 50000">
-            </div>
-            <div class="input-group">
-                <label>METODE TRANSFER</label>
-                <select id="wd-method" class="input-style" style="background: var(--bg-input); color: white;">
-                    <option value="DANA">DANA</option>
-                    <option value="GoPay">GoPay</option>
-                    <option value="OVO">OVO</option>
-                    <option value="ShopeePay">ShopeePay</option>
-                    <option value="BANK MANDIRI">Bank Mandiri</option>
-                    <option value="BANK BRI">Bank BRI</option>
-                    <option value="BANK BCA">Bank BCA</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>NOMOR REKENING / NO. HP E-WALLET</label>
-                <input type="text" id="wd-target" class="input-style" placeholder="Nomor akun / rekening">
-            </div>
-            <div class="btn-grid" style="margin-top: 10px;">
-                <button class="btn btn-outline" onclick="closeWithdrawModal()">BATAL</button>
-                <button class="btn btn-primary" onclick="prosesWithdraw()">KIRIM</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- IN-APP CAMERA SCREEN MODAL (WebRTC - LANGSUNG TERBUKA REAL-TIME TANPA PILIHAN GALERI) -->
-    <div id="cameraModal" class="modal-overlay" style="z-index: 200020; padding: 15px;">
-        <div class="modal-content" style="max-width: 450px; padding: 20px; position: relative; height: 80vh; display: flex; flex-direction: column; justify-content: space-between; background: #000; border-radius: 30px; border: 1px solid rgba(255,255,255,0.15);">
-            <h3 style="color: white; font-weight: 800; font-size: 18px; margin-bottom: 10px; text-align: center;">Ambil Foto Bukti</h3>
-            
-            <!-- Bidik Kamera Real-Time -->
-            <div style="flex: 1; position: relative; background: #111; border-radius: 20px; overflow: hidden; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.05);">
-                <video id="camera-preview" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
-            </div>
-            
-            <!-- Tombol Kamera Shutter -->
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 0 10px;">
-                <button class="btn btn-outline" onclick="closeCameraModal()" style="border-color: #ef4444; color: #ef4444; padding: 12px; font-size: 12px; flex: 1;">BATAL</button>
-                <button onclick="ambilFotoDariStream()" style="width: 60px; height: 60px; border-radius: 50%; background: white; border: 5px solid #475569; cursor: pointer; outline: none; transition: 0.2s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"></button>
-                <div style="flex: 1;"></div> 
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL MEMUAT PEMBARUAN (UPDATE OVERLAY - MEMILIKI Z-INDEX TERTINGGI 200060) -->
-    <div id="update-modal" class="modal-overlay" style="z-index: 200060; background: rgba(2, 6, 23, 0.97); padding: 25px;">
-        <div class="modal-content" style="max-width: 400px; padding: 30px; border-radius: 35px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: var(--shadow);" class="animate">
-            <div style="background: rgba(245, 158, 11, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                <i class="fa-solid fa-cloud-arrow-down" style="font-size: 35px; color: var(--accent);"></i>
-            </div>
-            <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 10px; color: white;">Pembaruan Tersedia!</h3>
-            <p id="update-desc" style="color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 25px;">Versi baru telah dirilis dengan peningkatan stabilitas dan performa. Perbarui sekarang untuk pengalaman terbaik.</p>
-            
-            <!-- BAR PROGRES PENGUNDUHAN -->
-            <div id="update-progress-container" style="display: none; margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--accent); margin-bottom: 8px; text-transform: uppercase;">
-                    <span id="update-status-text">Mengunduh berkas...</span>
-                    <span id="update-percent">0%</span>
-                </div>
-                <div style="background: var(--bg-input); width: 100%; height: 8px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(16, 185, 129, 0.15);">
-                    <div id="update-progress-bar" style="background: var(--accent); width: 0%; height: 100%; transition: width 0.1s linear; border-radius: 10px;"></div>
-                </div>
-            </div>
-
-            <!-- TOMBOL AKSI -->
-            <div id="update-actions" style="display: flex; gap: 12px;">
-                <button onclick="tundaUpdate()" style="flex: 1; background: #334155; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 13px;">TUNDA</button>
-                <button onclick="mulaiUpdate()" style="flex: 1; background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 13px;">PERBARUI</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Canvas tersembunyi untuk merender kompresi foto -->
-    <canvas id="camera-canvas" style="display: none;"></canvas>
+<body id="app-body">
 
     <div id="toast">Berhasil!</div>
 
+    <!-- 1. VIEW LOGIN -->
+    <div id="view-login" class="auth-view animate">
+        <div class="auth-card">
+            <h1 style="text-align: center; margin-bottom: 8px; font-weight: 900;">A&L <span style="color: var(--accent);">DRIVER</span></h1>
+            <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 40px; font-weight: 600;">Master Driver Portal - Alwan Cell</p>
+            
+            <div class="input-group">
+                <label>NOMOR WHATSAPP</label>
+                <input type="tel" id="login-phone" class="input-style" placeholder="08xxx">
+            </div>
+            <div class="input-group">
+                <label>PASSWORD KEAMANAN</label>
+                <input type="password" id="login-pass" class="input-style" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary" onclick="prosesLogin()">MASUK SYSTEM</button>
+            
+            <p style="text-align:center; margin-top:35px; font-size:9px; color:rgba(255,255,255,0.2); font-weight:800; letter-spacing:3px; text-transform:uppercase;">Dev adalah Alwan Cell</p>
+        </div>
+    </div>
+
+    <!-- 2. VIEW DASHBOARD -->
+    <div id="view-main" class="view-screen animate">
+        <header>
+            <h1 id="header-name">Halo, Driver</h1>
+            <p id="header-phone">08xxxxxx</p>
+        </header>
+
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <small>Pendapatan (HARI INI)</small>
+                    <h2 id="stat-income">Rp 0</h2>
+                </div>
+                <div class="stat-box">
+                    <small>Order Selesai</small>
+                    <h2 id="stat-count">0</h2>
+                </div>
+            </div>
+
+            <div class="tab-menu">
+                <button class="tab-btn active" id="tab-baru" onclick="switchTab('Menunggu Driver', this)">
+                    Baru <span id="badge-baru" class="tab-badge">0</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab('Proses', this)">Proses</button>
+                <button class="tab-btn" onclick="switchTab('Selesai', this)">Selesai</button>
+            </div>
+        </div>
+
+        <div class="scroll-content">
+            <div id="order-list"></div>
+        </div>
+    </div>
+
+    <!-- 3. VIEW PROFILE -->
+    <div id="view-profile" class="view-screen animate">
+        <div class="scroll-content" style="padding-top: 60px;">
+            <div class="container" style="text-align: center;">
+                <h2 style="margin-bottom: 35px; font-weight: 900; letter-spacing: -1px;">Akun Driver Master</h2>
+                <div class="auth-card">
+                    <div style="width:70px; height:70px; background:var(--accent); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-bottom:20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+                        <i class="fa-solid fa-user-shield" style="font-size:30px; color:black;"></i>
+                    </div>
+                    <h3 id="p-name" style="color: var(--accent); margin-bottom: 5px; font-size: 20px;">Nama</h3>
+                    <p id="p-phone" style="color: var(--text-muted); margin-bottom: 30px; font-weight: 600;"></p>
+                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; margin-bottom: 30px; text-align: left;">
+                        <small style="opacity: 0.5; font-size: 9px; font-weight: 900; letter-spacing: 1px;">SISTEM VERSI</small><br>
+                        <b style="font-size: 15px;">V.3.8.0 - MASTER ENGINE</b>
+                    </div>
+                    <button class="btn btn-danger" onclick="logoutSistem()">LOGOUT SEKARANG</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPDATE MODAL (ANTI STUCK) -->
+    <div id="update-modal">
+        <div class="auth-card" style="text-align:center;">
+            <i class="fa-solid fa-cloud-arrow-down" style="font-size:50px; color:var(--accent); margin-bottom:20px;"></i>
+            <h3 style="color:white; font-weight:900;">Updating Master...</h3>
+            <p id="up-msg" style="color:var(--text-muted); font-size:12px; margin:15px 0 10px;">Menginstal Sinkronisasi Versi 3.8.0 dan Perbaikan Tampilan Statistik.</p>
+            <div id="up-prog-box" class="up-progress-box"><div id="up-bar" class="up-progress-bar"></div></div>
+            <button id="btn-up-start" class="btn btn-primary" onclick="jalankanUpdateMaster()">PERBARUI SEKARANG</button>
+        </div>
+    </div>
+
+    <!-- NAVBAR FIXED AT THE VERY BOTTOM -->
+    <div id="navbar" class="navbar">
+        <div id="nav-home" class="nav-item active" onclick="switchView('main')"><i class="fa-solid fa-house"></i>Home</div>
+        <div id="nav-profile" class="nav-item" onclick="switchView('profile')"><i class="fa-solid fa-user-circle"></i>Profil</div>
+        <div class="nav-item" onclick="logoutSistem()"><i class="fa-solid fa-right-from-bracket"></i>Keluar</div>
+    </div>
+
+    <canvas id="compress-canvas" style="display: none;"></canvas>
+
+    <!-- FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        // --- 1. FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyCGhsZw1wyy1OyqfUiH-bvYqln7fMZyiYg",
             authDomain: "jnt-jastip.firebaseapp.com",
             databaseURL: "https://jnt-jastip-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "jnt-jastip",
             storageBucket: "jnt-jastip.firebasestorage.app",
-            messagingSenderId: "187685093180",
             appId: "1:187685093180:web:159e921771f2c8a5572839"
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // SISTEM VERSI & PROTEKSI LOOP (DRIVER)
-        const CURRENT_VERSION = "1.0.0"; 
-        const ACTIVE_VERSION = localStorage.getItem('driver_installed_version') || CURRENT_VERSION;
-        const ONGKIR = 5000; 
-        const ADMIN_WA = "6281807151531"; // Kontak WhatsApp Admin Utama
-
+        const ONGKIR = 5000;
+        let APP_VERSION = localStorage.getItem('al_app_version_driver') || "3.8.0";
+        let serverVersion = "";
         let currentUser = JSON.parse(localStorage.getItem('driver_session')) || null;
         let currentTab = "Menunggu Driver";
-        let latestVersionGlobal = CURRENT_VERSION;
-        let lastCheckedDay = getWIBDay(); 
 
-        // MONITORING ORDER REAL-TIME (NOTIFIKASI VIRTUAL)
-        let orderanTerproses = new Set();
-        let isFirstLoad = true;
-        let totalWithdrawSelesai = 0; // Total withdraw yang disetujui
-        let currentDompetSaldo = 0; // Saldo dompet aktif riil
-
-        // VARIABEL STATE KAMERA NATIVE WebRTC
-        let localStream = null;
-        let currentActiveOrderKey = null;
-
+        // --- 2. STARTUP ---
         window.onload = () => {
-            periksaIzinNotifikasi(); // Periksa status izin notifikasi sistem saat buka app
-            cekPembaruanAplikasi(); 
-            if(currentUser) {
-                showView('main');
-                initDashboard();
-            } else {
-                showView('login');
-            }
-
-            // Deteksi pergantian hari WIB otomatis
-            setInterval(() => {
-                let currentDay = getWIBDay();
-                if (currentDay !== lastCheckedDay) {
-                    lastCheckedDay = currentDay;
-                    muatOrderan(); 
-                    showToast("Hari baru dimulai! Statistik di-reset ke Rp 0.");
-                }
-            }, 5000);
-
-            // Inisialisasi asinkronus Text-to-Speech pada Chrome/Android WebView
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.getVoices();
-                window.speechSynthesis.onvoiceschanged = () => {
-                    window.speechSynthesis.getVoices();
-                };
-            }
+            cekUpdateSistem();
+            if(currentUser) { switchView('main'); initDashboard(); } 
+            else { switchView('login'); }
+            muatOrderan();
         };
 
-        // --- SISTEM SUARA WANITA LEMBUT "ADA ORDERAN MASUK" ---
-        function bunyikanSuaraNotif() {
-            if ('speechSynthesis' in window) {
-                const ucapan = new SpeechSynthesisUtterance("Ada orderan masuk. Silakan periksa aplikasi Anda.");
-                ucapan.lang = 'id-ID';
-                ucapan.rate = 0.85; 
-                ucapan.pitch = 1.15; 
-
-                const voices = window.speechSynthesis.getVoices();
-                const indonesianFemaleVoice = voices.find(v => v.lang.startsWith('id') && v.name.toLowerCase().includes('female'));
-                
-                if (indonesianFemaleVoice) {
-                    ucapan.voice = indonesianFemaleVoice;
-                } else {
-                    const fallbackId = voices.find(v => v.lang.startsWith('id'));
-                    if (fallbackId) ucapan.voice = fallbackId;
-                }
-
-                window.speechSynthesis.speak(ucapan);
-            }
-        }
-
-        // --- KAMERA LANGSUNG DI DALAM APLIKASI (BYPASS POPUP FILE) ---
-        function openCameraModal(key) {
-            currentActiveOrderKey = key;
-            
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                showToast("Membuka kamera...");
-                
-                // Memicu streaming kamera belakang fisik tanpa laci galeri
-                navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: "environment", // Paksa memicu kamera belakang secara fisik
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
-                    } 
-                }).then(stream => {
-                    localStream = stream;
-                    const video = document.getElementById('camera-preview');
-                    video.srcObject = stream;
-                    video.play();
-                    document.getElementById('cameraModal').style.display = 'flex';
-                }).catch(err => {
-                    console.error("Gagal mengakses kamera:", err);
-                    showToast("Buka pengaturan HP, berikan izin kamera untuk aplikasi ini.");
-                });
-            } else {
-                showToast("Kamera langsung tidak didukung pada browser ini!");
-            }
-        }
-
-        function closeCameraModal() {
-            if (localStream) {
-                // Matikan sensor kamera penghemat daya
-                localStream.getTracks().forEach(track => track.stop());
-                localStream = null;
-            }
-            document.getElementById('cameraModal').style.display = 'none';
-        }
-
-        function ambilFotoDariStream() {
-            if (!localStream || !currentActiveOrderKey) return;
-            
-            showToast("Memproses foto...");
-            
-            const video = document.getElementById('camera-preview');
-            const canvas = document.getElementById('camera-canvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Atur dimensi canvas kompresi ideal
-            canvas.width = 400; 
-            const scale = 400 / video.videoWidth;
-            canvas.height = video.videoHeight * scale;
-            
-            // Gambar frame video stream secara langsung ke canvas
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            // Konversi frame ke base64 JPEG kualitas 60%
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
-            
-            // Unggah ke Firebase orderan terkait
-            database.ref('semua_pesanan/' + currentActiveOrderKey).update({
-                foto_bukti: compressedBase64
-            }).then(() => {
-                showToast("Foto bukti berhasil diunggah! 👍");
-                closeCameraModal();
-            }).catch(err => {
-                showToast("Gagal menyimpan foto bukti!");
+        function cekUpdateSistem() {
+            database.ref('app_config/latest_version_driver').once('value', s => {
+                let serverV = s.val() ? s.val().toString().trim() : APP_VERSION;
+                if(serverV !== APP_VERSION) document.getElementById('update-modal').style.display = 'flex';
             });
         }
 
-        // --- CEK DAN MINTA IZIN NOTIFIKASI SYSTEM ---
-        function periksaIzinNotifikasi() {
-            if ("Notification" in window) {
-                // Tampilkan banner himbauan izin jika belum disetujui
-                if (Notification.permission !== "granted") {
-                    document.getElementById('notif-permission-banner').style.display = 'block';
-                } else {
-                    document.getElementById('notif-permission-banner').style.display = 'none';
-                }
-            }
-        }
-
-        function mintaIzinNotifikasiManual() {
-            if ("Notification" in window) {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        showToast("Notifikasi Atas Layar Diaktifkan! 👍");
-                        document.getElementById('notif-permission-banner').style.display = 'none';
-                        
-                        // Kirim notifikasi percobaan langsung dengan logo kustom Anda
-                        new Notification("A&L EXPRESS - Sukses!", {
-                            body: "Sistem notifikasi atas layar Anda kini telah aktif sepenuhnya.",
-                            icon: "https://i.ibb.co.com/8gW9fG5x/AL-Icon.png"
-                        });
-                    } else {
-                        showToast("Izin notifikasi ditolak!");
-                    }
-                });
-            }
-        }
-
-        // --- PEMICU NOTIFIKASI LAYAR ATAS (VIRTUAL BANNER + SYSTEM TRAY) ---
-        function pemicuNotifMasuk(order) {
-            bunyikanSuaraNotif();
-
-            if ('vibrate' in navigator) {
-                navigator.vibrate([300, 150, 300]);
-            }
-
-            if ("Notification" in window && Notification.permission === "granted") {
-                const systemNotif = new Notification("A&L EXPRESS - Orderan Baru!", {
-                    body: `Ada pesanan baru masuk dari ${order.nama} dengan tarif ${order.total_biaya}.`,
-                    icon: "https://i.ibb.co.com/8gW9fG5x/AL-Icon.png", 
-                    tag: "orderan-masuk", 
-                    requireInteraction: true 
-                });
-                
-                systemNotif.onclick = () => {
-                    window.focus();
-                    bukaNotifVirtual();
-                };
-            }
-
-            const banner = document.getElementById('virtual-notification');
-            document.getElementById('v-notif-body').innerText = `Pesanan dari ${order.nama} dengan tarif ${order.total_biaya}.`;
-            banner.style.top = '15px'; 
-
-            setTimeout(() => {
-                tutupVirtualNotif();
-            }, 7000);
-        }
-
-        function tutupVirtualNotif() {
-            const banner = document.getElementById('virtual-notification');
-            banner.style.top = '-120px'; 
-        }
-
-        function bukaNotifVirtual() {
-            tutupVirtualNotif();
-            clickHome(); 
-        }
-
-        // --- TOMBOL NAV HOME AKAN OTOMATIS MERESET TAB AKTIF KE "BARU" ---
-        function clickHome() {
-            showView('main');
-            const tabBtn = document.getElementById('tab-baru-btn');
-            if (tabBtn) {
-                switchTab('Menunggu Driver', tabBtn);
-            }
-        }
-
-        function getWIBDay() {
-            const formatter = new Intl.DateTimeFormat('id-ID', {
-                timeZone: 'Asia/Jakarta',
-                day: 'numeric'
-            });
-            return formatter.format(new Date());
-        }
-
-        // Perhitungan perbandingan tanggal WIB manual (100% kebal bug WebView HP) [2]
-        function isTodayWIB(order) {
-            if (!order) return false;
-            
-            const offsetWIB = 7 * 60 * 60 * 1000;
-            const dateToday = new Date(Date.now() + offsetWIB);
-            const todayDay = dateToday.getUTCDate();
-            const todayMonth = dateToday.getUTCMonth() + 1;
-            const todayYear = dateToday.getUTCFullYear();
-
-            // Metode 1: Berdasarkan timestamp ID Resi
-            if (order.id && order.id.startsWith('AL')) {
-                const timestamp = parseInt(order.id.substring(2, 15));
-                if (!isNaN(timestamp) && timestamp > 1700000000000) { 
-                    const dateOrder = new Date(timestamp + offsetWIB);
-                    if (dateOrder.getUTCFullYear() === todayYear &&
-                        dateOrder.getUTCMonth() + 1 === todayMonth &&
-                        dateOrder.getUTCDate() === todayDay) {
-                        return true;
-                    }
-                }
-            }
-
-            // Metode 2 (Bypass/Fallback): Berdasarkan pembacaan string waktu_order (Uji coba manual Firebase) [2]
-            if (order.waktu_order) {
-                const timeStr = String(order.waktu_order);
-                const datePart = timeStr.split(',')[0].trim(); 
-                
-                const parts = datePart.split(/[\/\-]/);
-                if (parts.length >= 3) {
-                    const oDay = parseInt(parts[0]);
-                    const oMonth = parseInt(parts[1]);
-                    const oYear = parseInt(parts[2]);
-                    
-                    if (oDay === todayDay && oMonth === todayMonth && oYear === todayYear) {
-                        return true;
-                    }
-                }
-            }
-            
-            return false;
-        }
-
-        // NAVIGATION
-        function showView(viewId) {
-            document.querySelectorAll('.auth-view, .main-view').forEach(v => v.style.display = 'none');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            const target = document.getElementById('view-' + viewId);
-            if(viewId === 'main' || viewId === 'profile') {
-                target.style.display = 'flex'; // Mengaktifkan layout flexbox pada dashboard & profile
-                document.getElementById('nav-' + (viewId === 'main' ? 'home' : 'profile')).classList.add('active');
-            } else {
-                target.style.display = 'flex';
-            }
-
-            if(viewId === 'profile' && currentUser) {
-                document.getElementById('profile-name').value = currentUser.nama;
-            }
-        }
-
-        // --- SISTEM PEMBARUAN OTOMATIS DRIVER ---
-        function cekPembaruanAplikasi() {
-            database.ref('app_config/latest_version_driver').on('value', (snap) => {
-                if (snap.exists()) {
-                    const latestVersion = snap.val();
-                    latestVersionGlobal = latestVersion;
-                    
-                    if (isNewerVersion(latestVersion, ACTIVE_VERSION)) {
-                        document.getElementById('update-desc').innerText = `Versi baru (${latestVersion}) telah tersedia untuk Driver dengan peningkatan stabilitas sistem. Silakan perbarui sekarang.`;
-                        document.getElementById('update-modal').style.display = 'flex';
-                    } else {
-                        document.getElementById('update-modal').style.display = 'none';
-                    }
-                }
-            }, (error) => {
-                console.warn("Pembaruan gagal dibaca (mungkin karena belum login):", error);
-            });
-        }
-
-        function isNewerVersion(latest, current) {
-            const lParts = latest.split('.').map(Number);
-            const cParts = current.split('.').map(Number);
-            for (let i = 0; i < Math.max(lParts.length, cParts.length); i++) {
-                const l = lParts[i] || 0;
-                const c = cParts[i] || 0;
-                if (l > c) return true;
-                if (l < c) return false;
-            }
-            return false;
-        }
-
-        function tundaUpdate() {
-            document.getElementById('update-modal').style.display = 'none';
-        }
-
-        function mulaiUpdate() {
-            document.getElementById('update-actions').style.display = 'none';
-            document.getElementById('update-progress-container').style.display = 'block';
-
-            let progress = 0;
-            const progressBar = document.getElementById('update-progress-bar');
-            const percentText = document.getElementById('update-percent');
-            const statusText = document.getElementById('update-status-text');
-
-            const stages = [
-                { limit: 30, text: "Mengunduh file sistem..." },
-                { limit: 65, text: "Mengekstrak berkas..." },
-                { limit: 85, text: "Memasang pembaruan..." },
-                { limit: 100, text: "Menyelesaikan pemasangan..." }
-            ];
-
-            const interval = setInterval(() => {
-                progress += Math.floor(Math.random() * 6) + 3; 
-                
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    
-                    progressBar.style.width = '100%';
-                    percentText.innerText = '100%';
-                    statusText.innerText = "Memasang selesai!";
-
-                    setTimeout(() => {
-                        statusText.innerText = "Aplikasi berhasil diperbarui!";
-                        localStorage.setItem('driver_installed_version', latestVersionGlobal);
-                        
-                        setTimeout(() => {
-                            // Melakukan reload dengan menyuntikkan parameter acak waktu (cache-buster) untuk melompati cache WebView Android
-                            window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now();
-                        }, 1000);
-                    }, 800);
-                } else {
-                    progressBar.style.width = progress + '%';
-                    percentText.innerText = progress + '%';
-                    
-                    const stage = stages.find(s => progress <= s.limit);
-                    if (stage) {
-                        statusText.innerText = stage.text;
-                    }
-                }
-            }, 180); 
-        }
-
-        // --- MANAJEMEN PENARIKAN SALDO (WITHDRAW) ---
-        function openWithdrawModal() {
-            if (currentDompetSaldo < ONGKIR) {
-                return showToast(`Saldo minimal penarikan adalah Rp ${ONGKIR.toLocaleString('id-ID')}`);
-            }
-            document.getElementById('wd-amount').value = currentDompetSaldo;
-            document.getElementById('withdrawModal').style.display = 'flex';
-        }
-
-        function closeWithdrawModal() {
-            document.getElementById('withdrawModal').style.display = 'none';
-        }
-
-        function prosesWithdraw() {
-            const amount = parseInt(document.getElementById('wd-amount').value);
-            const method = document.getElementById('wd-method').value;
-            const target = document.getElementById('wd-target').value;
-            
-            if (isNaN(amount) || amount < ONGKIR) {
-                return showToast("Jumlah tidak valid!");
-            }
-            if (amount > currentDompetSaldo) {
-                return showToast("Saldo dompet tidak mencukupi!");
-            }
-            if (!target) {
-                return showToast("Isi nomor rekening/e-wallet tujuan!");
-            }
-
-            const wdId = 'WD' + Date.now();
-            const wdData = {
-                id: wdId,
-                driver_phone: currentUser.hp,
-                driver_name: currentUser.nama,
-                jumlah: amount,
-                metode: method,
-                tujuan: target,
-                status: "Pending",
-                waktu: new Date().toLocaleString('id-ID')
-            };
-
-            database.ref('pengajuan_withdraw/' + wdId).set(wdData).then(() => {
-                showToast("Pengajuan dikirim! Menunggu konfirmasi Admin.");
-                closeWithdrawModal();
-            });
-        }
-
-        // --- MANAJEMEN KELUAR AKUN (LOGOUT NYATA 100% RESPONSIF) ---
-        function openLogoutModal() { 
-            document.getElementById('logoutModal').style.display = 'flex'; 
-        }
-        function closeLogoutModal() { 
-            document.getElementById('logoutModal').style.display = 'none'; 
-        }
-        function confirmLogout() {
-            localStorage.removeItem('driver_session');
-            currentUser = null;
-            closeLogoutModal();
-            location.reload();
-        }
-
-        // AUTH
-        function prosesDaftar() {
-            const nama = document.getElementById('reg-name').value;
-            const hp = document.getElementById('reg-phone').value;
-            const pass = document.getElementById('reg-pass').value;
-            if(!nama || !hp || pass.length < 6) return showToast("Lengkapi data (Pass min 6)!");
-            database.ref('driver_accounts/' + hp).once('value', (s) => {
-                if(s.exists()) {
-                    showToast("Nomor HP sudah terdaftar!");
-                } else {
-                    const data = { nama, hp, pass, status: "Pending" }; 
-                    database.ref('driver_accounts/' + hp).set(data).then(() => {
-                        showToast("Daftar Berhasil! Menunggu persetujuan Admin.");
-                        showView('login');
+        function jalankanUpdateMaster() {
+            document.getElementById('btn-up-start').style.display = 'none';
+            document.getElementById('up-prog-box').style.display = 'block';
+            let w = 0;
+            const iv = setInterval(() => {
+                if(w >= 100) {
+                    clearInterval(iv);
+                    database.ref('app_config/latest_version_driver').once('value', s => {
+                        localStorage.setItem('al_app_version_driver', s.val());
+                        location.reload();
                     });
-                }
-            });
-        }
-
-        function prosesLogin() {
-            const hp = document.getElementById('login-phone').value;
-            const pass = document.getElementById('login-pass').value;
-            if(!hp || !pass) return showToast("Masukkan HP & Password!");
-            database.ref('driver_accounts/' + hp).once('value', (s) => {
-                const data = s.val();
-                if(data && data.pass === pass) {
-                    if (data.status === "Pending") {
-                        document.getElementById('btn-admin-wa').href = `https://api.whatsapp.com/send?phone=${ADMIN_WA}&text=${encodeURIComponent('Halo Admin A&L Express! Saya driver baru dengan nama ' + data.nama + ' (' + data.hp + '). Mohon aktivasi akun saya.')}`;
-                        showView('pending');
-                    } else {
-                        currentUser = data;
-                        localStorage.setItem('driver_session', JSON.stringify(data));
-                        showToast("Login Berhasil!");
-                        showView('main');
-                        initDashboard();
-                    }
                 } else {
-                    showToast("HP atau Password salah!");
+                    w += 4; document.getElementById('up-bar').style.width = w + '%';
                 }
-            });
+            }, 60);
         }
 
-        function prosesGantiPass() {
-            const newPass = document.getElementById('new-pass').value;
-            if(newPass.length < 6) return showToast("Password min 6 karakter!");
-            database.ref('driver_accounts/' + currentUser.hp).update({ pass: newPass }).then(() => {
-                showToast("Password Diperbarui!");
-                currentUser.pass = newPass;
-                localStorage.setItem('driver_session', JSON.stringify(currentUser));
-                document.getElementById('new-pass').value = "";
-                clickHome();
-            });
+        // --- 3. NAVIGATION ---
+        function switchView(id) {
+            document.getElementById('view-login').style.display = 'none';
+            document.querySelectorAll('.view-screen').forEach(v => v.style.display = 'none');
+            
+            if (id === 'login') {
+                document.getElementById('view-login').style.display = 'flex';
+                document.getElementById('navbar').style.display = 'none';
+                document.getElementById('app-body').classList.remove('nav-active');
+            } else {
+                const target = document.getElementById('view-' + id);
+                if (target) target.style.display = 'flex';
+                document.getElementById('navbar').style.display = 'flex';
+                document.getElementById('app-body').classList.add('nav-active');
+                
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                if(id === 'main') document.getElementById('nav-home').classList.add('active');
+                if(id === 'profile') document.getElementById('nav-profile').classList.add('active');
+            }
+
+            if(currentUser) {
+                document.getElementById('p-name').innerText = currentUser.nama;
+                document.getElementById('p-phone').innerText = currentUser.hp;
+            }
         }
 
-        // DASHBOARD
-        function switchTab(tab, btn) {
-            currentTab = tab;
+        function switchTab(t, btn) {
+            currentTab = t;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             muatOrderan();
         }
 
-        function initDashboard() {
-            document.getElementById('header-name').innerText = "Halo, " + currentUser.nama;
-            document.getElementById('header-phone').innerText = currentUser.hp;
-            
-            // Pantau total penarikan saldo driver secara real-time
-            database.ref('pengajuan_withdraw').orderByChild('driver_phone').equalTo(currentUser.hp).on('value', (wdSnap) => {
-                totalWithdrawSelesai = 0;
-                if (wdSnap.exists()) {
-                    Object.values(wdSnap.val()).forEach(wd => {
-                        if (wd.status === "Selesai" || wd.status === "Disetujui") {
-                            totalWithdrawSelesai += parseInt(wd.jumlah) || 0;
-                        }
-                    });
-                }
-                muatOrderan(); 
-            });
-        }
-
+        // --- 4. DATA LOGIC ---
         function muatOrderan() {
             const list = document.getElementById('order-list');
-            database.ref('semua_pesanan').on('value', (snap) => {
+            database.ref('semua_pesanan').on('value', snap => {
                 list.innerHTML = "";
-                let income = 0; 
-                let successCount = 0; 
-                let dompet = 0; 
-                let found = false;
-                
-                let countBaru = 0;
-                let countProses = 0;
-                let countSelesai = 0;
-
+                let income = 0, countSelesai = 0, bBaru = 0;
                 const data = snap.val();
-                
                 if(data) {
-                    // PINDAI JALUR MASUK ORDERAN BARU UNTUK PEMICU NOTIFIKASI
-                    Object.keys(data).forEach(key => {
-                        const order = data[key];
-                        const isOrderToday = isTodayWIB(order);
-
-                        // Hitung jumlah data aktif real-time untuk badge tab menu
-                        if (order.status === "Menunggu Driver") {
-                            countBaru++;
-                        }
-                        if (order.status === "Pesanan Diproses Driver" || order.status === "Dalam Perjalanan") {
-                            countProses++;
-                        }
-                        if ((order.status === "Selesai" || order.status === "Batal") && isOrderToday) {
-                            countSelesai++;
-                        }
-
-                        if (order.status === "Menunggu Driver") {
-                            if (!isFirstLoad && !orderanTerproses.has(key)) {
-                                pemicuNotifMasuk(order); 
-                            }
-                            orderanTerproses.add(key);
-                        } else {
-                            orderanTerproses.add(key);
-                        }
-                    });
-
-                    isFirstLoad = false;
-
-                    // RENDERING KARTU DAN PENGHITUNGAN KOMISI
                     Object.keys(data).reverse().forEach(key => {
-                        const order = data[key];
-                        const isOrderToday = isTodayWIB(order);
-
-                        // Driver berhak mendapatkan Rp 5.000 jika pesanan berhasil diselesaikan atas namanya
-                        // Menggunakan fallback jika driver_phone kosong (toleransi data uji coba lama Anda)
-                        const isMyOrder = !order.driver_phone || order.driver_phone === currentUser.hp;
-
-                        if(order.status === "Selesai" && isMyOrder) {
-                            dompet += ONGKIR; 
-
-                            if (isOrderToday) {
-                                successCount++;
-                                income += ONGKIR; 
-                            }
+                        const o = data[key];
+                        if(o.status === "Menunggu Driver") bBaru++;
+                        if(o.status === "Selesai" && o.driver_phone === currentUser.hp) {
+                            countSelesai++; income += ONGKIR;
                         }
-                        
                         let match = false;
-                        if(currentTab === "Menunggu Driver" && order.status === "Menunggu Driver") {
-                            match = true; 
-                        }
-                        if(currentTab === "Dalam Proses" && (order.status === "Pesanan Diproses Driver" || order.status === "Dalam Perjalanan")) {
-                            match = true; 
-                        }
-                        if(currentTab === "Selesai" && (order.status === "Selesai" || order.status === "Batal")) {
-                            if (isOrderToday) {
-                                match = true;
-                            }
-                        }
-
-                        if(match) {
-                            found = true;
-                            renderCard(key, order);
-                        }
+                        if(currentTab === "Menunggu Driver" && o.status === "Menunggu Driver") match = true;
+                        if(currentTab === "Proses" && (o.status === "Pesanan Diproses Driver" || o.status === "Dalam Perjalanan")) match = true;
+                        if(currentTab === "Selesai" && (o.status === "Selesai" || o.status === "Batal")) match = true;
+                        if(match) renderCard(key, o);
                     });
-                } else {
-                    isFirstLoad = false;
                 }
-
-                // UPDATE TAMPILAN BULATAN MERAH BADGE REAL-TIME
-                const bBaru = document.getElementById('badge-baru');
-                const bProses = document.getElementById('badge-proses');
-                const bSelesai = document.getElementById('badge-selesai');
-
-                if (countBaru > 0) { bBaru.innerText = countBaru; bBaru.style.display = 'flex'; } else { bBaru.style.display = 'none'; }
-                if (countProses > 0) { bProses.innerText = countProses; bProses.style.display = 'flex'; } else { bProses.style.display = 'none'; }
-                if (countSelesai > 0) { bSelesai.innerText = countSelesai; bSelesai.style.display = 'flex'; } else { bSelesai.style.display = 'none'; }
-
-                // Hitung neraca keuangan dompet dikurangi penarikan yang disetujui Admin
-                let realDompet = dompet - totalWithdrawSelesai;
-                currentDompetSaldo = realDompet;
-
+                document.getElementById('badge-baru').innerText = bBaru;
+                document.getElementById('badge-baru').style.display = bBaru > 0 ? 'flex' : 'none';
                 document.getElementById('stat-income').innerText = "Rp " + income.toLocaleString('id-ID');
-                document.getElementById('stat-dompet').innerText = "Rp " + realDompet.toLocaleString('id-ID');
-                document.getElementById('stat-count').innerText = successCount;
-                if(!found) list.innerHTML = `<div style="text-align:center; padding:80px 20px; color:var(--text-muted); font-size:14px;"><i class="fa-solid fa-box-open" style="display:block; font-size:40px; margin-bottom:15px; opacity:0.3;"></i>Kosong</div>`;
+                document.getElementById('stat-count').innerText = countSelesai;
             });
         }
 
-        function renderCard(key, order) {
-            const list = document.getElementById('order-list');
-            let items = "";
-            for(let i in order.pesanan_detail) {
-                const val = order.pesanan_detail[i];
-                items += `<div>• ${typeof val === 'object' ? val.nama : i} (x${typeof val === 'object' ? val.qty : val})</div>`;
-            }
-
-            const phone = order.hp ? (order.hp.startsWith('0') ? '62' + order.hp.slice(1) : order.hp) : '';
-            const teksWA = `Halo Kak *${order.nama}*,\nSaya Driver *A&L Express*. Konfirmasi pesanan Resi *#${order.id}* ke alamat *${order.alamat}*. Totalnya *${order.total_biaya}*.\n\nMohon ditunggu ya!`;
-            const waLink = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(teksWA)}`;
-            
-            const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.alamat)}`;
-
+        function renderCard(key, o) {
             const card = document.createElement('div');
             card.className = "order-card animate";
+            
+            // SINKRONISASI FIELD RINCIAN (FIX UNDEFINED)
+            let detailHtml = "";
+            let items = o.item || o.pesanan_detail || {};
+            for(let i in items) { 
+                let data = items[i];
+                let nama = data.nama || i;
+                let qty = data.qty || data;
+                detailHtml += `<div>• ${nama} <b style="color:var(--accent)">x${qty}</b></div>`; 
+            }
 
-            let buttons = "";
-            if(order.status === "Menunggu Driver") {
-                buttons = `
-                    <div class="btn-grid">
-                        <button class="btn btn-danger" onclick="updateStatus('${key}', 'Batal')">BATALKAN</button>
-                        <button class="btn btn-primary" onclick="updateStatus('${key}', 'Pesanan Diproses Driver')">AMBIL</button>
-                    </div>`;
-            } else if(order.status === "Pesanan Diproses Driver") {
-                buttons = `
-                    <div class="btn-grid">
-                        <a href="${mapsLink}" target="_blank" class="btn btn-info"><i class="fa-solid fa-map-location-dot"></i> NAVIGASI</a>
-                        <button class="btn btn-primary" onclick="updateStatus('${key}', 'Dalam Perjalanan')">KIRIM</button>
-                    </div>`;
-            } else if(order.status === "Dalam Perjalanan") {
-                let completeBtn = "";
-                if (order.foto_bukti) {
-                    completeBtn = `<button class="btn btn-success" onclick="updateStatus('${key}', 'Selesai')"><i class="fa-solid fa-circle-check"></i> MARK SELESAI</button>`;
-                } else {
-                    completeBtn = `
-                        <!-- MENGHAPUS ATRIBUT accept SECARA TOTAL SEHINGGA NATIVE ANDROID SEGERA MEMBUKA KAMERA UTAMA REAL-TIME -->
-                        <input type="file" id="camera-input-${key}" capture="environment" style="display: none;" onchange="prosesFotoBukti('${key}', this)">
-                        <button class="btn btn-outline" style="border-color:var(--accent); color:var(--accent);" onclick="openCameraModal('${key}')"><i class="fa-solid fa-camera"></i> FOTO BUKTI</button>
-                    `;
-                }
-                buttons = `<div class="btn-grid"><a href="${mapsLink}" target="_blank" class="btn btn-info"><i class="fa-solid fa-map-location-dot"></i> NAVIGASI</a>${completeBtn}</div>`;
-            } else {
-                buttons = `<a href="${waLink}" target="_blank" class="btn btn-success"><i class="fa-brands fa-whatsapp"></i> HUBUNGI LAGI</a>`;
+            // SINKRONISASI HARGA (FIX UNDEFINED)
+            let hargaTampil = o.total || o.total_biaya || "Rp 0";
+
+            let actionBtn = "";
+            if(o.status === "Menunggu Driver") {
+                actionBtn = `<button class="btn btn-primary" onclick="updateStatus('${key}', 'Pesanan Diproses Driver')">AMBIL PESANAN</button>`;
+            } else if(o.status === "Pesanan Diproses Driver") {
+                actionBtn = `<button class="btn btn-primary" onclick="updateStatus('${key}', 'Dalam Perjalanan')">MULAI PENGANTARAN</button>`;
+            } else if(o.status === "Dalam Perjalanan") {
+                actionBtn = `
+                    <label for="direct-cam-${key}" class="btn btn-success" style="cursor:pointer;">
+                        <i class="fa-solid fa-camera"></i> FOTO BUKTI & SELESAI
+                    </label>
+                    <input type="file" accept="image/*" capture="environment" id="direct-cam-${key}" style="display:none;" onchange="uploadFotoMaster('${key}', this)">
+                `;
             }
 
             card.innerHTML = `
-                <span class="status-pill" style="background:${getStatusCol(order.status)}">${order.status}</span>
-                <div class="info-row" style="margin-top:10px;"><b style="color:var(--text-muted); font-size:11px;">#${order.id.substring(0,18)}...</b></div>
-                <div class="info-row"><i class="fa-solid fa-user"></i> <b>${order.nama}</b></div>
-                <div class="info-row"><i class="fa-solid fa-location-dot"></i> <span>${order.alamat}</span></div>
-                <div class="info-row" style="color:var(--accent)"><i class="fa-solid fa-comment-dots"></i> <i>"${order.catatan || '-'}"</i></div>
-                <div class="item-list">${items}</div>
-                
-                ${order.foto_bukti ? `<div style="margin-bottom:15px; border-radius:15px; overflow:hidden;"><img src="${order.foto_bukti}" style="width:100%; max-height:150px; object-fit:cover;" alt="Bukti Kirim"></div>` : ""}
-
-                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:16px; margin-bottom:15px; color:var(--accent)">
-                    <span>Total Bayar:</span><span>${order.total_biaya}</span>
+                <span class="status-tag" style="background:${getCol(o.status)}">${o.status}</span>
+                <div style="margin-bottom:15px;"><small style="color:var(--text-muted); font-weight:800;">RESI MASTER:</small><br><b style="color:var(--accent); font-size:15px; letter-spacing:0.5px;">${o.id}</b></div>
+                <div class="card-info"><i class="fa-solid fa-circle-user"></i> <b>${o.nama}</b></div>
+                <div class="card-info"><i class="fa-solid fa-map-pin"></i> <span>${o.alamat}</span></div>
+                <div class="item-list-container">${detailHtml || 'Rincian menu tidak terbaca'}</div>
+                <div style="display:flex; justify-content:space-between; font-weight:800; color:var(--accent); margin-bottom:20px; font-size:16px;">
+                    <span>Total Tunai (COD):</span><span>${hargaTampil}</span>
                 </div>
-                ${buttons}
+                ${actionBtn}
             `;
-            list.appendChild(card);
+            document.getElementById('order-list').appendChild(card);
         }
 
-        // --- SISTEM CARI RESI MANUAL DRIVER ---
-        function lacakManual() {
-            const resi = document.getElementById('resi-input').value.toUpperCase().trim();
-            if(!resi) return showToast("Masukkan resi!");
-            database.ref('semua_pesanan/' + resi).once('value', snapshot => { 
-                if(snapshot.exists()) {
-                    const list = document.getElementById('order-list');
-                    list.innerHTML = "";
-                    renderCard(resi, snapshot.val());
-                    showToast("Resi ditemukan!");
-                } else { 
-                    showToast("Resi tidak ditemukan!"); 
-                } 
+        // --- 5. PHOTO PROCESS ---
+        function uploadFotoMaster(key, input) {
+            const file = input.files[0];
+            if(!file) return;
+            showToast("Mengunggah Bukti Master...");
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.getElementById('compress-canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 600;
+                    canvas.height = (img.height / img.width) * 600;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    database.ref('semua_pesanan/' + key).update({
+                        status: "Selesai",
+                        foto_pengiriman: canvas.toDataURL('image/jpeg', 0.6)
+                    }).then(() => { showToast("Pesanan Master Selesai!"); });
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- 6. UTILS ---
+        function updateStatus(key, st) {
+            database.ref('semua_pesanan/' + key).update({ status: st, driver_phone: currentUser.hp, driver_name: currentUser.nama });
+        }
+
+        function initDashboard() {
+            document.getElementById('header-name').innerText = "Halo, " + currentUser.nama;
+            document.getElementById('header-phone').innerText = currentUser.hp;
+        }
+
+        function prosesLogin() {
+            const hp = document.getElementById('login-phone').value;
+            const ps = document.getElementById('login-pass').value;
+            database.ref('driver_accounts/' + hp).once('value', s => {
+                const d = s.val();
+                if(d && d.pass === ps) { localStorage.setItem('driver_session', JSON.stringify(d)); location.reload(); }
+                else showNotif("Login Gagal!");
             });
         }
 
-        function updateStatus(key, status) {
-            const updateData = { status };
-            if (status === "Pesanan Diproses Driver") {
-                updateData.driver_phone = currentUser.hp;
-                updateData.driver_name = currentUser.nama;
-            }
-            database.ref('semua_pesanan/' + key).update(updateData).then(() => showToast("Status Diperbarui!"));
+        function logoutSistem() { localStorage.clear(); location.reload(); }
+        function getCol(s) {
+            if(s === "Menunggu Driver") return 'var(--danger)';
+            if(s === "Selesai") return 'var(--success)';
+            return 'var(--info)';
         }
-
-        function getStatusCol(s) {
-            if(s === "Menunggu Driver") return "#ef4444";
-            if(s === "Pesanan Diproses Driver") return "#3b82f6";
-            if(s === "Dalam Perjalanan") return "#f59e0b";
-            if(s === "Batal") return "#64748b";
-            return "#10b981";
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg; t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2000);
-        }
-
-        // --- SISTEM DETEKSI GESER KE BAWAH UNTUK REFRESH (PULL TO REFRESH) ---
-        let startY = 0;
-        let pulling = false;
-        const ptrIndicator = document.getElementById('ptr-indicator');
-        const ptrIcon = document.getElementById('ptr-icon');
-
-        document.addEventListener('touchstart', (e) => {
-            const activeScrollContent = document.querySelector('.main-view[style*="display: flex"] .scroll-content');
-            if (activeScrollContent && activeScrollContent.scrollTop === 0) {
-                startY = e.touches[0].clientY;
-                pulling = true;
-                activeScrollContent.style.transition = 'none';
-            }
-        }, { passive: true });
-
-        document.addEventListener('touchmove', (e) => {
-            if (!pulling) return;
-            const activeScrollContent = document.querySelector('.main-view[style*="display: flex"] .scroll-content');
-            if (!activeScrollContent) return;
-
-            const currentY = e.touches[0].clientY;
-            const diff = currentY - startY;
-
-            if (diff > 0) {
-                const drag = Math.min(diff * 0.4, 80); 
-                activeScrollContent.style.transform = `translateY(${drag}px)`;
-                ptrIcon.style.transform = `rotate(${drag * 4}deg)`;
-            }
-        }, { passive: true });
-
-        document.addEventListener('touchend', (e) => {
-            if (!pulling) return;
-            pulling = false;
-            
-            const activeScrollContent = document.querySelector('.main-view[style*="display: flex"] .scroll-content');
-            if (!activeScrollContent) return;
-
-            const currentY = e.changedTouches[0].clientY;
-            const diff = currentY - startY;
-
-            activeScrollContent.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.8, 0.3, 1)';
-            activeScrollContent.style.transform = 'translateY(0)';
-            
-            if (diff > 120) {
-                ptrIcon.classList.add('fa-spin'); 
-                showToast("Menyegarkan halaman...");
-                
-                setTimeout(() => {
-                    location.reload(true); 
-                }, 800);
-            } else {
-                setTimeout(() => {
-                    ptrIcon.style.transform = 'rotate(0deg)';
-                }, 300);
-            }
-        });
+        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display='block'; setTimeout(()=>t.style.display='none', 3000); }
     </script>
 </body>
 </html>
